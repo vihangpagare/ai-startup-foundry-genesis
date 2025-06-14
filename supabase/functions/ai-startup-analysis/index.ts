@@ -22,7 +22,7 @@ serve(async (req) => {
   }
 
   try {
-    // Hardcoded API keys
+    // Use the provided hardcoded API keys
     const anthropicApiKey = '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';
     const exaApiKey = '7156ecfb-a3a4-4253-8995-44f41b7f351d';
     
@@ -55,9 +55,11 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             query: searchQuery,
-            num_results: 3,
-            include_text: true,
-            text_length_threshold: 300
+            numResults: 3,
+            contents: {
+              text: true
+            },
+            textLengthThreshold: 300
           }),
         });
         
@@ -81,7 +83,7 @@ serve(async (req) => {
     const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
     console.log('Calling Anthropic API...');
-    console.log('Using API key starting with:', anthropicApiKey.substring(0, 15));
+    console.log('Using hardcoded API key starting with:', anthropicApiKey.substring(0, 15));
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
