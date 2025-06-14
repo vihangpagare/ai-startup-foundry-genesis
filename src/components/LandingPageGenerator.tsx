@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import LandingPagePreview from './LandingPagePreview';
 
 interface LandingPageGeneratorProps {
   idea: string;
@@ -64,6 +64,12 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       
       if (data?.success) {
         setReactCode(data.analysis);
+        
+        // Update localStorage with the new report
+        const storedReports = localStorage.getItem('generatedReports');
+        const reports = storedReports ? JSON.parse(storedReports) : {};
+        reports['landing-page'] = data.analysis;
+        localStorage.setItem('generatedReports', JSON.stringify(reports));
       } else {
         throw new Error(data?.error || 'Failed to generate landing page code');
       }
@@ -168,11 +174,15 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="code" className="w-full">
+          <Tabs defaultValue="preview" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="code">React Code</TabsTrigger>
               <TabsTrigger value="preview">Live Preview</TabsTrigger>
+              <TabsTrigger value="code">React Code</TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="preview" className="mt-6">
+              <LandingPagePreview code={reactCode} />
+            </TabsContent>
             
             <TabsContent value="code" className="mt-6">
               <div className="space-y-4">
@@ -203,10 +213,6 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                   placeholder="Generated React code will appear here..."
                 />
               </div>
-            </TabsContent>
-            
-            <TabsContent value="preview" className="mt-6">
-              <CodePreview code={reactCode} />
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -243,66 +249,6 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-};
-
-const CodePreview = ({ code }: { code: string }) => {
-  const [previewHtml, setPreviewHtml] = useState<string>('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (code) {
-      // This is a simplified preview - in a real implementation you'd want to compile the React code
-      // For now, we'll show a placeholder that indicates the code is ready for use
-      setTimeout(() => {
-        setPreviewHtml(`
-          <div style="padding: 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
-            <h2>🚀 Landing Page Code Generated!</h2>
-            <p>Your production-ready React component is ready to deploy.</p>
-            <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
-              Copy the code from the "React Code" tab and add it to your React project.<br/>
-              The component includes responsive design, conversion optimization, and modern styling.
-            </p>
-            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 6px;">
-              <strong>Features Included:</strong><br/>
-              ✅ Hero Section with CTA<br/>
-              ✅ Feature Showcase<br/>
-              ✅ Pricing Plans<br/>
-              ✅ Testimonials<br/>
-              ✅ FAQ Section<br/>
-              ✅ Footer with Links
-            </div>
-          </div>
-        `);
-        setLoading(false);
-      }, 1000);
-    }
-  }, [code]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] bg-gray-50 rounded-lg">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Preparing preview...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <div className="bg-gray-100 px-4 py-2 border-b flex items-center space-x-2">
-        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        <span className="ml-4 text-sm text-gray-600">Landing Page Preview</span>
-      </div>
-      <div 
-        className="min-h-[400px] p-4"
-        dangerouslySetInnerHTML={{ __html: previewHtml }}
-      />
     </div>
   );
 };

@@ -18,11 +18,7 @@ const Results = () => {
   const [ideaData, setIdeaData] = useState<any>(null);
   const [generatedReports, setGeneratedReports] = useState<Record<string, string>>({});
   const [executiveSummary, setExecutiveSummary] = useState({
-    marketSize: '$15B+',
-    targetMarket: 'Business professionals',
-    revenueProjection: '$100K-250K',
     timeToMarket: '3-6 months',
-    initialInvestment: '$25K-75K',
     viabilityScore: '85%'
   });
   const navigate = useNavigate();
@@ -51,36 +47,16 @@ const Results = () => {
   const generateDynamicExecutiveSummary = (data: any, reports: Record<string, string>) => {
     // Extract insights from AI-generated reports to create dynamic metrics
     const idea = data.idea?.toLowerCase() || '';
-    const businessPlan = reports['business-plan'] || '';
-    const financial = reports['financial'] || '';
     
-    // Analyze the financial report for revenue projections
-    let revenueProjection = '$100K-250K';
-    const revenueMatch = financial.match(/revenue.*?(\$[\d,]+(?:K|M)?)/i);
-    if (revenueMatch) {
-      revenueProjection = revenueMatch[1];
-    }
-
-    // Analyze business plan for market size
-    let marketSize = '$15B+';
-    const marketMatch = businessPlan.match(/market.*?(\$[\d,]+(?:B|M)?)/i);
-    if (marketMatch) {
-      marketSize = marketMatch[1];
-    }
-
-    // Industry-based refinements
+    // Industry-based refinements for time to market
     let timeToMarket = '3-6 months';
-    let initialInvestment = '$25K-75K';
     
     if (idea.includes('restaurant') || idea.includes('food')) {
-      marketSize = marketSize || '$45B+';
       timeToMarket = '2-4 months';
     } else if (idea.includes('health') || idea.includes('medical')) {
       timeToMarket = '6-12 months';
-      initialInvestment = '$100K-300K';
     } else if (idea.includes('fintech') || idea.includes('finance')) {
       timeToMarket = '6-12 months';
-      initialInvestment = '$150K-500K';
     }
 
     // Calculate viability score based on report content quality
@@ -92,18 +68,15 @@ const Results = () => {
     if (data.targetAudience && data.targetAudience !== 'Not specified') viabilityScore += 5;
     
     // Analyze report content quality
+    const businessPlan = reports['business-plan'] || '';
     if (businessPlan.length > 2000) viabilityScore += 3;
-    if (financial.includes('revenue model')) viabilityScore += 2;
+    if (reports['financial']?.includes('revenue model')) viabilityScore += 2;
     if (reports['competitive']?.includes('competitor')) viabilityScore += 3;
     
     viabilityScore = Math.min(viabilityScore, 97);
 
     setExecutiveSummary({
-      marketSize,
-      targetMarket: data.targetAudience || 'Business professionals',
-      revenueProjection,
       timeToMarket,
-      initialInvestment,
       viabilityScore: `${viabilityScore}%`
     });
   };
@@ -249,35 +222,17 @@ const Results = () => {
           </CardHeader>
         </Card>
 
-        {/* Executive Summary Cards */}
-        <div className="grid md:grid-cols-5 gap-4 mb-8">
+        {/* Executive Summary Cards - Reduced to 2 cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8 max-w-2xl mx-auto">
           <Card className="text-center border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-indigo-600 mb-1">{executiveSummary.marketSize}</div>
-              <div className="text-sm text-gray-600">Market Size</div>
-            </CardContent>
-          </Card>
-          <Card className="text-center border-0 bg-white/80 backdrop-blur-sm">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-purple-600 mb-1">{executiveSummary.revenueProjection}</div>
-              <div className="text-sm text-gray-600">Year 1 Revenue</div>
-            </CardContent>
-          </Card>
-          <Card className="text-center border-0 bg-white/80 backdrop-blur-sm">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-indigo-600 mb-1">{executiveSummary.timeToMarket}</div>
+              <div className="text-3xl font-bold text-indigo-600 mb-1">{executiveSummary.timeToMarket}</div>
               <div className="text-sm text-gray-600">Time to Market</div>
             </CardContent>
           </Card>
           <Card className="text-center border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-purple-600 mb-1">{executiveSummary.initialInvestment}</div>
-              <div className="text-sm text-gray-600">Initial Investment</div>
-            </CardContent>
-          </Card>
-          <Card className="text-center border-0 bg-white/80 backdrop-blur-sm">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-600 mb-1">{executiveSummary.viabilityScore}</div>
+              <div className="text-3xl font-bold text-green-600 mb-1">{executiveSummary.viabilityScore}</div>
               <div className="text-sm text-gray-600">Viability Score</div>
             </CardContent>
           </Card>

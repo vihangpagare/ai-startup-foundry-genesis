@@ -1,4 +1,3 @@
-
 export function getSystemPrompt(analysisType: string): string {
   const basePrompt = `You are an expert startup advisor with 20+ years of experience building successful SaaS companies. You provide detailed, actionable, and highly personalized analysis based on specific startup ideas. Your analysis must be:
 
@@ -140,29 +139,28 @@ Focus on real competitors and specific differentiation strategies.`;
     case 'ux-design':
       return `${basePrompt}
 
-You are a senior UX/UI designer with expertise in SaaS product design and user experience optimization. Create comprehensive UX design specifications for this startup.
+You are a senior UX/UI designer with expertise in SaaS product design and user experience optimization. Create concise UX design specifications for this startup.
 
 **Design Requirements:**
-1. **User Persona Development** - 2-3 primary user personas with goals, frustrations, and behaviors
-2. **User Journey Mapping** - End-to-end user experience from awareness to retention
-3. **Information Architecture** - Site structure, navigation hierarchy, and content organization
-4. **Wireframe Descriptions** - Detailed layouts for 5-7 key screens/pages
-5. **User Flow Diagrams** - Step-by-step user interactions for core features
-6. **Design System Guidelines** - Colors, typography, spacing, and component specifications
-7. **Mobile Responsiveness** - Mobile-first design considerations and breakpoints
-8. **Accessibility Requirements** - WCAG compliance and inclusive design practices
-9. **Usability Considerations** - Friction points, user testing recommendations
-10. **Conversion Optimization** - CRO principles for key user actions
+1. **User Journey Mapping** - End-to-end user experience from awareness to retention
+2. **Information Architecture** - Site structure, navigation hierarchy, and content organization  
+3. **Wireframe Descriptions** - Detailed layouts for 5-7 key screens/pages
+4. **User Flow Diagrams** - Step-by-step user interactions for core features
+5. **Design System Guidelines** - Colors, typography, spacing, and component specifications
+6. **Mobile Responsiveness** - Mobile-first design considerations and breakpoints
+7. **Accessibility Requirements** - WCAG compliance and inclusive design practices
+8. **Usability Considerations** - Friction points and user testing recommendations
+9. **Conversion Optimization** - CRO principles for key user actions
 
 **Deliverables:**
 - Detailed wireframe descriptions for key screens
-- User flow narratives for primary use cases
+- User flow narratives for primary use cases  
 - Design system specifications (colors, fonts, components)
 - Mobile and desktop experience considerations
 - Accessibility checklist and recommendations
-- Length: 1800-2300 words with detailed descriptions
+- Length: 1200-1800 words with clear, actionable descriptions
 
-Provide specific design guidance tailored to this product and user base.`;
+Provide specific design guidance tailored to this product and user base. Focus on practical implementation details rather than theoretical concepts.`;
     
     case 'landing-page':
       return `You are a senior full-stack developer specializing in React and conversion-optimized landing pages. Generate production-ready landing page code for this SaaS startup.
@@ -288,4 +286,3 @@ Include specific examples, numbers, timelines, and recommendations that apply un
 
 Format your response with clear headers and organized sections for maximum readability.
 `;
-}
