@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { AnalysisRequest, AnalysisResponse } from './types.ts';
-import { fetchMarketResearch } from './research.ts';
+import { fetchMarketResearch, fetchCompetitorAnalysis, fetchIndustryInsights } from './research.ts';
 import { generateAnalysis } from './ai-service.ts';
 
 const corsHeaders = {
@@ -33,19 +33,36 @@ serve(async (req) => {
     const request: AnalysisRequest = await req.json();
     console.log('Analysis request:', { idea: request.idea?.substring(0, 100), analysisType: request.analysisType });
 
-    // Get market research data using Exa API if available
-    let marketResearch = '';
+    // Get comprehensive market research data using Exa API if available
+    let comprehensiveResearch = '';
     if (exaApiKey && request.analysisType !== 'landing-page') {
-      marketResearch = await fetchMarketResearch(request.idea, exaApiKey);
+      console.log('Fetching comprehensive market research...');
+      
+      // Fetch different types of research based on analysis type
+      const marketResearch = await fetchMarketResearch(request.idea, exaApiKey);
+      
+      if (request.analysisType === 'competitive') {
+        const competitorAnalysis = await fetchCompetitorAnalysis(request.idea, exaApiKey);
+        comprehensiveResearch = `${marketResearch}\n\n${competitorAnalysis}`;
+      } else if (request.analysisType === 'business-plan' || request.analysisType === 'marketing') {
+        const industryInsights = await fetchIndustryInsights(request.idea, exaApiKey);
+        comprehensiveResearch = `${marketResearch}\n\n${industryInsights}`;
+      } else {
+        comprehensiveResearch = marketResearch;
+      }
+      
+      console.log('Total research data length:', comprehensiveResearch.length);
+    } else {
+      console.log('Exa API not available or landing page generation - proceeding without research');
     }
 
-    // Generate AI analysis using Claude
-    const analysis = await generateAnalysis(request, marketResearch, anthropicApiKey);
+    // Generate AI analysis using Claude with enhanced research
+    const analysis = await generateAnalysis(request, comprehensiveResearch, anthropicApiKey);
 
     const response: AnalysisResponse = {
       success: true,
       analysis,
-      marketData: marketResearch ? 'Included' : 'Not available'
+      marketData: comprehensiveResearch ? `Enhanced research included (${comprehensiveResearch.length} chars)` : 'Not available'
     };
 
     return new Response(JSON.stringify(response), {
