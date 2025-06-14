@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Download, FileText, TrendingUp, Code, CheckCircle, Sparkles, Building, Users, Zap, PieChart, Target, Rocket, Star, Globe, Brain, Moon, Sun, BarChart, Presentation, Database, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BusinessPlan from '@/components/BusinessPlan';
@@ -279,7 +281,7 @@ const ResultsContent = () => {
               
               <Button 
                 className="btn-vibrant"
-                onClick={downloadCompletePackage}
+                onClick={handleDownloadPackage}
               >
                 <Download className="mr-2 h-4 w-4" />
                 {isMobile ? 'Download' : 'Complete Package'}
