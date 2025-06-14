@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, DollarSign, Users, Target, Download, ZoomIn, BarChart3, PieChart as PieChartIcon, Activity, Funnel as FunnelIcon } from 'lucide-react';
+import { TrendingUp, DollarSign, Users, Target, Download, ZoomIn, BarChart3, PieChart as PieChartIcon, Activity, Fuel } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface EnhancedDataVisualizationProps {
@@ -169,7 +168,7 @@ const EnhancedDataVisualization: React.FC<EnhancedDataVisualizationProps> = ({ i
                 <span className="hidden sm:inline">Revenue</span>
               </TabsTrigger>
               <TabsTrigger value="funnel" className="flex items-center space-x-1">
-                <FunnelIcon className="h-4 w-4" />
+                <Fuel className="h-4 w-4" />
                 <span className="hidden sm:inline">Funnel</span>
               </TabsTrigger>
               <TabsTrigger value="competitive" className="flex items-center space-x-1">
