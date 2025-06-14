@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Lightbulb, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import React from 'react';
 
 interface IdeaFormProps {
   onExampleClick: (description: string) => void;
@@ -59,7 +60,9 @@ export const IdeaForm = ({ onExampleClick }: IdeaFormProps) => {
 
   // Expose setIdea for parent component to use with examples
   React.useEffect(() => {
-    onExampleClick && (window as any).__setIdea = setIdea;
+    if (onExampleClick) {
+      (window as any).__setIdea = setIdea;
+    }
   }, [onExampleClick]);
 
   return (
