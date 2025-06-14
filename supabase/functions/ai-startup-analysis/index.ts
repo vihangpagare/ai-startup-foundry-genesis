@@ -1,5 +1,4 @@
 
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -17,11 +16,11 @@ interface AnalysisRequest {
   analysisType: 'business-plan' | 'marketing' | 'technical' | 'financial' | 'competitive' | 'ux-design' | 'landing-page';
 }
 
-// Helper function to clean API keys by removing surrounding quotes
+// Helper function to clean API keys by removing surrounding quotes and whitespace
 const cleanApiKey = (key: string | undefined): string | undefined => {
   if (!key) return undefined;
-  // Remove single or double quotes from the beginning and end
-  return key.replace(/^['"]|['"]$/g, '').trim();
+  // Remove single or double quotes from the beginning and end, and trim whitespace
+  return key.replace(/^['"\s]+|['"\s]+$/g, '').trim();
 };
 
 serve(async (req) => {
@@ -33,7 +32,7 @@ serve(async (req) => {
     const rawAnthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     const rawExaApiKey = Deno.env.get('EXA_API_KEY');
     
-    // Clean the API keys by removing quotes
+    // Clean the API keys by removing quotes and whitespace
     const anthropicApiKey = cleanApiKey(rawAnthropicApiKey);
     const exaApiKey = cleanApiKey(rawExaApiKey);
     
@@ -41,7 +40,9 @@ serve(async (req) => {
       anthropic: anthropicApiKey ? 'Present (cleaned)' : 'Missing',
       exa: exaApiKey ? 'Present (cleaned)' : 'Missing',
       rawAnthropicLength: rawAnthropicApiKey?.length,
-      cleanedAnthropicLength: anthropicApiKey?.length
+      cleanedAnthropicLength: anthropicApiKey?.length,
+      rawAnthropicSample: rawAnthropicApiKey?.substring(0, 10),
+      cleanedAnthropicSample: anthropicApiKey?.substring(0, 10)
     });
 
     if (!anthropicApiKey) {
@@ -79,7 +80,8 @@ serve(async (req) => {
           ).join('\n') || '';
           console.log('Market research fetched successfully');
         } else {
-          console.log('Exa API call failed:', exaResponse.status, await exaResponse.text());
+          const errorText = await exaResponse.text();
+          console.log('Exa API call failed:', exaResponse.status, errorText);
         }
       } catch (error) {
         console.log('Exa search failed:', error);
@@ -90,7 +92,9 @@ serve(async (req) => {
     const systemPrompt = getSystemPrompt(analysisType);
     const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
-    console.log('Calling Anthropic API with cleaned key...');
+    console.log('Calling Anthropic API...');
+    console.log('Using API key starting with:', anthropicApiKey.substring(0, 10));
+    
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -308,4 +312,3 @@ Include specific examples, numbers, timelines, and recommendations that apply un
 Format your response with clear headers and organized sections for maximum readability.
 `;
 }
-
