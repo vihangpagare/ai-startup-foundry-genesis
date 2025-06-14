@@ -124,7 +124,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
           <p className="text-gray-600">Generating production-ready React landing page...</p>
-          <p className="text-sm text-gray-500 mt-2">Creating conversion-optimized components and code</p>
+          <p className="text-sm text-gray-500 mt-2">Creating conversion-optimized components with live preview</p>
         </div>
       </div>
     );
@@ -161,7 +161,10 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Badge variant="secondary" className="bg-green-100 text-green-800">
-                Powered by Claude AI
+                Live React Execution
+              </Badge>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                CodeSandbox Powered
               </Badge>
               <Button onClick={regenerateContent} variant="outline" size="sm">
                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -170,13 +173,13 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
             </div>
           </div>
           <CardDescription>
-            Complete React TypeScript component with Tailwind CSS for {ideaData?.companyName || 'your SaaS startup'}
+            Complete React TypeScript component with Tailwind CSS for {ideaData?.companyName || 'your SaaS startup'} - now with live code execution
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="preview" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="preview">Live Preview</TabsTrigger>
+              <TabsTrigger value="preview">Live React Preview</TabsTrigger>
               <TabsTrigger value="code">React Code</TabsTrigger>
             </TabsList>
             
@@ -230,8 +233,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardContent className="pt-6">
             <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-blue-700">Responsive</div>
-            <div className="text-sm text-blue-600">Design</div>
+            <div className="text-2xl font-bold text-blue-700">Live</div>
+            <div className="text-sm text-blue-600">Execution</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
@@ -244,8 +247,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
           <CardContent className="pt-6">
             <Play className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-orange-700">Live</div>
-            <div className="text-sm text-orange-600">Preview</div>
+            <div className="text-2xl font-bold text-orange-700">CodeSandbox</div>
+            <div className="text-sm text-orange-600">Powered</div>
           </CardContent>
         </Card>
       </div>
