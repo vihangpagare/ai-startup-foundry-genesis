@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -305,3 +306,4 @@ Include specific examples, numbers, timelines, and recommendations that apply un
 
 Format your response with clear headers and organized sections for maximum readability.
 `;
+}
