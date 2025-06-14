@@ -19,8 +19,27 @@ const FinancialProjections = ({ idea, ideaData }: FinancialProjectionsProps) => 
   const { toast } = useToast();
 
   useEffect(() => {
-    generateFinancialProjections();
-  }, [idea, ideaData]);
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
+        const reports = JSON.parse(storedReports);
+        if (reports['financial']) {
+          setAnalysis(reports['financial']);
+          setLoading(false);
+          return;
+        }
+      }
+      // If no pre-generated content, generate new
+      generateFinancialProjections();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateFinancialProjections();
+    }
+  };
 
   const generateFinancialProjections = async () => {
     setLoading(true);
@@ -68,8 +87,7 @@ const FinancialProjections = ({ idea, ideaData }: FinancialProjectionsProps) => 
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating AI-powered financial projections...</p>
-          <p className="text-sm text-gray-500 mt-2">Analyzing revenue models and market data</p>
+          <p className="text-gray-600">Loading financial projections...</p>
         </div>
       </div>
     );

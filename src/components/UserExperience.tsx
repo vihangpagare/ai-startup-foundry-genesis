@@ -18,8 +18,27 @@ const UserExperience = ({ idea, ideaData }: UserExperienceProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    generateAnalysis();
-  }, [idea, ideaData]);
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
+        const reports = JSON.parse(storedReports);
+        if (reports['ux-design']) {
+          setAnalysis(reports['ux-design']);
+          setLoading(false);
+          return;
+        }
+      }
+      // If no pre-generated content, generate new
+      generateAnalysis();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateAnalysis();
+    }
+  };
 
   const generateAnalysis = async () => {
     setLoading(true);
@@ -67,8 +86,7 @@ const UserExperience = ({ idea, ideaData }: UserExperienceProps) => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating AI-powered UX design specifications...</p>
-          <p className="text-sm text-gray-500 mt-2">Creating user personas, wireframes, and design systems</p>
+          <p className="text-gray-600">Loading UX design specifications...</p>
         </div>
       </div>
     );

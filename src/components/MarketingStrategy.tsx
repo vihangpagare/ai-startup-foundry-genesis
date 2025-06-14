@@ -19,8 +19,27 @@ const MarketingStrategy = ({ idea, ideaData }: MarketingStrategyProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    generateMarketingStrategy();
-  }, [idea, ideaData]);
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
+        const reports = JSON.parse(storedReports);
+        if (reports['marketing']) {
+          setAnalysis(reports['marketing']);
+          setLoading(false);
+          return;
+        }
+      }
+      // If no pre-generated content, generate new
+      generateMarketingStrategy();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateMarketingStrategy();
+    }
+  };
 
   const generateMarketingStrategy = async () => {
     setLoading(true);
@@ -68,8 +87,7 @@ const MarketingStrategy = ({ idea, ideaData }: MarketingStrategyProps) => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating AI-powered marketing strategy...</p>
-          <p className="text-sm text-gray-500 mt-2">Analyzing market trends and opportunities</p>
+          <p className="text-gray-600">Loading marketing strategy...</p>
         </div>
       </div>
     );

@@ -19,8 +19,27 @@ const TechnicalSpecs = ({ idea, ideaData }: TechnicalSpecsProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    generateTechnicalSpecs();
-  }, [idea, ideaData]);
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
+        const reports = JSON.parse(storedReports);
+        if (reports['technical']) {
+          setAnalysis(reports['technical']);
+          setLoading(false);
+          return;
+        }
+      }
+      // If no pre-generated content, generate new
+      generateTechnicalSpecs();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateTechnicalSpecs();
+    }
+  };
 
   const generateTechnicalSpecs = async () => {
     setLoading(true);
@@ -68,8 +87,7 @@ const TechnicalSpecs = ({ idea, ideaData }: TechnicalSpecsProps) => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating AI-powered technical specifications...</p>
-          <p className="text-sm text-gray-500 mt-2">Analyzing architecture and technology stack</p>
+          <p className="text-gray-600">Loading technical specifications...</p>
         </div>
       </div>
     );
