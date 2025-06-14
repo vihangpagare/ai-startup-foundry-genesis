@@ -1,6 +1,11 @@
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Code, Database, Shield, Smartphone } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, RefreshCw, Code, Database, Shield, Smartphone } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface TechnicalSpecsProps {
   idea: string;
@@ -8,280 +13,151 @@ interface TechnicalSpecsProps {
 }
 
 const TechnicalSpecs = ({ idea, ideaData }: TechnicalSpecsProps) => {
-  const isRestaurantIdea = idea.toLowerCase().includes('restaurant');
-  const isDesignIdea = idea.toLowerCase().includes('design');
-  const isHRIdea = idea.toLowerCase().includes('hr') || idea.toLowerCase().includes('job');
+  const [analysis, setAnalysis] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const getTechnicalData = () => {
-    if (isRestaurantIdea) {
-      return {
-        coreFeatures: [
-          "Photo upload and processing",
-          "AI-powered content generation",
-          "Social media scheduling",
-          "Template customization",
-          "Analytics dashboard"
-        ],
-        integrations: ["Instagram API", "Facebook API", "OpenAI API", "Cloudinary", "Stripe"],
-        databaseSchema: ["users", "restaurants", "photos", "generated_content", "social_posts", "subscriptions"]
-      };
-    } else if (isDesignIdea) {
-      return {
-        coreFeatures: [
-          "Template creation toolkit",
-          "Drag-and-drop customization",
-          "Marketplace browsing",
-          "Revenue tracking",
-          "Customer reviews"
-        ],
-        integrations: ["Stripe API", "PayPal API", "Figma API", "AWS S3", "SendGrid"],
-        databaseSchema: ["users", "templates", "purchases", "reviews", "payments", "customizations"]
-      };
-    } else if (isHRIdea) {
-      return {
-        coreFeatures: [
-          "Job description analyzer",
-          "AI writing assistant",
-          "Performance metrics",
-          "Template library",
-          "Team collaboration"
-        ],
-        integrations: ["OpenAI API", "LinkedIn API", "Indeed API", "Slack API", "Google Analytics"],
-        databaseSchema: ["users", "companies", "job_descriptions", "analyses", "templates", "teams"]
-      };
-    } else {
-      return {
-        coreFeatures: [
-          "Core automation engine",
-          "User dashboard",
-          "Data management",
-          "Reporting tools",
-          "Integration hub"
-        ],
-        integrations: ["Third-party APIs", "Webhook support", "OAuth providers", "Payment processing"],
-        databaseSchema: ["users", "projects", "automations", "data", "integrations", "reports"]
-      };
+  useEffect(() => {
+    generateTechnicalSpecs();
+  }, [idea, ideaData]);
+
+  const generateTechnicalSpecs = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: functionError } = await supabase.functions.invoke('ai-startup-analysis', {
+        body: {
+          idea,
+          companyName: ideaData?.companyName,
+          targetAudience: ideaData?.targetAudience,
+          problemStatement: ideaData?.problemStatement,
+          solution: ideaData?.solution,
+          uniqueValue: ideaData?.uniqueValue,
+          analysisType: 'technical'
+        }
+      });
+
+      if (functionError) throw functionError;
+      
+      if (data?.success) {
+        setAnalysis(data.analysis);
+      } else {
+        throw new Error(data?.error || 'Failed to generate analysis');
+      }
+    } catch (err: any) {
+      console.error('Technical specs generation error:', err);
+      setError(err.message);
+      toast({
+        title: "Analysis Failed",
+        description: "Could not generate technical specifications. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const data = getTechnicalData();
+  const regenerateAnalysis = () => {
+    generateTechnicalSpecs();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
+          <p className="text-gray-600">Generating AI-powered technical specifications...</p>
+          <p className="text-sm text-gray-500 mt-2">Analyzing architecture and technology stack</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-red-200 bg-red-50">
+        <CardHeader>
+          <CardTitle className="text-red-800 flex items-center space-x-2">
+            <Code className="h-5 w-5" />
+            <span>Analysis Error</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-700 mb-4">{error}</p>
+          <Button onClick={regenerateAnalysis} variant="outline" className="border-red-300">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry Analysis
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Architecture Overview */}
-      <Card>
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-cyan-50">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Code className="h-5 w-5" />
-            <span>Technical Architecture</span>
-          </CardTitle>
-          <CardDescription>Modern, scalable full-stack application</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center space-x-2">
+              <Code className="h-6 w-6 text-blue-600" />
+              <span>AI-Generated Technical Specifications</span>
+            </CardTitle>
+            <div className="flex items-center space-x-2">
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Powered by Claude AI
+              </Badge>
+              <Button onClick={regenerateAnalysis} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Regenerate
+              </Button>
+            </div>
+          </div>
+          <CardDescription>
+            Comprehensive technical architecture and development roadmap for {ideaData?.companyName || 'your SaaS startup'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold mb-3">Frontend Stack</h4>
-              <div className="space-y-2">
-                <Badge variant="secondary">React 18</Badge>
-                <Badge variant="secondary">TypeScript</Badge>
-                <Badge variant="secondary">Tailwind CSS</Badge>
-                <Badge variant="secondary">Vite</Badge>
-                <Badge variant="secondary">React Router</Badge>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Backend & Infrastructure</h4>
-              <div className="space-y-2">
-                <Badge variant="secondary">Supabase (Recommended)</Badge>
-                <Badge variant="secondary">PostgreSQL Database</Badge>
-                <Badge variant="secondary">Supabase Auth</Badge>
-                <Badge variant="secondary">Edge Functions</Badge>
-                <Badge variant="secondary">Vercel Hosting</Badge>
-              </div>
+          <div className="prose prose-blue max-w-none">
+            <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+              {analysis}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Core Features */}
-      <Card>
-        <CardHeader>
-          <CardTitle>MVP Feature Specifications</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <h4 className="font-semibold mb-3">Must-Have Features (MVP)</h4>
-            <div className="grid gap-3">
-              {data.coreFeatures.map((feature, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <span className="font-medium text-green-800">{feature}</span>
-                  <Badge variant="outline" className="bg-green-100 text-green-700">MVP</Badge>
-                </div>
-              ))}
-            </div>
-            
-            <h4 className="font-semibold mb-3 mt-6">Future Enhancements</h4>
-            <div className="grid gap-2">
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-blue-800">Advanced AI features</span>
-              </div>
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-blue-800">Mobile app development</span>
-              </div>
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-blue-800">Advanced analytics</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Database Design */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Database className="h-5 w-5" />
-            <span>Database Schema</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            {data.databaseSchema.map((table, index) => (
-              <div key={index} className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <span className="font-mono text-sm">{table}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h5 className="font-semibold text-blue-800 mb-1">Database Features</h5>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>• Row Level Security (RLS) policies</li>
-              <li>• Real-time subscriptions</li>
-              <li>• Automatic API generation</li>
-              <li>• Built-in authentication</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Third-party Integrations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Required Integrations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
-            {data.integrations.map((integration, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <span className="font-medium text-purple-800">{integration}</span>
-                <Badge variant="outline" className="bg-purple-100 text-purple-700">API</Badge>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Security & Performance */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Shield className="h-5 w-5" />
-            <span>Security & Performance</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold mb-3">Security Measures</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• JWT-based authentication</li>
-                <li>• Row-level security policies</li>
-                <li>• API rate limiting</li>
-                <li>• Input validation</li>
-                <li>• HTTPS encryption</li>
-                <li>• GDPR compliance ready</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Performance Optimization</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Code splitting with React.lazy</li>
-                <li>• Image optimization</li>
-                <li>• Database indexing</li>
-                <li>• CDN integration</li>
-                <li>• Caching strategies</li>
-                <li>• Bundle size optimization</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Responsive Design */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Smartphone className="h-5 w-5" />
-            <span>Responsive Design Specifications</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg text-center">
-                <h5 className="font-semibold mb-2">Mobile</h5>
-                <p className="text-sm text-gray-600">320px - 768px</p>
-                <p className="text-xs text-gray-500 mt-1">Touch-optimized UI</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg text-center">
-                <h5 className="font-semibold mb-2">Tablet</h5>
-                <p className="text-sm text-gray-600">768px - 1024px</p>
-                <p className="text-xs text-gray-500 mt-1">Hybrid interface</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg text-center">
-                <h5 className="font-semibold mb-2">Desktop</h5>
-                <p className="text-sm text-gray-600">1024px+</p>
-                <p className="text-xs text-gray-500 mt-1">Full feature set</p>
-              </div>
-            </div>
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <h5 className="font-semibold text-green-800 mb-1">Accessibility Features</h5>
-              <ul className="text-sm text-green-700 space-y-1">
-                <li>• WCAG 2.1 AA compliance</li>
-                <li>• Keyboard navigation support</li>
-                <li>• Screen reader compatibility</li>
-                <li>• High contrast color schemes</li>
-                <li>• Focus management</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Development Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Development Roadmap</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[
-              { phase: "Phase 1: Foundation", duration: "2-3 weeks", tasks: "Authentication, basic UI, database setup" },
-              { phase: "Phase 2: Core Features", duration: "3-4 weeks", tasks: "Main functionality, API integrations" },
-              { phase: "Phase 3: Polish & Testing", duration: "1-2 weeks", tasks: "UI refinement, testing, bug fixes" },
-              { phase: "Phase 4: Launch Prep", duration: "1 week", tasks: "Deployment, monitoring, documentation" }
-            ].map((phase, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-                <div>
-                  <h5 className="font-semibold text-indigo-800">{phase.phase}</h5>
-                  <p className="text-sm text-gray-600">{phase.tasks}</p>
-                </div>
-                <Badge variant="outline" className="bg-indigo-100 text-indigo-700">{phase.duration}</Badge>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Technical Metrics Overview */}
+      <div className="grid md:grid-cols-4 gap-4">
+        <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardContent className="pt-6">
+            <Code className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-700">Modern</div>
+            <div className="text-sm text-blue-600">Architecture</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
+          <CardContent className="pt-6">
+            <Database className="h-8 w-8 text-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-700">Scalable</div>
+            <div className="text-sm text-green-600">Database</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 bg-gradient-to-br from-purple-50 to-violet-50">
+          <CardContent className="pt-6">
+            <Shield className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-700">Secure</div>
+            <div className="text-sm text-purple-600">Infrastructure</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
+          <CardContent className="pt-6">
+            <Smartphone className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-orange-700">Responsive</div>
+            <div className="text-sm text-orange-600">Design</div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,11 @@
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Loader2, RefreshCw, Megaphone, TrendingUp, Users, Target } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface MarketingStrategyProps {
   idea: string;
@@ -7,211 +13,151 @@ interface MarketingStrategyProps {
 }
 
 const MarketingStrategy = ({ idea, ideaData }: MarketingStrategyProps) => {
-  const isRestaurantIdea = idea.toLowerCase().includes('restaurant');
-  const isDesignIdea = idea.toLowerCase().includes('design');
-  const isHRIdea = idea.toLowerCase().includes('hr') || idea.toLowerCase().includes('job');
+  const [analysis, setAnalysis] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const getMarketingData = () => {
-    if (isRestaurantIdea) {
-      return {
-        primaryChannels: ["Instagram Marketing", "Facebook Ads", "Restaurant Industry Forums", "Local Business Networks"],
-        messaging: "Transform your menu photos into viral social content",
-        contentIdeas: [
-          "Before/After social media transformations",
-          "Restaurant owner success stories",
-          "Social media tips for restaurants",
-          "Menu photography best practices"
-        ],
-        launchStrategy: "Beta launch with 10 local restaurants → Social proof → Paid advertising"
-      };
-    } else if (isDesignIdea) {
-      return {
-        primaryChannels: ["Dribbble", "Behance", "Design Twitter", "Designer Communities", "LinkedIn"],
-        messaging: "Monetize your design skills with custom template marketplace",
-        contentIdeas: [
-          "Template creation tutorials",
-          "Designer income case studies",
-          "Web design trend analysis",
-          "Client work vs. template revenue comparison"
-        ],
-        launchStrategy: "Invite top designers → Exclusive early access → Community-driven growth"
-      };
-    } else if (isHRIdea) {
-      return {
-        primaryChannels: ["LinkedIn Ads", "HR Conferences", "HR Podcasts", "Industry Publications"],
-        messaging: "Write job descriptions that attract top talent with AI insights",
-        contentIdeas: [
-          "Job description optimization tips",
-          "Hiring success metrics",
-          "Industry-specific hiring guides",
-          "AI in recruitment best practices"
-        ],
-        launchStrategy: "HR community partnerships → Free tool trial → Enterprise sales"
-      };
-    } else {
-      return {
-        primaryChannels: ["Content Marketing", "LinkedIn", "Industry Forums", "Paid Search"],
-        messaging: "Streamline your business operations with intelligent automation",
-        contentIdeas: [
-          "Industry-specific case studies",
-          "Productivity improvement guides",
-          "Automation best practices",
-          "ROI calculation tools"
-        ],
-        launchStrategy: "Content-driven approach → Lead generation → Free trial conversion"
-      };
+  useEffect(() => {
+    generateMarketingStrategy();
+  }, [idea, ideaData]);
+
+  const generateMarketingStrategy = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: functionError } = await supabase.functions.invoke('ai-startup-analysis', {
+        body: {
+          idea,
+          companyName: ideaData?.companyName,
+          targetAudience: ideaData?.targetAudience,
+          problemStatement: ideaData?.problemStatement,
+          solution: ideaData?.solution,
+          uniqueValue: ideaData?.uniqueValue,
+          analysisType: 'marketing'
+        }
+      });
+
+      if (functionError) throw functionError;
+      
+      if (data?.success) {
+        setAnalysis(data.analysis);
+      } else {
+        throw new Error(data?.error || 'Failed to generate analysis');
+      }
+    } catch (err: any) {
+      console.error('Marketing strategy generation error:', err);
+      setError(err.message);
+      toast({
+        title: "Analysis Failed",
+        description: "Could not generate marketing strategy. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const data = getMarketingData();
+  const regenerateAnalysis = () => {
+    generateMarketingStrategy();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
+          <p className="text-gray-600">Generating AI-powered marketing strategy...</p>
+          <p className="text-sm text-gray-500 mt-2">Analyzing market trends and opportunities</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-red-200 bg-red-50">
+        <CardHeader>
+          <CardTitle className="text-red-800 flex items-center space-x-2">
+            <Megaphone className="h-5 w-5" />
+            <span>Analysis Error</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-700 mb-4">{error}</p>
+          <Button onClick={regenerateAnalysis} variant="outline" className="border-red-300">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry Analysis
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Brand Messaging */}
-      <Card>
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-50 to-pink-50">
         <CardHeader>
-          <CardTitle>Brand Positioning & Messaging</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-semibold mb-2">Core Message</h4>
-            <p className="text-lg text-indigo-600 font-medium">{data.messaging}</p>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Value Propositions</h4>
-            <div className="grid gap-2">
-              <Badge variant="secondary">Save 5+ hours per week</Badge>
-              <Badge variant="secondary">Increase efficiency by 40%</Badge>
-              <Badge variant="secondary">Professional results without expertise</Badge>
-              <Badge variant="secondary">Affordable for small businesses</Badge>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center space-x-2">
+              <Megaphone className="h-6 w-6 text-purple-600" />
+              <span>AI-Generated Marketing Strategy</span>
+            </CardTitle>
+            <div className="flex items-center space-x-2">
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Powered by Claude AI
+              </Badge>
+              <Button onClick={regenerateAnalysis} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Regenerate
+              </Button>
             </div>
           </div>
-          <div>
-            <h4 className="font-semibold mb-2">Brand Voice</h4>
-            <p className="text-gray-600">Professional yet approachable, innovative but reliable, empowering small businesses to compete with larger competitors.</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Go-to-Market Strategy */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Go-to-Market Strategy</CardTitle>
-          <CardDescription>Phase-by-phase launch approach</CardDescription>
+          <CardDescription>
+            Comprehensive marketing and growth strategy for {ideaData?.companyName || 'your SaaS startup'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-semibold mb-2">Launch Strategy</h4>
-              <p className="text-gray-600">{data.launchStrategy}</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Primary Marketing Channels</h4>
-              <div className="grid md:grid-cols-2 gap-3">
-                {data.primaryChannels.map((channel, index) => (
-                  <div key={index} className="flex items-center p-3 bg-blue-50 rounded-lg">
-                    <span className="font-medium text-blue-800">{channel}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="prose prose-purple max-w-none">
+            <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+              {analysis}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Content Strategy */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Content Marketing Strategy</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <h4 className="font-semibold mb-3">Content Pillars</h4>
-            <div className="grid gap-3">
-              {data.contentIdeas.map((content, index) => (
-                <div key={index} className="p-3 border border-gray-200 rounded-lg">
-                  <span className="text-gray-700">{content}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4">
-              <h4 className="font-semibold mb-2">Content Calendar</h4>
-              <div className="text-sm text-gray-600 space-y-1">
-                <div>• 2-3 blog posts per week</div>
-                <div>• Daily social media posts</div>
-                <div>• Weekly video tutorials</div>
-                <div>• Monthly case studies</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Customer Acquisition Funnel */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Customer Acquisition Funnel</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              { stage: "Awareness", tactics: "SEO content, social media, PR", metric: "1000 monthly visitors" },
-              { stage: "Interest", tactics: "Free resources, webinars, email capture", metric: "15% email signup rate" },
-              { stage: "Consideration", tactics: "Free trial, demo videos, case studies", metric: "25% trial signup" },
-              { stage: "Purchase", tactics: "Onboarding, customer success, pricing incentives", metric: "20% trial-to-paid conversion" },
-              { stage: "Retention", tactics: "Customer success, feature updates, community", metric: "85% monthly retention" }
-            ].map((stage, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg">
-                <div>
-                  <h5 className="font-semibold text-indigo-800">{stage.stage}</h5>
-                  <p className="text-sm text-gray-600">{stage.tactics}</p>
-                </div>
-                <Badge variant="outline">{stage.metric}</Badge>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Pricing Strategy */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Pricing & Monetization</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="p-4 border border-gray-200 rounded-lg">
-              <h4 className="font-semibold mb-2">Starter</h4>
-              <div className="text-2xl font-bold text-indigo-600 mb-2">Free</div>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• 5 projects/month</li>
-                <li>• Basic features</li>
-                <li>• Email support</li>
-              </ul>
-            </div>
-            <div className="p-4 border-2 border-indigo-200 rounded-lg bg-indigo-50">
-              <h4 className="font-semibold mb-2">Professional</h4>
-              <div className="text-2xl font-bold text-indigo-600 mb-2">$29/mo</div>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Unlimited projects</li>
-                <li>• Advanced features</li>
-                <li>• Priority support</li>
-                <li>• Analytics dashboard</li>
-              </ul>
-            </div>
-            <div className="p-4 border border-gray-200 rounded-lg">
-              <h4 className="font-semibold mb-2">Enterprise</h4>
-              <div className="text-2xl font-bold text-indigo-600 mb-2">$99/mo</div>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Everything in Pro</li>
-                <li>• Team collaboration</li>
-                <li>• Custom integrations</li>
-                <li>• Dedicated support</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Marketing Metrics Overview */}
+      <div className="grid md:grid-cols-4 gap-4">
+        <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardContent className="pt-6">
+            <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-700">Targeted</div>
+            <div className="text-sm text-blue-600">Audience Analysis</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
+          <CardContent className="pt-6">
+            <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-700">Growth</div>
+            <div className="text-sm text-green-600">Optimization</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 bg-gradient-to-br from-purple-50 to-violet-50">
+          <CardContent className="pt-6">
+            <Target className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-700">Channel</div>
+            <div className="text-sm text-purple-600">Strategy</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
+          <CardContent className="pt-6">
+            <Megaphone className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-orange-700">Brand</div>
+            <div className="text-sm text-orange-600">Positioning</div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
