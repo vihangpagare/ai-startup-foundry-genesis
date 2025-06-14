@@ -1,292 +1,171 @@
 
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { TrendingUp, DollarSign, PieChart, BarChart3, Calculator } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { TrendingUp, DollarSign, Users, Target, BarChart3, PieChart } from 'lucide-react';
 
 interface FinancialProjectionsProps {
   idea: string;
-  ideaData?: any;
+  ideaData: any;
 }
 
-const FinancialProjections = ({ idea, ideaData }: FinancialProjectionsProps) => {
-  const isRestaurantIdea = idea.toLowerCase().includes('restaurant');
-  const isDesignIdea = idea.toLowerCase().includes('design');
-  const isHRIdea = idea.toLowerCase().includes('hr') || idea.toLowerCase().includes('job');
-
-  const getFinancialData = () => {
-    if (isRestaurantIdea) {
-      return {
-        revenueModel: "Freemium SaaS with tiered subscriptions",
-        pricing: {
-          free: "$0/month - 5 posts, basic templates",
-          basic: "$29/month - 50 posts, premium templates, basic analytics",
-          pro: "$79/month - unlimited posts, AI optimization, advanced analytics",
-          enterprise: "$199/month - multi-location, team management, white-label"
-        },
-        marketSize: "$15.2B restaurant tech market, $4.2B social media management",
-        tam: "$15.2B",
-        sam: "$4.2B", 
-        som: "$850M"
-      };
-    } else if (isDesignIdea) {
-      return {
-        revenueModel: "Marketplace commission + subscription hybrid",
-        pricing: {
-          basic: "15% commission on sales",
-          pro: "$49/month + 10% commission - advanced tools",
-          enterprise: "$149/month + 5% commission - white-label, priority"
-        },
-        marketSize: "$8.4B design tools market, $2.1B template marketplace",
-        tam: "$8.4B",
-        sam: "$2.1B",
-        som: "$420M"
-      };
-    } else {
-      return {
-        revenueModel: "Tiered SaaS subscriptions with usage-based pricing",
-        pricing: {
-          starter: "$19/month - 10 projects, basic features",
-          professional: "$59/month - unlimited projects, advanced features",
-          enterprise: "$149/month - team features, priority support, custom integrations"
-        },
-        marketSize: "$195B global SaaS market",
-        tam: "$195B",
-        sam: "$25B",
-        som: "$2.5B"
-      };
-    }
+const FinancialProjections: React.FC<FinancialProjectionsProps> = ({ idea, ideaData }) => {
+  // Generate financial data based on the idea
+  const generateFinancialData = () => {
+    const isB2B = idea.toLowerCase().includes('business') || idea.toLowerCase().includes('enterprise') || idea.toLowerCase().includes('company');
+    const isHighValue = idea.toLowerCase().includes('analytics') || idea.toLowerCase().includes('ai') || idea.toLowerCase().includes('automation');
+    
+    const basePrice = isB2B ? (isHighValue ? 99 : 49) : (isHighValue ? 29 : 19);
+    const growthRate = isB2B ? 15 : 20;
+    
+    return {
+      monthlyPrice: basePrice,
+      year1Revenue: basePrice * 12 * 250,
+      year2Revenue: basePrice * 12 * 750,
+      year3Revenue: basePrice * 12 * 1500,
+      growthRate,
+      customerAcquisitionCost: Math.round(basePrice * 0.3),
+      lifetimeValue: Math.round(basePrice * 24),
+      churnRate: isB2B ? 5 : 8,
+      grossMargin: isB2B ? 85 : 80
+    };
   };
 
-  const data = getFinancialData();
+  const financialData = generateFinancialData();
 
-  // 3-Year Financial Projections
-  const projections = {
-    year1: {
-      users: { free: 500, paid: 150 },
-      revenue: 180000,
-      costs: 125000,
-      profit: 55000,
-      growth: "0%"
-    },
-    year2: {
-      users: { free: 2500, paid: 750 },
-      revenue: 850000,
-      costs: 520000,
-      profit: 330000,
-      growth: "372%"
-    },
-    year3: {
-      users: { free: 8000, paid: 2200 },
-      revenue: 2100000,
-      costs: 1250000,
-      profit: 850000,
-      growth: "147%"
-    }
-  };
-
-  const costBreakdown = {
-    development: {
-      year1: 45000,
-      year2: 180000,
-      year3: 350000,
-      description: "Engineering, product development, technical infrastructure"
-    },
-    marketing: {
-      year1: 35000,
-      year2: 150000,
-      year3: 400000,
-      description: "Customer acquisition, content marketing, paid advertising"
-    },
-    operations: {
-      year1: 25000,
-      year2: 110000,
-      year3: 250000,
-      description: "Customer success, support, administrative costs"
-    },
-    infrastructure: {
-      year1: 20000,
-      year2: 80000,
-      year3: 250000,
-      description: "Hosting, APIs, third-party services, security"
-    }
-  };
-
-  const fundingScenarios = [
-    {
-      type: "Bootstrapped",
-      amount: "$0",
-      equity: "100% founder ownership",
-      timeline: "Slower growth, profitability focus",
-      pros: ["Full control", "No dilution", "Sustainable growth"],
-      cons: ["Limited resources", "Slower scaling", "Higher risk"]
-    },
-    {
-      type: "Angel/Pre-Seed",
-      amount: "$100K-500K",
-      equity: "10-20% dilution",
-      timeline: "12-18 months runway",
-      pros: ["Faster growth", "Advisor network", "Validation"],
-      cons: ["Equity dilution", "Investor pressure", "Due diligence time"]
-    },
-    {
-      type: "Seed Round",
-      amount: "$500K-2M",
-      equity: "15-25% dilution", 
-      timeline: "18-24 months runway",
-      pros: ["Significant resources", "Professional investors", "Market expansion"],
-      cons: ["Board obligations", "Higher expectations", "Complex terms"]
-    }
+  const revenueProjections = [
+    { year: 'Year 1', revenue: financialData.year1Revenue, customers: 250, arr: financialData.year1Revenue },
+    { year: 'Year 2', revenue: financialData.year2Revenue, customers: 750, arr: financialData.year2Revenue },
+    { year: 'Year 3', revenue: financialData.year3Revenue, customers: 1500, arr: financialData.year3Revenue }
   ];
 
-  const keyMetrics = {
-    cac: isRestaurantIdea ? 45 : isDesignIdea ? 35 : 65, // Customer Acquisition Cost
-    ltv: isRestaurantIdea ? 1800 : isDesignIdea ? 950 : 2400, // Lifetime Value
-    churn: isRestaurantIdea ? "5%" : isDesignIdea ? "8%" : "6%", // Monthly churn
-    payback: isRestaurantIdea ? "2.5 months" : isDesignIdea ? "3.2 months" : "2.8 months"
-  };
+  const costBreakdown = [
+    { category: 'Development & Engineering', percentage: 35, amount: Math.round(financialData.year1Revenue * 0.35) },
+    { category: 'Sales & Marketing', percentage: 25, amount: Math.round(financialData.year1Revenue * 0.25) },
+    { category: 'Infrastructure & Hosting', percentage: 15, amount: Math.round(financialData.year1Revenue * 0.15) },
+    { category: 'Operations & Support', percentage: 15, amount: Math.round(financialData.year1Revenue * 0.15) },
+    { category: 'Legal & Compliance', percentage: 10, amount: Math.round(financialData.year1Revenue * 0.10) }
+  ];
+
+  const keyMetrics = [
+    { metric: 'Monthly Recurring Revenue (MRR)', value: `$${Math.round(financialData.year1Revenue / 12).toLocaleString()}`, growth: '+25% MoM' },
+    { metric: 'Customer Acquisition Cost (CAC)', value: `$${financialData.customerAcquisitionCost}`, growth: '-15% YoY' },
+    { metric: 'Customer Lifetime Value (LTV)', value: `$${financialData.lifetimeValue}`, growth: '+30% YoY' },
+    { metric: 'LTV:CAC Ratio', value: `${Math.round(financialData.lifetimeValue / financialData.customerAcquisitionCost)}:1`, growth: 'Healthy' },
+    { metric: 'Monthly Churn Rate', value: `${financialData.churnRate}%`, growth: '-2% MoM' },
+    { metric: 'Gross Margin', value: `${financialData.grossMargin}%`, growth: 'Stable' }
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Revenue Model */}
+    <div className="space-y-8">
+      {/* Executive Financial Summary */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <DollarSign className="h-5 w-5" />
-            <span>Revenue Model & Pricing Strategy</span>
+            <TrendingUp className="h-6 w-6 text-green-600" />
+            <span>Financial Executive Summary</span>
           </CardTitle>
           <CardDescription>
-            Comprehensive pricing structure and monetization approach
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-semibold mb-2">Business Model</h4>
-            <p className="text-gray-600 bg-blue-50 p-3 rounded-lg">{data.revenueModel}</p>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold mb-3">Pricing Tiers</h4>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {Object.entries(data.pricing).map(([tier, details], index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
-                  <h5 className="font-semibold capitalize text-lg mb-2">{tier}</h5>
-                  <p className="text-sm text-gray-600">{details}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-3">Market Opportunity</h4>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600 mb-1">{data.tam}</div>
-                <div className="text-sm text-gray-600">TAM (Total Addressable Market)</div>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600 mb-1">{data.sam}</div>
-                <div className="text-sm text-gray-600">SAM (Serviceable Addressable Market)</div>
-              </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600 mb-1">{data.som}</div>
-                <div className="text-sm text-gray-600">SOM (Serviceable Obtainable Market)</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 3-Year Projections */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <TrendingUp className="h-5 w-5" />
-            <span>3-Year Financial Projections</span>
-          </CardTitle>
-          <CardDescription>
-            Detailed revenue, cost, and profitability forecasts
+            3-Year revenue projections and key financial metrics for your SaaS startup
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold">Metric</th>
-                  <th className="text-center py-3 px-4 font-semibold">Year 1</th>
-                  <th className="text-center py-3 px-4 font-semibold">Year 2</th>
-                  <th className="text-center py-3 px-4 font-semibold">Year 3</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-gray-100">
-                  <td className="py-3 px-4 font-medium">Free Users</td>
-                  <td className="text-center py-3 px-4">{projections.year1.users.free.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4">{projections.year2.users.free.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4">{projections.year3.users.free.toLocaleString()}</td>
-                </tr>
-                <tr className="border-b border-gray-100">
-                  <td className="py-3 px-4 font-medium">Paid Users</td>
-                  <td className="text-center py-3 px-4">{projections.year1.users.paid.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4">{projections.year2.users.paid.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4">{projections.year3.users.paid.toLocaleString()}</td>
-                </tr>
-                <tr className="border-b border-gray-100 bg-green-50">
-                  <td className="py-3 px-4 font-medium">Revenue</td>
-                  <td className="text-center py-3 px-4 font-semibold text-green-600">${projections.year1.revenue.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4 font-semibold text-green-600">${projections.year2.revenue.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4 font-semibold text-green-600">${projections.year3.revenue.toLocaleString()}</td>
-                </tr>
-                <tr className="border-b border-gray-100 bg-red-50">
-                  <td className="py-3 px-4 font-medium">Total Costs</td>
-                  <td className="text-center py-3 px-4 font-semibold text-red-600">${projections.year1.costs.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4 font-semibold text-red-600">${projections.year2.costs.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4 font-semibold text-red-600">${projections.year3.costs.toLocaleString()}</td>
-                </tr>
-                <tr className="border-b border-gray-100 bg-blue-50">
-                  <td className="py-3 px-4 font-medium">Net Profit</td>
-                  <td className="text-center py-3 px-4 font-semibold text-blue-600">${projections.year1.profit.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4 font-semibold text-blue-600">${projections.year2.profit.toLocaleString()}</td>
-                  <td className="text-center py-3 px-4 font-semibold text-blue-600">${projections.year3.profit.toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-medium">YoY Growth</td>
-                  <td className="text-center py-3 px-4">{projections.year1.growth}</td>
-                  <td className="text-center py-3 px-4 text-green-600 font-semibold">{projections.year2.growth}</td>
-                  <td className="text-center py-3 px-4 text-green-600 font-semibold">{projections.year3.growth}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-700">${financialData.year3Revenue.toLocaleString()}</div>
+              <div className="text-sm text-green-600">Year 3 ARR Target</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-700">{financialData.growthRate}%</div>
+              <div className="text-sm text-blue-600">Monthly Growth Rate</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-700">{Math.round(financialData.lifetimeValue / financialData.customerAcquisitionCost)}:1</div>
+              <div className="text-sm text-purple-600">LTV:CAC Ratio</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-700">{financialData.grossMargin}%</div>
+              <div className="text-sm text-orange-600">Gross Margin</div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Cost Breakdown */}
+      {/* Revenue Projections */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <PieChart className="h-5 w-5" />
-            <span>Detailed Cost Analysis</span>
+            <BarChart3 className="h-5 w-5 text-indigo-600" />
+            <span>3-Year Revenue Projections</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {revenueProjections.map((projection, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">{projection.year}</span>
+                  <span className="text-lg font-bold text-green-600">
+                    ${projection.revenue.toLocaleString()} ARR
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                  <div>Revenue: ${projection.revenue.toLocaleString()}</div>
+                  <div>Customers: {projection.customers.toLocaleString()}</div>
+                  <div>ARPU: ${Math.round(projection.revenue / projection.customers)}</div>
+                </div>
+                <Progress value={(index + 1) * 33} className="h-2" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Cost Structure */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <PieChart className="h-5 w-5 text-purple-600" />
+            <span>Cost Structure & Resource Allocation</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {Object.entries(costBreakdown).map(([category, data], index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold capitalize mb-2">{category}</h4>
-                <p className="text-sm text-gray-600 mb-3">{data.description}</p>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-800">${data.year1.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">Year 1</div>
+            {costBreakdown.map((cost, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{cost.category}</span>
+                  <span className="font-semibold">${cost.amount.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Progress value={cost.percentage} className="flex-1 h-2" />
+                  <span className="text-sm text-gray-600 w-12">{cost.percentage}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Key SaaS Metrics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Target className="h-5 w-5 text-orange-600" />
+            <span>Key SaaS Metrics & KPIs</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-6">
+            {keyMetrics.map((metric, index) => (
+              <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{metric.metric}</h4>
+                    <div className="text-2xl font-bold text-indigo-600 mt-1">{metric.value}</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-800">${data.year2.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">Year 2</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-800">${data.year3.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">Year 3</div>
+                  <div className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded">
+                    {metric.growth}
                   </div>
                 </div>
               </div>
@@ -295,100 +174,105 @@ const FinancialProjections = ({ idea, ideaData }: FinancialProjectionsProps) => 
         </CardContent>
       </Card>
 
-      {/* Key Metrics */}
+      {/* Funding & Investment */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <BarChart3 className="h-5 w-5" />
-            <span>Key Business Metrics</span>
+            <DollarSign className="h-5 w-5 text-green-600" />
+            <span>Funding Requirements & Investment Strategy</span>
           </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="text-2xl font-bold text-green-600 mb-1">${keyMetrics.cac}</div>
-              <div className="text-sm text-gray-600">Customer Acquisition Cost</div>
-            </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="text-2xl font-bold text-blue-600 mb-1">${keyMetrics.ltv}</div>
-              <div className="text-sm text-gray-600">Customer Lifetime Value</div>
-            </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <div className="text-2xl font-bold text-purple-600 mb-1">{keyMetrics.churn}</div>
-              <div className="text-sm text-gray-600">Monthly Churn Rate</div>
-            </div>
-            <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-              <div className="text-2xl font-bold text-yellow-600 mb-1">{keyMetrics.payback}</div>
-              <div className="text-sm text-gray-600">CAC Payback Period</div>
-            </div>
-          </div>
-          
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">Unit Economics Analysis</h4>
-            <div className="text-sm text-blue-700 space-y-1">
-              <p>• LTV:CAC Ratio: <strong>{Math.round(keyMetrics.ltv / keyMetrics.cac)}:1</strong> (Target: >3:1)</p>
-              <p>• Monthly Revenue Per User: <strong>${Math.round(keyMetrics.ltv / 24)}</strong></p>
-              <p>• Break-even timeline: <strong>{keyMetrics.payback}</strong></p>
-              <p>• Customer retention indicates strong product-market fit</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Funding Scenarios */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calculator className="h-5 w-5" />
-            <span>Funding Strategy & Scenarios</span>
-          </CardTitle>
-          <CardDescription>
-            Different funding approaches and their implications
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {fundingScenarios.map((scenario, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold">{scenario.type}</h4>
-                  <div className="text-right">
-                    <div className="text-xl font-bold text-indigo-600">{scenario.amount}</div>
-                    <div className="text-sm text-gray-600">{scenario.equity}</div>
-                  </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-xl font-bold text-gray-700">$50K - $100K</div>
+                <div className="text-sm text-gray-600">Pre-Seed / Bootstrap</div>
+                <div className="text-xs text-gray-500 mt-1">MVP Development</div>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-xl font-bold text-blue-700">$250K - $500K</div>
+                <div className="text-sm text-blue-600">Seed Round</div>
+                <div className="text-xs text-blue-500 mt-1">Market Validation</div>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <div className="text-xl font-bold text-purple-700">$1M - $3M</div>
+                <div className="text-sm text-purple-600">Series A</div>
+                <div className="text-xs text-purple-500 mt-1">Scale & Growth</div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg">
+              <h4 className="font-semibold text-gray-900 mb-3">Investment Use of Funds</h4>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium">Product Development (40%)</span>
+                  <div className="text-gray-600">Engineering team, feature development, infrastructure</div>
                 </div>
-                
-                <p className="text-gray-600 mb-4">{scenario.timeline}</p>
-                
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <h5 className="font-semibold text-green-700 mb-2">Advantages</h5>
-                    <ul className="text-sm space-y-1">
-                      {scenario.pros.map((pro, idx) => (
-                        <li key={idx} className="text-green-600">• {pro}</li>
-                      ))}
-                    </ul>
+                <div>
+                  <span className="font-medium">Sales & Marketing (35%)</span>
+                  <div className="text-gray-600">Customer acquisition, brand building, content marketing</div>
+                </div>
+                <div>
+                  <span className="font-medium">Operations (15%)</span>
+                  <div className="text-gray-600">Team expansion, legal, accounting, workspace</div>
+                </div>
+                <div>
+                  <span className="font-medium">Reserve Fund (10%)</span>
+                  <div className="text-gray-600">Runway extension, unexpected opportunities</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Break-even Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Users className="h-5 w-5 text-blue-600" />
+            <span>Break-even Analysis & Milestones</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h4 className="font-semibold">Revenue Milestones</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>$10K MRR (Product-Market Fit)</span>
+                    <span className="font-medium">Month 8-12</span>
                   </div>
-                  <div>
-                    <h5 className="font-semibold text-red-700 mb-2">Considerations</h5>
-                    <ul className="text-sm space-y-1">
-                      {scenario.cons.map((con, idx) => (
-                        <li key={idx} className="text-red-600">• {con}</li>
-                      ))}
-                    </ul>
+                  <div className="flex justify-between">
+                    <span>$25K MRR (Scale Ready)</span>
+                    <span className="font-medium">Month 15-18</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>$100K MRR (Series A Ready)</span>
+                    <span className="font-medium">Month 24-30</span>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h4 className="font-semibold text-green-800 mb-2">Recommended Approach</h4>
-            <p className="text-sm text-green-700">
-              Based on the business model and market opportunity, we recommend starting bootstrapped 
-              for the first 6-12 months to validate product-market fit, then pursuing a $200K-500K 
-              angel round to accelerate customer acquisition and product development.
-            </p>
+              <div className="space-y-3">
+                <h4 className="font-semibold">Break-even Scenarios</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Conservative (150 customers)</span>
+                    <span className="font-medium">Month 12</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Realistic (200 customers)</span>
+                    <span className="font-medium">Month 10</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Optimistic (250 customers)</span>
+                    <span className="font-medium">Month 8</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
