@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -29,24 +28,19 @@ serve(async (req) => {
   }
 
   try {
-    const rawAnthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
-    const rawExaApiKey = Deno.env.get('EXA_API_KEY');
-    
-    // Clean the API keys by removing quotes and whitespace
-    const anthropicApiKey = cleanApiKey(rawAnthropicApiKey);
-    const exaApiKey = cleanApiKey(rawExaApiKey);
+    // Hardcoded API keys
+    const anthropicApiKey = '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';
+    const exaApiKey = '7156ecfb-a3a4-4253-8995-44f41b7f351d';
     
     console.log('API Keys check:', {
-      anthropic: anthropicApiKey ? 'Present (cleaned)' : 'Missing',
-      exa: exaApiKey ? 'Present (cleaned)' : 'Missing',
-      rawAnthropicLength: rawAnthropicApiKey?.length,
-      cleanedAnthropicLength: anthropicApiKey?.length,
-      rawAnthropicSample: rawAnthropicApiKey?.substring(0, 10),
-      cleanedAnthropicSample: anthropicApiKey?.substring(0, 10)
+      anthropic: anthropicApiKey ? 'Present (hardcoded)' : 'Missing',
+      exa: exaApiKey ? 'Present (hardcoded)' : 'Missing',
+      anthropicKeyLength: anthropicApiKey.length,
+      exaKeyLength: exaApiKey.length
     });
 
     if (!anthropicApiKey) {
-      throw new Error('ANTHROPIC_API_KEY not configured in Supabase secrets');
+      throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
     const { idea, companyName, targetAudience, problemStatement, solution, uniqueValue, analysisType }: AnalysisRequest = await req.json();
@@ -93,7 +87,7 @@ serve(async (req) => {
     const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
     console.log('Calling Anthropic API...');
-    console.log('Using API key starting with:', anthropicApiKey.substring(0, 10));
+    console.log('Using hardcoded API key starting with:', anthropicApiKey.substring(0, 15));
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -311,4 +305,3 @@ Include specific examples, numbers, timelines, and recommendations that apply un
 
 Format your response with clear headers and organized sections for maximum readability.
 `;
-}
