@@ -1,4 +1,3 @@
-
 interface IdeaData {
   idea: string;
   companyName?: string;
@@ -40,9 +39,6 @@ export const exportToPDF = async (ideaData: IdeaData): Promise<boolean> => {
 export const downloadCompletePackage = async (ideaData: IdeaData): Promise<boolean> => {
   try {
     // Create a comprehensive package with all deliverables
-    const packageContent = generateCompletePackage(ideaData);
-    
-    // Create a ZIP-like structure as multiple files
     const files = [
       {
         name: `${ideaData.companyName || 'Startup'}_Executive_Summary.txt`,
