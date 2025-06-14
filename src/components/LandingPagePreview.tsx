@@ -1,7 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import { Loader2, ExternalLink, AlertCircle } from 'lucide-react';
+import { Loader2, ExternalLink, AlertCircle, RefreshCw, CheckCircle, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CodeProcessor } from '@/services/codeProcessor';
+import { SandboxManager } from '@/services/sandboxManager';
 
 interface LandingPagePreviewProps {
   code: string;
@@ -9,134 +12,84 @@ interface LandingPagePreviewProps {
 
 const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
   const [sandboxUrl, setSandboxUrl] = useState<string>('');
+  const [sandboxId, setSandboxId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [processingResults, setProcessingResults] = useState<{
+    errors: string[];
+    warnings: string[];
+  }>({ errors: [], warnings: [] });
 
   useEffect(() => {
     if (code) {
-      createCodeSandbox();
+      processAndCreateSandbox();
     }
   }, [code]);
 
-  const createCodeSandbox = async () => {
+  const processAndCreateSandbox = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Create sandbox files structure
-      const files = {
-        'package.json': {
-          content: JSON.stringify({
-            name: 'landing-page-preview',
-            version: '1.0.0',
-            main: 'index.js',
-            dependencies: {
-              'react': '^18.2.0',
-              'react-dom': '^18.2.0',
-              'react-scripts': '5.0.1',
-              '@types/react': '^18.2.0',
-              '@types/react-dom': '^18.2.0',
-              'typescript': '^4.9.0',
-              'tailwindcss': '^3.3.0',
-              'lucide-react': '^0.263.1'
-            },
-            scripts: {
-              start: 'react-scripts start',
-              build: 'react-scripts build'
-            },
-            browserslist: {
-              production: ['>0.2%', 'not dead', 'not op_mini all'],
-              development: ['last 1 chrome version', 'last 1 firefox version', 'last 1 safari version']
-            }
-          }, null, 2)
-        },
-        'public/index.html': {
-          content: `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Landing Page Preview</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>`
-        },
-        'src/index.tsx': {
-          content: `import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(<App />);`
-        },
-        'src/App.tsx': {
-          content: code
-        },
-        'tailwind.config.js': {
-          content: `module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}`
-        },
-        'src/index.css': {
-          content: `@tailwind base;
-@tailwind components;
-@tailwind utilities;`
-        }
-      };
-
-      // Create sandbox using CodeSandbox API
-      const response = await fetch('https://codesandbox.io/api/v1/sandboxes/define?json=1', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer csb_v1_SwU1mDZgahlkKtGy2sjlPJASCHEE9VX1OW_GlPBYkE4`
-        },
-        body: JSON.stringify({
-          files,
-          template: 'create-react-app-typescript'
-        })
+      // Step 1: Process the code
+      const processingResult = CodeProcessor.processReactCode(code);
+      setProcessingResults({
+        errors: processingResult.errors,
+        warnings: processingResult.warnings
       });
 
-      if (!response.ok) {
-        throw new Error(`CodeSandbox API error: ${response.status}`);
+      // Step 2: If there are critical errors, don't proceed
+      if (processingResult.errors.length > 0) {
+        setError(`Code processing errors: ${processingResult.errors.join(', ')}`);
+        setLoading(false);
+        return;
       }
 
-      const result = await response.json();
-      const embedUrl = `https://codesandbox.io/embed/${result.sandbox_id}?fontsize=14&hidenavigation=1&theme=dark&view=preview`;
-      setSandboxUrl(embedUrl);
+      // Step 3: Create or get cached sandbox
+      const sandboxResult = await SandboxManager.createOrUpdateSandbox(processingResult.processedCode);
+
+      if (sandboxResult.success) {
+        setSandboxUrl(sandboxResult.embedUrl);
+        setSandboxId(sandboxResult.sandboxId);
+      } else {
+        throw new Error(sandboxResult.error || 'Failed to create sandbox');
+      }
+      
       setLoading(false);
     } catch (err: any) {
-      console.error('CodeSandbox creation error:', err);
+      console.error('Preview creation error:', err);
       setError(err.message || 'Failed to create live preview');
       setLoading(false);
     }
   };
 
   const openInNewTab = () => {
-    if (sandboxUrl) {
-      const sandboxId = sandboxUrl.match(/\/embed\/([^?]+)/)?.[1];
-      if (sandboxId) {
-        window.open(`https://codesandbox.io/s/${sandboxId}`, '_blank');
-      }
+    if (sandboxId) {
+      window.open(`https://codesandbox.io/s/${sandboxId}`, '_blank');
+    }
+  };
+
+  const openInEditor = () => {
+    if (sandboxId) {
+      window.open(`https://codesandbox.io/s/${sandboxId}?file=/src/App.tsx`, '_blank');
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[600px] bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-center min-h-[600px] bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Creating live React preview...</p>
-          <p className="text-sm text-gray-500 mt-2">Setting up CodeSandbox environment</p>
+          <p className="text-gray-700 font-medium">Processing React Code...</p>
+          <p className="text-sm text-gray-500 mt-2">Validating • Optimizing • Creating Live Environment</p>
+          <div className="mt-4 flex justify-center space-x-2">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              Code Processing
+            </Badge>
+            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+              Sandbox Creation
+            </Badge>
+          </div>
         </div>
       </div>
     );
@@ -144,47 +97,117 @@ root.render(<App />);`
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[600px] bg-red-50 rounded-lg border border-red-200">
+      <div className="min-h-[600px] bg-red-50 rounded-lg border border-red-200 p-6">
         <div className="text-center">
-          <AlertCircle className="h-8 w-8 mx-auto mb-4 text-red-600" />
-          <p className="text-red-700 mb-4">Failed to create live preview</p>
-          <p className="text-sm text-red-600 mb-4">{error}</p>
-          <Button onClick={createCodeSandbox} variant="outline" className="border-red-300">
-            Retry Preview
-          </Button>
+          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-600" />
+          <h3 className="text-lg font-semibold text-red-800 mb-2">Preview Generation Failed</h3>
+          <p className="text-red-700 mb-4">{error}</p>
+          
+          {processingResults.errors.length > 0 && (
+            <div className="bg-red-100 rounded-lg p-4 mb-4 text-left">
+              <h4 className="font-medium text-red-800 mb-2">Code Processing Errors:</h4>
+              <ul className="text-sm text-red-700 space-y-1">
+                {processingResults.errors.map((err, index) => (
+                  <li key={index}>• {err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="flex justify-center space-x-3">
+            <Button onClick={processAndCreateSandbox} variant="outline" className="border-red-300">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry Preview
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <div className="bg-gray-100 px-4 py-2 border-b flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          <span className="ml-4 text-sm text-gray-600">Live React Preview</span>
+    <div className="border rounded-lg overflow-hidden bg-white shadow-lg">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-gray-100 to-gray-200 px-4 py-3 border-b">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex space-x-1">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-gray-700">Live React Execution</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {processingResults.warnings.length > 0 && (
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                {processingResults.warnings.length} Warning{processingResults.warnings.length > 1 ? 's' : ''}
+              </Badge>
+            )}
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              TypeScript Ready
+            </Badge>
+            <div className="flex space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={openInEditor}
+                className="flex items-center space-x-1 text-xs"
+              >
+                <Code className="h-3 w-3" />
+                <span>Edit Code</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={openInNewTab}
+                className="flex items-center space-x-1 text-xs"
+              >
+                <ExternalLink className="h-3 w-3" />
+                <span>Open Full</span>
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={openInNewTab}
-          className="flex items-center space-x-1"
-        >
-          <ExternalLink className="h-4 w-4" />
-          <span>Open in CodeSandbox</span>
-        </Button>
+        
+        {processingResults.warnings.length > 0 && (
+          <div className="mt-2 bg-yellow-50 rounded p-2">
+            <p className="text-xs text-yellow-800 font-medium mb-1">Code Warnings:</p>
+            <ul className="text-xs text-yellow-700 space-y-1">
+              {processingResults.warnings.slice(0, 3).map((warning, index) => (
+                <li key={index}>• {warning}</li>
+              ))}
+              {processingResults.warnings.length > 3 && (
+                <li>• ... and {processingResults.warnings.length - 3} more</li>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
-      <div className="overflow-hidden">
+
+      {/* Live Preview */}
+      <div className="relative">
         {sandboxUrl && (
           <iframe
             src={sandboxUrl}
             className="w-full h-[600px] border-0"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
-            title="Live Landing Page Preview"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads"
+            title="Live React Landing Page Preview"
+            loading="lazy"
           />
         )}
+        
+        {/* Loading overlay for iframe */}
+        <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-2">
+            <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+            <span className="text-sm text-gray-600">Loading React App...</span>
+          </div>
+        </div>
       </div>
     </div>
   );

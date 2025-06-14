@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play } from 'lucide-react';
+import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,6 +18,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
   const [reactCode, setReactCode] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -44,7 +45,9 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
   };
 
   const generateLandingPageCode = async () => {
+    const wasRegenerating = isRegenerating;
     setLoading(true);
+    setIsRegenerating(false);
     setError(null);
 
     try {
@@ -70,6 +73,11 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         const reports = storedReports ? JSON.parse(storedReports) : {};
         reports['landing-page'] = data.analysis;
         localStorage.setItem('generatedReports', JSON.stringify(reports));
+
+        toast({
+          title: wasRegenerating ? "Code Regenerated!" : "Code Generated!",
+          description: "Your React landing page is ready with live preview.",
+        });
       } else {
         throw new Error(data?.error || 'Failed to generate landing page code');
       }
@@ -115,6 +123,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
   };
 
   const regenerateContent = () => {
+    setIsRegenerating(true);
     generateLandingPageCode();
   };
 
@@ -161,26 +170,38 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Badge variant="secondary" className="bg-green-100 text-green-800">
-                Live React Execution
+                <Play className="h-3 w-3 mr-1" />
+                Live Execution
               </Badge>
               <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                CodeSandbox Powered
+                Enhanced Processing
               </Badge>
-              <Button onClick={regenerateContent} variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Regenerate
+              <Button 
+                onClick={regenerateContent} 
+                variant="outline" 
+                size="sm"
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                {loading ? 'Generating...' : 'Regenerate'}
               </Button>
             </div>
           </div>
           <CardDescription>
-            Complete React TypeScript component with Tailwind CSS for {ideaData?.companyName || 'your SaaS startup'} - now with live code execution
+            AI-generated React TypeScript component with real-time code execution, error handling, and optimization for {ideaData?.companyName || 'your SaaS startup'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="preview" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="preview">Live React Preview</TabsTrigger>
-              <TabsTrigger value="code">React Code</TabsTrigger>
+              <TabsTrigger value="preview">
+                <Eye className="h-4 w-4 mr-2" />
+                Live React Preview
+              </TabsTrigger>
+              <TabsTrigger value="code">
+                <Code className="h-4 w-4 mr-2" />
+                Source Code
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="preview" className="mt-6">
@@ -190,9 +211,14 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
             <TabsContent value="code" className="mt-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">
-                    Complete TypeScript React Component ({reactCode.split('\n').length} lines)
-                  </span>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-gray-600">
+                      TypeScript React Component ({reactCode.split('\n').length} lines)
+                    </span>
+                    <Badge variant="outline" className="text-xs">
+                      Production Ready
+                    </Badge>
+                  </div>
                   <div className="flex space-x-2">
                     <Button
                       onClick={() => copyToClipboard(reactCode)}
@@ -221,34 +247,34 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         </CardContent>
       </Card>
 
-      {/* Features Overview */}
+      {/* Enhanced Features Overview */}
       <div className="grid md:grid-cols-4 gap-4">
         <Card className="text-center border-0 bg-gradient-to-br from-violet-50 to-purple-50">
           <CardContent className="pt-6">
             <Code className="h-8 w-8 text-violet-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-violet-700">TypeScript</div>
-            <div className="text-sm text-violet-600">Ready</div>
+            <div className="text-2xl font-bold text-violet-700">Enhanced</div>
+            <div className="text-sm text-violet-600">Processing</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardContent className="pt-6">
             <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-blue-700">Live</div>
+            <div className="text-2xl font-bold text-blue-700">Real-Time</div>
             <div className="text-sm text-blue-600">Execution</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
           <CardContent className="pt-6">
-            <RefreshCw className="h-8 w-8 text-green-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-green-700">Conversion</div>
-            <div className="text-sm text-green-600">Optimized</div>
+            <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-700">Error</div>
+            <div className="text-sm text-green-600">Recovery</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
           <CardContent className="pt-6">
             <Play className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-orange-700">CodeSandbox</div>
-            <div className="text-sm text-orange-600">Powered</div>
+            <div className="text-2xl font-bold text-orange-700">Smart</div>
+            <div className="text-sm text-orange-600">Caching</div>
           </CardContent>
         </Card>
       </div>
