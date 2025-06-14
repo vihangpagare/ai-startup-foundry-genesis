@@ -1,12 +1,12 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 interface MarketingStrategyProps {
   idea: string;
+  ideaData?: any;
 }
 
-const MarketingStrategy = ({ idea }: MarketingStrategyProps) => {
+const MarketingStrategy = ({ idea, ideaData }: MarketingStrategyProps) => {
   const isRestaurantIdea = idea.toLowerCase().includes('restaurant');
   const isDesignIdea = idea.toLowerCase().includes('design');
   const isHRIdea = idea.toLowerCase().includes('hr') || idea.toLowerCase().includes('job');

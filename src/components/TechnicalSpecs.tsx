@@ -1,13 +1,13 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Code, Database, Shield, Smartphone } from 'lucide-react';
 
 interface TechnicalSpecsProps {
   idea: string;
+  ideaData?: any;
 }
 
-const TechnicalSpecs = ({ idea }: TechnicalSpecsProps) => {
+const TechnicalSpecs = ({ idea, ideaData }: TechnicalSpecsProps) => {
   const isRestaurantIdea = idea.toLowerCase().includes('restaurant');
   const isDesignIdea = idea.toLowerCase().includes('design');
   const isHRIdea = idea.toLowerCase().includes('hr') || idea.toLowerCase().includes('job');
