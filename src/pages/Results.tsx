@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download, FileText, TrendingUp, Code, CheckCircle, Sparkles, Building, Users, Zap, PieChart, Target, Rocket, Star, Globe, Brain, Moon, Sun, BarChart, Presentation, Database, Smartphone } from 'lucide-react';
+import { ArrowLeft, Download, FileText, TrendingUp, Code, CheckCircle, Sparkles, Building, Users, Zap, PieChart, Target, Rocket, Star, Globe, Brain, BarChart, Presentation, Database, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BusinessPlan from '@/components/BusinessPlan';
 import MarketingStrategy from '@/components/MarketingStrategy';
@@ -15,6 +14,7 @@ import UserExperience from '@/components/UserExperience';
 import LandingPageGenerator from '@/components/LandingPageGenerator';
 import DataVisualization from '@/components/DataVisualization';
 import RealTimeMarketData from '@/components/RealTimeMarketData';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { exportToPDF, downloadCompletePackage } from '@/utils/exportUtils';
 import { exportToAdvancedPDF, exportToPowerPoint, exportToJSON } from '@/utils/enhancedExport';
@@ -30,7 +30,6 @@ const ResultsContent = () => {
   });
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { theme, toggleTheme } = useTheme();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -54,10 +53,8 @@ const ResultsContent = () => {
   }, [navigate]);
 
   const generateDynamicExecutiveSummary = (data: any, reports: Record<string, string>) => {
-    // Extract insights from AI-generated reports to create dynamic metrics
     const idea = data.idea?.toLowerCase() || '';
     
-    // Industry-based refinements for time to market
     let timeToMarket = '3-6 months';
     
     if (idea.includes('restaurant') || idea.includes('food')) {
@@ -68,15 +65,12 @@ const ResultsContent = () => {
       timeToMarket = '6-12 months';
     }
 
-    // Calculate viability score based on report content quality
     let viabilityScore = 75;
     
-    // Boost score for well-defined problems and solutions
     if (data.problemStatement && data.solution) viabilityScore += 10;
     if (data.uniqueValue) viabilityScore += 5;
     if (data.targetAudience && data.targetAudience !== 'Not specified') viabilityScore += 5;
     
-    // Analyze report content quality
     const businessPlan = reports['business-plan'] || '';
     if (businessPlan.length > 2000) viabilityScore += 3;
     if (reports['financial']?.includes('revenue model')) viabilityScore += 2;
@@ -253,14 +247,7 @@ const ResultsContent = () => {
             </Button>
             
             <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleTheme}
-                className="text-white hover:bg-white/10"
-              >
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
+              <ThemeSwitcher />
               
               {!isMobile && (
                 <>
@@ -292,7 +279,6 @@ const ResultsContent = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Mobile Export Options */}
         {isMobile && (
           <Card className="mb-6 card-vibrant">
             <CardHeader>
@@ -320,10 +306,8 @@ const ResultsContent = () => {
           </Card>
         )}
 
-        {/* Real-time Market Data */}
         <RealTimeMarketData idea={ideaData.idea} />
 
-        {/* Enhanced Success Banner */}
         <Card className="mb-8 card-vibrant gentle-glow">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center space-x-3">
@@ -350,7 +334,6 @@ const ResultsContent = () => {
           </CardHeader>
         </Card>
 
-        {/* Enhanced Executive Summary Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="card-vibrant text-center smooth-hover">
             <CardContent className="pt-6">
@@ -390,10 +373,8 @@ const ResultsContent = () => {
           </Card>
         </div>
 
-        {/* Data Visualizations */}
         <DataVisualization ideaData={ideaData} reports={generatedReports} />
 
-        {/* Enhanced Deliverables Overview */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {deliverables.map((deliverable, index) => (
             <Card key={index} className="card-vibrant hover:shadow-vibrant transition-all duration-500 smooth-hover">
@@ -420,7 +401,6 @@ const ResultsContent = () => {
           ))}
         </div>
 
-        {/* Enhanced Analysis Tabs */}
         <Card className="card-vibrant shadow-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl flex items-center justify-center space-x-3 font-poppins">
