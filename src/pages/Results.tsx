@@ -208,10 +208,10 @@ const Results = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Enhanced Success Banner */}
-        <Card className="mb-8 card-vibrant pulse-glow animate-fade-in-up">
+        <Card className="mb-8 card-vibrant gentle-glow">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center space-x-3">
-              <div className="bg-gradient-success p-3 rounded-full animate-pulse">
+              <div className="bg-gradient-success p-3 rounded-full">
                 <CheckCircle className="h-8 w-8 text-white" />
               </div>
               <div>
@@ -219,11 +219,11 @@ const Results = () => {
                   Your Complete Startup Package is Ready! 🚀
                 </span>
                 <div className="flex items-center justify-center space-x-2 mt-2">
-                  <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
+                  <Sparkles className="h-5 w-5 text-yellow-500" />
                   <span className="text-lg text-gradient-secondary font-medium">
                     AI-generated with {executiveSummary.viabilityScore} market viability score
                   </span>
-                  <Star className="h-5 w-5 text-yellow-500 animate-pulse" />
+                  <Star className="h-5 w-5 text-yellow-500" />
                 </div>
               </div>
             </CardTitle>
@@ -236,7 +236,7 @@ const Results = () => {
 
         {/* Enhanced Executive Summary Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="card-vibrant text-center animate-slide-up" style={{animationDelay: '0.1s'}}>
+          <Card className="card-vibrant text-center smooth-hover">
             <CardContent className="pt-6">
               <div className="bg-gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Rocket className="h-8 w-8 text-white" />
@@ -245,7 +245,7 @@ const Results = () => {
               <div className="text-sm text-gray-600 font-medium">Time to Market</div>
             </CardContent>
           </Card>
-          <Card className="card-vibrant text-center animate-slide-up" style={{animationDelay: '0.2s'}}>
+          <Card className="card-vibrant text-center smooth-hover">
             <CardContent className="pt-6">
               <div className="bg-gradient-success p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <TrendingUp className="h-8 w-8 text-white" />
@@ -254,7 +254,7 @@ const Results = () => {
               <div className="text-sm text-gray-600 font-medium">Viability Score</div>
             </CardContent>
           </Card>
-          <Card className="card-vibrant text-center animate-slide-up" style={{animationDelay: '0.3s'}}>
+          <Card className="card-vibrant text-center smooth-hover">
             <CardContent className="pt-6">
               <div className="bg-gradient-accent p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Globe className="h-8 w-8 text-white" />
@@ -263,7 +263,7 @@ const Results = () => {
               <div className="text-sm text-gray-600 font-medium">Market Research</div>
             </CardContent>
           </Card>
-          <Card className="card-vibrant text-center animate-slide-up" style={{animationDelay: '0.4s'}}>
+          <Card className="card-vibrant text-center smooth-hover">
             <CardContent className="pt-6">
               <div className="bg-gradient-warning p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Brain className="h-8 w-8 text-white" />
@@ -277,7 +277,7 @@ const Results = () => {
         {/* Enhanced Deliverables Overview */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {deliverables.map((deliverable, index) => (
-            <Card key={index} className="card-vibrant hover:shadow-vibrant transition-all duration-500 float" style={{animationDelay: `${index * 0.1}s`}}>
+            <Card key={index} className="card-vibrant hover:shadow-vibrant transition-all duration-500 smooth-hover">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -302,7 +302,7 @@ const Results = () => {
         </div>
 
         {/* Enhanced Analysis Tabs */}
-        <Card className="card-vibrant shadow-2xl animate-fade-in-up">
+        <Card className="card-vibrant shadow-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl flex items-center justify-center space-x-3 font-poppins">
               <div className="bg-gradient-primary p-3 rounded-full">
@@ -327,31 +327,45 @@ const Results = () => {
               </TabsList>
               
               <TabsContent value="business-plan" className="mt-6">
-                <BusinessPlan idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <BusinessPlan idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
               
               <TabsContent value="marketing" className="mt-6">
-                <MarketingStrategy idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <MarketingStrategy idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
               
               <TabsContent value="competitive" className="mt-6">
-                <CompetitiveAnalysis idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <CompetitiveAnalysis idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
               
               <TabsContent value="technical" className="mt-6">
-                <TechnicalSpecs idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <TechnicalSpecs idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
               
               <TabsContent value="ux-design" className="mt-6">
-                <UserExperience idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <UserExperience idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
               
               <TabsContent value="financial" className="mt-6">
-                <FinancialProjections idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <FinancialProjections idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
               
               <TabsContent value="landing-page" className="mt-6">
-                <LandingPageGenerator idea={ideaData.idea} ideaData={ideaData} />
+                <div className="report-section">
+                  <LandingPageGenerator idea={ideaData.idea} ideaData={ideaData} />
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
