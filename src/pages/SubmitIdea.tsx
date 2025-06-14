@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -303,11 +304,7 @@ const SubmitIdea = () => {
                 <div 
                   key={index}
                   className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg cursor-pointer hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 border border-gray-200 hover:border-indigo-200"
-                  onClick={() => !isProcessing && setFormData({
-                    ...formData,
-                    idea: example.description,
-                    companyName: example.title.split(' ')[0] + (example.title.split(' ')[1] || '')
-                  })}
+                  onClick={() => !isProcessing && setIdea(example.description)}
                 >
                   <div className="flex justify-between items-start mb-3">
                     <h4 className="font-semibold text-gray-900">{example.title}</h4>
