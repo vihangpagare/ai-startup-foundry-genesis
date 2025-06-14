@@ -12,8 +12,8 @@ import FinancialProjections from '@/components/FinancialProjections';
 import CompetitiveAnalysis from '@/components/CompetitiveAnalysis';
 import UserExperience from '@/components/UserExperience';
 import LandingPageGenerator from '@/components/LandingPageGenerator';
-import DataVisualization from '@/components/DataVisualization';
-import RealTimeMarketData from '@/components/RealTimeMarketData';
+import EnhancedDataVisualization from '@/components/EnhancedDataVisualization';
+import EnhancedRealTimeMarketData from '@/components/EnhancedRealTimeMarketData';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { exportToPDF, downloadCompletePackage } from '@/utils/exportUtils';
@@ -182,7 +182,7 @@ const ResultsContent = () => {
     {
       icon: <Building className="h-6 w-6" />,
       title: "Strategic Business Plan",
-      description: "Comprehensive business strategy, market analysis, and operational framework",
+      description: "Comprehensive business strategy, market analysis, and operational framework with enhanced AI insights",
       status: "Complete",
       pages: "25-30 pages",
       gradient: "from-purple-500 to-pink-500"
@@ -190,7 +190,7 @@ const ResultsContent = () => {
     {
       icon: <TrendingUp className="h-6 w-6" />,
       title: "Marketing & Growth Strategy",
-      description: "Go-to-market plan, customer acquisition, and revenue optimization",
+      description: "Go-to-market plan, customer acquisition, and revenue optimization with real-time market data",
       status: "Complete", 
       pages: "15-20 pages",
       gradient: "from-blue-500 to-cyan-500"
@@ -198,7 +198,7 @@ const ResultsContent = () => {
     {
       icon: <Users className="h-6 w-6" />,
       title: "Competitive Analysis",
-      description: "Market positioning, competitor research, and differentiation strategy",
+      description: "Market positioning, competitor research, and differentiation strategy with live intelligence",
       status: "Complete",
       pages: "10-12 pages",
       gradient: "from-green-500 to-emerald-500"
@@ -206,7 +206,7 @@ const ResultsContent = () => {
     {
       icon: <Code className="h-6 w-6" />,
       title: "Technical Architecture",
-      description: "MVP specifications, system design, and development roadmap",
+      description: "MVP specifications, system design, and development roadmap with modern tech stack",
       status: "Complete",
       pages: "20-25 pages",
       gradient: "from-orange-500 to-red-500"
@@ -214,7 +214,7 @@ const ResultsContent = () => {
     {
       icon: <Target className="h-6 w-6" />,
       title: "User Experience Design",
-      description: "Wireframes, user flows, and responsive design specifications", 
+      description: "Wireframes, user flows, and responsive design specifications with accessibility focus", 
       status: "Complete",
       pages: "15-18 pages",
       gradient: "from-indigo-500 to-purple-500"
@@ -222,7 +222,7 @@ const ResultsContent = () => {
     {
       icon: <PieChart className="h-6 w-6" />,
       title: "Financial Projections",
-      description: "Revenue models, cost analysis, and 3-year financial forecasts",
+      description: "Revenue models, cost analysis, and 3-year financial forecasts with interactive charts",
       status: "Complete",
       pages: "12-15 pages",
       gradient: "from-pink-500 to-rose-500"
@@ -279,6 +279,7 @@ const ResultsContent = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mobile Export Options */}
         {isMobile && (
           <Card className="mb-6 card-vibrant">
             <CardHeader>
@@ -306,8 +307,10 @@ const ResultsContent = () => {
           </Card>
         )}
 
-        <RealTimeMarketData idea={ideaData.idea} />
+        {/* Enhanced Real-Time Market Data */}
+        <EnhancedRealTimeMarketData idea={ideaData.idea} />
 
+        {/* Enhanced Success Header */}
         <Card className="mb-8 card-vibrant gentle-glow">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center space-x-3">
@@ -316,12 +319,12 @@ const ResultsContent = () => {
               </div>
               <div>
                 <span className="text-3xl font-bold text-gradient font-poppins">
-                  Your Complete Startup Package is Ready! 🚀
+                  Your Enhanced Startup Package is Ready! 🚀
                 </span>
                 <div className="flex items-center justify-center space-x-2 mt-2">
                   <Sparkles className="h-5 w-5 text-yellow-500" />
                   <span className="text-lg text-gradient-secondary font-medium">
-                    AI-generated with {executiveSummary.viabilityScore} market viability score
+                    AI-powered with {executiveSummary.viabilityScore} market viability • Live market intelligence
                   </span>
                   <Star className="h-5 w-5 text-yellow-500" />
                 </div>
@@ -334,6 +337,7 @@ const ResultsContent = () => {
           </CardHeader>
         </Card>
 
+        {/* Enhanced Metrics Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="card-vibrant text-center smooth-hover">
             <CardContent className="pt-6">
@@ -341,7 +345,7 @@ const ResultsContent = () => {
                 <Rocket className="h-8 w-8 text-white" />
               </div>
               <div className="text-3xl font-bold text-gradient mb-1">{executiveSummary.timeToMarket}</div>
-              <div className="text-sm text-gray-600 font-medium">Time to Market</div>
+              <div className="text-sm text-muted-foreground font-medium">Time to Market</div>
             </CardContent>
           </Card>
           <Card className="card-vibrant text-center smooth-hover">
@@ -350,7 +354,7 @@ const ResultsContent = () => {
                 <TrendingUp className="h-8 w-8 text-white" />
               </div>
               <div className="text-3xl font-bold text-gradient mb-1">{executiveSummary.viabilityScore}</div>
-              <div className="text-sm text-gray-600 font-medium">Viability Score</div>
+              <div className="text-sm text-muted-foreground font-medium">Viability Score</div>
             </CardContent>
           </Card>
           <Card className="card-vibrant text-center smooth-hover">
@@ -359,7 +363,7 @@ const ResultsContent = () => {
                 <Globe className="h-8 w-8 text-white" />
               </div>
               <div className="text-3xl font-bold text-gradient mb-1">Live</div>
-              <div className="text-sm text-gray-600 font-medium">Market Research</div>
+              <div className="text-sm text-muted-foreground font-medium">Market Research</div>
             </CardContent>
           </Card>
           <Card className="card-vibrant text-center smooth-hover">
@@ -367,14 +371,16 @@ const ResultsContent = () => {
               <div className="bg-gradient-warning p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Brain className="h-8 w-8 text-white" />
               </div>
-              <div className="text-3xl font-bold text-gradient mb-1">AI</div>
-              <div className="text-sm text-gray-600 font-medium">Powered Analysis</div>
+              <div className="text-3xl font-bold text-gradient mb-1">AI+</div>
+              <div className="text-sm text-muted-foreground font-medium">Enhanced Analysis</div>
             </CardContent>
           </Card>
         </div>
 
-        <DataVisualization ideaData={ideaData} reports={generatedReports} />
+        {/* Enhanced Data Visualization */}
+        <EnhancedDataVisualization ideaData={ideaData} reports={generatedReports} />
 
+        {/* Enhanced Deliverables Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {deliverables.map((deliverable, index) => (
             <Card key={index} className="card-vibrant hover:shadow-vibrant transition-all duration-500 smooth-hover">
@@ -386,7 +392,7 @@ const ResultsContent = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg font-poppins">{deliverable.title}</CardTitle>
-                      <div className="text-xs text-gray-500 font-medium">{deliverable.pages}</div>
+                      <div className="text-xs text-muted-foreground font-medium">{deliverable.pages}</div>
                     </div>
                   </div>
                   <span className="text-sm text-white font-bold bg-gradient-success px-3 py-2 rounded-full shadow-lg">
@@ -395,22 +401,23 @@ const ResultsContent = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-gray-700 font-medium">{deliverable.description}</CardDescription>
+                <CardDescription className="text-muted-foreground font-medium">{deliverable.description}</CardDescription>
               </CardContent>
             </Card>
           ))}
         </div>
 
+        {/* Enhanced Main Analysis Tabs */}
         <Card className="card-vibrant shadow-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl flex items-center justify-center space-x-3 font-poppins">
               <div className="bg-gradient-primary p-3 rounded-full">
                 <Zap className="h-8 w-8 text-white" />
               </div>
-              <span className="text-gradient">Complete AI-Powered Startup Analysis</span>
+              <span className="text-gradient">Enhanced AI-Powered Startup Analysis</span>
             </CardTitle>
-            <CardDescription className="text-xl text-gray-700 dark:text-gray-300 font-medium">
-              Comprehensive business foundation with AI-generated analysis, live market data, and advanced visualizations
+            <CardDescription className="text-xl text-muted-foreground font-medium">
+              Comprehensive business foundation with live market intelligence, interactive visualizations, and color-coded insights
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -440,60 +447,63 @@ const ResultsContent = () => {
               
               <TabsContent value="overview" className="mt-6">
                 <div className="space-y-6">
-                  <DataVisualization ideaData={ideaData} reports={generatedReports} />
+                  <EnhancedDataVisualization ideaData={ideaData} reports={generatedReports} />
+                  
+                  {/* Enhanced Key Metrics Dashboard */}
                   <div className="grid md:grid-cols-2 gap-6">
                     <Card className="report-section">
                       <CardHeader>
                         <CardTitle className="flex items-center space-x-2">
                           <BarChart className="h-5 w-5" />
-                          <span>Key Metrics Dashboard</span>
+                          <span>Enhanced Metrics Dashboard</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
-                          <div className="flex justify-between items-center">
-                            <span>Market Opportunity</span>
-                            <Badge className="bg-green-100 text-green-800">High</Badge>
+                          <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <span className="text-foreground">Market Opportunity</span>
+                            <Badge className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">High Potential</Badge>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span>Technical Feasibility</span>
-                            <Badge className="bg-blue-100 text-blue-800">Very High</Badge>
+                          <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <span className="text-foreground">Technical Feasibility</span>
+                            <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">Very High</Badge>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span>Competition Level</span>
-                            <Badge className="bg-yellow-100 text-yellow-800">Moderate</Badge>
+                          <div className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                            <span className="text-foreground">Competition Level</span>
+                            <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">Moderate</Badge>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span>Investment Appeal</span>
-                            <Badge className="bg-purple-100 text-purple-800">Strong</Badge>
+                          <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                            <span className="text-foreground">Investment Appeal</span>
+                            <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100">Strong</Badge>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
+                    
                     <Card className="report-section">
                       <CardHeader>
                         <CardTitle className="flex items-center space-x-2">
                           <Target className="h-5 w-5" />
-                          <span>Next Steps Roadmap</span>
+                          <span>Enhanced Roadmap</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-3 p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
                             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                            <span className="text-sm">MVP Development (Month 1-2)</span>
+                            <span className="text-sm text-foreground">MVP Development (Month 1-2)</span>
                           </div>
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-3 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <span className="text-sm">Beta Testing (Month 3)</span>
+                            <span className="text-sm text-foreground">Beta Testing & Market Validation (Month 3)</span>
                           </div>
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-3 p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20">
                             <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                            <span className="text-sm">Market Launch (Month 4-5)</span>
+                            <span className="text-sm text-foreground">Market Launch & User Acquisition (Month 4-5)</span>
                           </div>
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-3 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20">
                             <div className="w-3 h-3 bg-pink-500 rounded-full"></div>
-                            <span className="text-sm">Scale & Growth (Month 6+)</span>
+                            <span className="text-sm text-foreground">Scale, Growth & Investment (Month 6+)</span>
                           </div>
                         </div>
                       </CardContent>
@@ -502,6 +512,7 @@ const ResultsContent = () => {
                 </div>
               </TabsContent>
               
+              {/* Keep existing TabsContent for other tabs */}
               <TabsContent value="business-plan" className="mt-6">
                 <div className="report-section">
                   <BusinessPlan idea={ideaData.idea} ideaData={ideaData} />
