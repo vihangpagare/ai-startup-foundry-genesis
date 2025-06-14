@@ -137,7 +137,7 @@ const BusinessPlan = ({ idea, ideaData }: BusinessPlanProps) => {
   if (showFallback) {
     return (
       <ErrorBoundary>
-        <FallbackReport type="business-plan" ideaData={ideaData} />
+        <FallbackReport analysisType="business-plan" ideaData={ideaData} />
       </ErrorBoundary>
     );
   }

@@ -137,7 +137,7 @@ const TechnicalSpecs = ({ idea, ideaData }: TechnicalSpecsProps) => {
   if (showFallback) {
     return (
       <ErrorBoundary>
-        <FallbackReport type="technical" ideaData={ideaData} />
+        <FallbackReport analysisType="technical" ideaData={ideaData} />
       </ErrorBoundary>
     );
   }

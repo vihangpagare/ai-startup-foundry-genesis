@@ -137,7 +137,7 @@ const MarketingStrategy = ({ idea, ideaData }: MarketingStrategyProps) => {
   if (showFallback) {
     return (
       <ErrorBoundary>
-        <FallbackReport type="marketing" ideaData={ideaData} />
+        <FallbackReport analysisType="marketing" ideaData={ideaData} />
       </ErrorBoundary>
     );
   }

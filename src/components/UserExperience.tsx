@@ -137,7 +137,7 @@ const UserExperience = ({ idea, ideaData }: UserExperienceProps) => {
   if (showFallback) {
     return (
       <ErrorBoundary>
-        <FallbackReport type="ux-design" ideaData={ideaData} />
+        <FallbackReport analysisType="ux-design" ideaData={ideaData} />
       </ErrorBoundary>
     );
   }
