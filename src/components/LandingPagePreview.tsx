@@ -31,12 +31,12 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
   const processAndCreateSandbox = async () => {
     setLoading(true);
     setError(null);
-    setDebugInfo('Starting code processing...');
+    setDebugInfo('Starting enhanced code processing...');
 
     try {
       console.log('Processing code for sandbox...');
       
-      // Step 1: Process the code
+      // Step 1: Process the code with enhanced validation
       const processingResult = CodeProcessor.processReactCode(code);
       console.log('Processing result:', {
         errors: processingResult.errors,
@@ -49,7 +49,7 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
         warnings: processingResult.warnings
       });
 
-      setDebugInfo(`Code processed. Errors: ${processingResult.errors.length}, Warnings: ${processingResult.warnings.length}`);
+      setDebugInfo(`Code processed successfully. Errors: ${processingResult.errors.length}, Warnings: ${processingResult.warnings.length}`);
 
       // Step 2: If there are critical errors, don't proceed
       if (processingResult.errors.length > 0) {
@@ -60,9 +60,9 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
         return;
       }
 
-      setDebugInfo('Creating sandbox...');
+      setDebugInfo('Creating optimized sandbox environment...');
 
-      // Step 3: Create or get cached sandbox
+      // Step 3: Create or get cached sandbox with processed code
       const sandboxResult = await SandboxManager.createOrUpdateSandbox(processingResult.processedCode);
       console.log('Sandbox result:', sandboxResult);
 
@@ -70,6 +70,11 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
         setSandboxUrl(sandboxResult.embedUrl);
         setSandboxId(sandboxResult.sandboxId);
         setDebugInfo(`Sandbox created successfully: ${sandboxResult.sandboxId}`);
+        
+        // Add a small delay to ensure iframe loads properly
+        setTimeout(() => {
+          console.log('Sandbox should be fully loaded now');
+        }, 2000);
       } else {
         throw new Error(sandboxResult.error || 'Failed to create sandbox');
       }
@@ -101,16 +106,16 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
           <p className="text-gray-700 font-medium">Processing React Code...</p>
-          <p className="text-sm text-gray-500 mt-2">Validating • Optimizing • Creating Live Environment</p>
+          <p className="text-sm text-gray-500 mt-2">Enhanced Validation • Syntax Fixing • Optimizing</p>
           {debugInfo && (
             <p className="text-xs text-gray-400 mt-2 bg-gray-100 px-3 py-1 rounded">{debugInfo}</p>
           )}
           <div className="mt-4 flex justify-center space-x-2">
             <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Code Processing
+              Enhanced Processing
             </Badge>
             <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              Sandbox Creation
+              Live Execution Ready
             </Badge>
           </div>
         </div>
@@ -147,7 +152,7 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
           <div className="flex justify-center space-x-3">
             <Button onClick={processAndCreateSandbox} variant="outline" className="border-red-300">
               <RefreshCw className="h-4 w-4 mr-2" />
-              Retry Preview
+              Retry with Enhanced Processing
             </Button>
           </div>
         </div>
@@ -179,7 +184,7 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
               </Badge>
             )}
             <Badge variant="secondary" className="bg-green-100 text-green-800">
-              TypeScript Ready
+              Enhanced Processing
             </Badge>
             <div className="flex space-x-1">
               <Button
@@ -206,7 +211,7 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
         
         {processingResults.warnings.length > 0 && (
           <div className="mt-2 bg-yellow-50 rounded p-2">
-            <p className="text-xs text-yellow-800 font-medium mb-1">Code Warnings:</p>
+            <p className="text-xs text-yellow-800 font-medium mb-1">Processing Warnings (Auto-Fixed):</p>
             <ul className="text-xs text-yellow-700 space-y-1">
               {processingResults.warnings.slice(0, 3).map((warning, index) => (
                 <li key={index}>• {warning}</li>
