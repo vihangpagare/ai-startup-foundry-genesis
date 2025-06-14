@@ -16,13 +16,6 @@ interface AnalysisRequest {
   analysisType: 'business-plan' | 'marketing' | 'technical' | 'financial' | 'competitive' | 'ux-design' | 'landing-page';
 }
 
-// Helper function to clean API keys by removing surrounding quotes and whitespace
-const cleanApiKey = (key: string | undefined): string | undefined => {
-  if (!key) return undefined;
-  // Remove single or double quotes from the beginning and end, and trim whitespace
-  return key.replace(/^['"\s]+|['"\s]+$/g, '').trim();
-};
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -88,7 +81,7 @@ serve(async (req) => {
     const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
     console.log('Calling Anthropic API...');
-    console.log('Using hardcoded API key starting with:', anthropicApiKey.substring(0, 15));
+    console.log('Using API key starting with:', anthropicApiKey.substring(0, 15));
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
