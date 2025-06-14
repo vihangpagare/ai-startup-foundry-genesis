@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,14 @@ import { useToast } from '@/hooks/use-toast';
 
 const Results = () => {
   const [ideaData, setIdeaData] = useState<any>(null);
+  const [executiveSummary, setExecutiveSummary] = useState({
+    marketSize: '$15B+',
+    targetMarket: 'Business professionals',
+    revenueProjection: '$100K-250K',
+    timeToMarket: '3-6 months',
+    initialInvestment: '$25K-75K',
+    viabilityScore: '85%'
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,10 +38,83 @@ const Results = () => {
     try {
       const parsedData = JSON.parse(storedData);
       setIdeaData(parsedData);
+      generateExecutiveSummary(parsedData);
     } catch (error) {
       navigate('/submit-idea');
     }
   }, [navigate]);
+
+  const generateExecutiveSummary = (data: any) => {
+    // Generate more dynamic metrics based on the actual idea content
+    const idea = data.idea?.toLowerCase() || '';
+    const targetAudience = data.targetAudience || 'Business professionals';
+    
+    // Industry-based market sizing
+    let marketSize = '$15B+';
+    let timeToMarket = '3-6 months';
+    let initialInvestment = '$25K-75K';
+    let revenueProjection = '$100K-250K';
+    
+    if (idea.includes('restaurant') || idea.includes('food')) {
+      marketSize = '$45B+';
+      revenueProjection = '$150K-400K';
+      timeToMarket = '2-4 months';
+    } else if (idea.includes('design') || idea.includes('creative')) {
+      marketSize = '$13B+';
+      revenueProjection = '$75K-200K';
+      timeToMarket = '3-5 months';
+    } else if (idea.includes('hr') || idea.includes('recruiting') || idea.includes('job')) {
+      marketSize = '$30B+';
+      revenueProjection = '$200K-500K';
+      timeToMarket = '4-8 months';
+      initialInvestment = '$50K-150K';
+    } else if (idea.includes('e-commerce') || idea.includes('retail')) {
+      marketSize = '$120B+';
+      revenueProjection = '$250K-750K';
+      timeToMarket = '4-6 months';
+      initialInvestment = '$75K-200K';
+    } else if (idea.includes('health') || idea.includes('medical')) {
+      marketSize = '$85B+';
+      revenueProjection = '$300K-800K';
+      timeToMarket = '6-12 months';
+      initialInvestment = '$100K-300K';
+    } else if (idea.includes('education') || idea.includes('learning')) {
+      marketSize = '$25B+';
+      revenueProjection = '$125K-350K';
+      timeToMarket = '3-6 months';
+    } else if (idea.includes('finance') || idea.includes('fintech')) {
+      marketSize = '$180B+';
+      revenueProjection = '$400K-1M';
+      timeToMarket = '6-12 months';
+      initialInvestment = '$150K-500K';
+    }
+
+    // Generate viability score based on multiple factors
+    let viabilityScore = 75;
+    
+    // Boost score for well-defined problems and solutions
+    if (data.problemStatement && data.solution) viabilityScore += 10;
+    if (data.uniqueValue) viabilityScore += 5;
+    if (data.targetAudience && data.targetAudience !== 'Not specified') viabilityScore += 5;
+    if (data.companyName) viabilityScore += 3;
+    
+    // Industry complexity adjustments
+    if (idea.includes('ai') || idea.includes('artificial intelligence')) viabilityScore += 5;
+    if (idea.includes('blockchain') || idea.includes('crypto')) viabilityScore -= 10;
+    if (idea.includes('social media') || idea.includes('content')) viabilityScore += 8;
+    
+    // Cap at 97%
+    viabilityScore = Math.min(viabilityScore, 97);
+
+    setExecutiveSummary({
+      marketSize,
+      targetMarket: targetAudience,
+      revenueProjection,
+      timeToMarket,
+      initialInvestment,
+      viabilityScore: `${viabilityScore}%`
+    });
+  };
 
   if (!ideaData) return null;
 
@@ -121,16 +203,6 @@ const Results = () => {
     }
   ];
 
-  const executiveSummary = {
-    marketSize: ideaData.idea.toLowerCase().includes('restaurant') ? '$15.2B' :
-                ideaData.idea.toLowerCase().includes('design') ? '$8.4B' :
-                ideaData.idea.toLowerCase().includes('hr') ? '$24.3B' : '$195B',
-    targetMarket: ideaData.targetAudience || 'Small to medium businesses',
-    revenueProjection: '$250K-500K',
-    timeToMarket: '3-6 months',
-    initialInvestment: '$50K-100K'
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
@@ -174,7 +246,7 @@ const Results = () => {
                 <span className="text-2xl font-bold text-green-800">Your Complete Startup Package is Ready!</span>
                 <div className="flex items-center space-x-2 mt-1">
                   <Sparkles className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-700">Generated in 12 minutes with 95% market viability score</span>
+                  <span className="text-sm text-green-700">AI-generated with {executiveSummary.viabilityScore} market viability score</span>
                 </div>
               </div>
             </CardTitle>
@@ -213,7 +285,7 @@ const Results = () => {
           </Card>
           <Card className="text-center border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-600 mb-1">95%</div>
+              <div className="text-2xl font-bold text-green-600 mb-1">{executiveSummary.viabilityScore}</div>
               <div className="text-sm text-gray-600">Viability Score</div>
             </CardContent>
           </Card>
@@ -249,10 +321,10 @@ const Results = () => {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center space-x-2">
               <Zap className="h-6 w-6 text-indigo-600" />
-              <span>Complete Startup Analysis & Documentation</span>
+              <span>Complete AI-Powered Startup Analysis</span>
             </CardTitle>
             <CardDescription className="text-lg">
-              Comprehensive business foundation with detailed analysis across all critical startup dimensions
+              Comprehensive business foundation with AI-generated analysis across all critical startup dimensions
             </CardDescription>
           </CardHeader>
           <CardContent>
