@@ -18,47 +18,52 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
   const [reactCode, setReactCode] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if we have pre-generated content
-    const storedReports = localStorage.getItem('generatedReports');
-    if (storedReports) {
-      try {
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
         const reports = JSON.parse(storedReports);
         if (reports['landing-page']) {
           setReactCode(reports['landing-page']);
           setLoading(false);
           return;
         }
-      } catch (error) {
-        console.error('Error loading stored reports:', error);
       }
+      // If no pre-generated content, generate new
+      generateLandingPageCode();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateLandingPageCode();
     }
-    
-    generateLandingPageCode();
-  }, [idea, ideaData]);
+  };
 
   const generateLandingPageCode = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data, error: apiError } = await supabase.functions.invoke('generate-landing-page', {
+      const { data, error: apiError } = await supabase.functions.invoke('ai-startup-analysis', {
         body: {
           idea,
           companyName: ideaData?.companyName,
           targetAudience: ideaData?.targetAudience,
+          problemStatement: ideaData?.problemStatement,
+          solution: ideaData?.solution,
           uniqueValue: ideaData?.uniqueValue,
-          analysisData: ideaData
+          analysisType: 'landing-page'
         }
       });
 
       if (apiError) throw apiError;
       
       if (data?.success) {
-        setReactCode(data.code);
+        setReactCode(data.analysis);
       } else {
         throw new Error(data?.error || 'Failed to generate landing page code');
       }
