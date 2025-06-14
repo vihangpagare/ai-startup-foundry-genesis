@@ -32,6 +32,7 @@ const GeneratingReports = () => {
     'landing-page': 'pending'
   });
   const [generatedContent, setGeneratedContent] = useState<Record<string, string>>({});
+  const [hasStartedGeneration, setHasStartedGeneration] = useState(false);
 
   const analysisTypes = [
     { key: 'business-plan', name: 'Business Plan', icon: '📋' },
@@ -53,13 +54,38 @@ const GeneratingReports = () => {
     try {
       const parsedData = JSON.parse(storedData);
       setIdeaData(parsedData);
-      generateAllReports(parsedData);
     } catch (error) {
       navigate('/submit-idea');
     }
   }, [navigate]);
 
+  // Start generation only once when ideaData is available
+  useEffect(() => {
+    if (ideaData && !hasStartedGeneration) {
+      setHasStartedGeneration(true);
+      generateAllReports(ideaData);
+    }
+  }, [ideaData, hasStartedGeneration]);
+
+  // Check if all reports are complete and redirect
+  useEffect(() => {
+    const completedReports = Object.values(status).filter(s => s === 'complete').length;
+    const totalReports = analysisTypes.length;
+    
+    if (completedReports === totalReports && completedReports > 0) {
+      // Store all generated content
+      localStorage.setItem('generatedReports', JSON.stringify(generatedContent));
+      
+      console.log('All reports completed, redirecting to results...');
+      // Small delay to ensure UI updates are visible
+      setTimeout(() => {
+        navigate('/results');
+      }, 1500);
+    }
+  }, [status, generatedContent, navigate]);
+
   const generateReport = async (analysisType: string, data: any) => {
+    console.log(`Starting generation for ${analysisType}`);
     setStatus(prev => ({ ...prev, [analysisType]: 'loading' }));
 
     try {
@@ -78,6 +104,7 @@ const GeneratingReports = () => {
       if (error) throw error;
       
       if (result?.success) {
+        console.log(`${analysisType} completed successfully`);
         setGeneratedContent(prev => ({ ...prev, [analysisType]: result.analysis }));
         setStatus(prev => ({ ...prev, [analysisType]: 'complete' }));
       } else {
@@ -90,24 +117,15 @@ const GeneratingReports = () => {
   };
 
   const generateAllReports = async (data: any) => {
+    console.log('Starting generation of all reports...');
+    
     // Generate all reports in parallel
     const promises = analysisTypes.map(type => 
       generateReport(type.key, data)
     );
     
-    await Promise.all(promises);
-    
-    // Check if all completed successfully
-    const allComplete = Object.values(status).every(s => s === 'complete');
-    if (allComplete) {
-      // Store all generated content
-      localStorage.setItem('generatedReports', JSON.stringify(generatedContent));
-      
-      // Wait a moment then navigate
-      setTimeout(() => {
-        navigate('/results');
-      }, 1000);
-    }
+    await Promise.allSettled(promises);
+    console.log('All report generation attempts completed');
   };
 
   const getProgress = () => {
@@ -117,6 +135,7 @@ const GeneratingReports = () => {
 
   const retryGeneration = () => {
     if (ideaData) {
+      console.log('Retrying generation...');
       setStatus({
         'business-plan': 'pending',
         'marketing': 'pending',
@@ -127,7 +146,7 @@ const GeneratingReports = () => {
         'landing-page': 'pending'
       });
       setGeneratedContent({});
-      generateAllReports(ideaData);
+      setHasStartedGeneration(false);
     }
   };
 
