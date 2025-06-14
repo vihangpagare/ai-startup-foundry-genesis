@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -16,18 +15,31 @@ interface AnalysisRequest {
   analysisType: 'business-plan' | 'marketing' | 'technical' | 'financial' | 'competitive' | 'ux-design' | 'landing-page';
 }
 
+// Helper function to clean API keys by removing surrounding quotes
+const cleanApiKey = (key: string | undefined): string | undefined => {
+  if (!key) return undefined;
+  // Remove single or double quotes from the beginning and end
+  return key.replace(/^['"]|['"]$/g, '').trim();
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
-    const exaApiKey = Deno.env.get('EXA_API_KEY');
+    const rawAnthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    const rawExaApiKey = Deno.env.get('EXA_API_KEY');
+    
+    // Clean the API keys by removing quotes
+    const anthropicApiKey = cleanApiKey(rawAnthropicApiKey);
+    const exaApiKey = cleanApiKey(rawExaApiKey);
     
     console.log('API Keys check:', {
-      anthropic: anthropicApiKey ? 'Present' : 'Missing',
-      exa: exaApiKey ? 'Present' : 'Missing'
+      anthropic: anthropicApiKey ? 'Present (cleaned)' : 'Missing',
+      exa: exaApiKey ? 'Present (cleaned)' : 'Missing',
+      rawAnthropicLength: rawAnthropicApiKey?.length,
+      cleanedAnthropicLength: anthropicApiKey?.length
     });
 
     if (!anthropicApiKey) {
@@ -65,7 +77,7 @@ serve(async (req) => {
           ).join('\n') || '';
           console.log('Market research fetched successfully');
         } else {
-          console.log('Exa API call failed:', exaResponse.status);
+          console.log('Exa API call failed:', exaResponse.status, await exaResponse.text());
         }
       } catch (error) {
         console.log('Exa search failed:', error);
@@ -76,7 +88,7 @@ serve(async (req) => {
     const systemPrompt = getSystemPrompt(analysisType);
     const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
-    console.log('Calling Anthropic API...');
+    console.log('Calling Anthropic API with cleaned key...');
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -85,7 +97,7 @@ serve(async (req) => {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 4000,
         temperature: 0.7,
         messages: [
@@ -293,4 +305,3 @@ Include specific examples, numbers, timelines, and recommendations that apply un
 
 Format your response with clear headers and organized sections for maximum readability.
 `;
-}
