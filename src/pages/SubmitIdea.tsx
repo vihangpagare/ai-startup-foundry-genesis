@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,14 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const SubmitIdea = () => {
-  const [formData, setFormData] = useState({
-    idea: '',
-    companyName: '',
-    targetAudience: '',
-    problemStatement: '',
-    solution: '',
-    uniqueValue: ''
-  });
+  const [idea, setIdea] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [targetAudience, setTargetAudience] = useState('');
+  const [problemStatement, setProblemStatement] = useState('');
+  const [solution, setSolution] = useState('');
+  const [uniqueValue, setUniqueValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState('');
   const navigate = useNavigate();
@@ -26,41 +23,34 @@ const SubmitIdea = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.idea.trim()) {
+    if (!idea.trim()) {
       toast({
-        title: "Please describe your SaaS idea",
-        description: "We need your idea description to create your startup package.",
-        variant: "destructive"
+        title: "Error",
+        description: "Please enter your startup idea",
+        variant: "destructive",
       });
       return;
     }
 
-    setIsProcessing(true);
-    
-    // Simulate comprehensive processing with realistic steps
-    const steps = [
-      'Analyzing market viability and competition...',
-      'Generating strategic business foundation...',
-      'Designing technical architecture...',
-      'Creating marketing and growth strategies...',
-      'Developing MVP specifications...',
-      'Finalizing comprehensive business plan...'
-    ];
-
-    for (let i = 0; i < steps.length; i++) {
-      setProcessingStep(steps[i]);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    
-    // Store comprehensive data
-    const comprehensiveData = {
-      ...formData,
-      timestamp: new Date().toISOString(),
-      analysisComplete: true
+    const ideaData = {
+      idea,
+      companyName,
+      targetAudience,
+      problemStatement,
+      solution,
+      uniqueValue,
+      submittedAt: new Date().toISOString()
     };
+
+    localStorage.setItem('saasIdea', JSON.stringify(ideaData));
     
-    localStorage.setItem('saasIdea', JSON.stringify(comprehensiveData));
-    navigate('/results');
+    toast({
+      title: "Idea Submitted!",
+      description: "Generating your comprehensive startup analysis...",
+    });
+    
+    // Navigate to generation page instead of results
+    navigate('/generating-reports');
   };
 
   const exampleIdeas = [
@@ -168,8 +158,8 @@ const SubmitIdea = () => {
                     <Input
                       id="companyName"
                       placeholder="e.g., FoodiePost, DesignMarket, HireWise"
-                      value={formData.companyName}
-                      onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
                       disabled={isProcessing}
                     />
                   </div>
@@ -179,8 +169,8 @@ const SubmitIdea = () => {
                     <Textarea
                       id="idea"
                       placeholder="Describe your SaaS idea in detail. Include the core problem you're solving, your proposed solution, key features, and target users. Be as specific as possible..."
-                      value={formData.idea}
-                      onChange={(e) => setFormData({...formData, idea: e.target.value})}
+                      value={idea}
+                      onChange={(e) => setIdea(e.target.value)}
                       className="min-h-[120px] text-base"
                       disabled={isProcessing}
                       required
@@ -192,8 +182,8 @@ const SubmitIdea = () => {
                     <Textarea
                       id="problemStatement"
                       placeholder="What specific problem does your SaaS solve? Who experiences this problem and how painful is it for them?"
-                      value={formData.problemStatement}
-                      onChange={(e) => setFormData({...formData, problemStatement: e.target.value})}
+                      value={problemStatement}
+                      onChange={(e) => setProblemStatement(e.target.value)}
                       className="min-h-[80px]"
                       disabled={isProcessing}
                     />
@@ -204,8 +194,8 @@ const SubmitIdea = () => {
                     <Input
                       id="targetAudience"
                       placeholder="e.g., Small restaurant owners, Freelance designers, HR managers at mid-size companies"
-                      value={formData.targetAudience}
-                      onChange={(e) => setFormData({...formData, targetAudience: e.target.value})}
+                      value={targetAudience}
+                      onChange={(e) => setTargetAudience(e.target.value)}
                       disabled={isProcessing}
                     />
                   </div>
@@ -215,8 +205,8 @@ const SubmitIdea = () => {
                     <Textarea
                       id="solution"
                       placeholder="How does your SaaS solve the problem? What makes your approach unique or better than existing solutions?"
-                      value={formData.solution}
-                      onChange={(e) => setFormData({...formData, solution: e.target.value})}
+                      value={solution}
+                      onChange={(e) => setSolution(e.target.value)}
                       className="min-h-[80px]"
                       disabled={isProcessing}
                     />
@@ -227,8 +217,8 @@ const SubmitIdea = () => {
                     <Input
                       id="uniqueValue"
                       placeholder="What makes your solution different from competitors? What's your key differentiator?"
-                      value={formData.uniqueValue}
-                      onChange={(e) => setFormData({...formData, uniqueValue: e.target.value})}
+                      value={uniqueValue}
+                      onChange={(e) => setUniqueValue(e.target.value)}
                       disabled={isProcessing}
                     />
                   </div>

@@ -36,18 +36,21 @@ serve(async (req) => {
 
 Requirements:
 - Use TypeScript and Tailwind CSS exclusively
-- Include ALL necessary imports
+- Include ALL necessary imports (React, icons from lucide-react, etc.)
 - Create a complete, self-contained component
 - Use modern React patterns (functional components, hooks)
-- Include proper TypeScript interfaces
+- Include proper TypeScript interfaces where needed
 - Make it fully responsive and accessible
 - Use lucide-react for all icons
 - Include realistic, specific content for this business
 - Optimize for conversion with clear CTAs
 - Use gradient backgrounds and modern design
 - Export as default component
+- Include hero section, features, pricing, testimonials, FAQ, and footer
+- Use proper semantic HTML structure
+- Include hover effects and animations with Tailwind
 
-The code should be production-ready and deployable immediately.`;
+The code should be production-ready and deployable immediately. Return ONLY the complete React component code.`;
 
     const userPrompt = `
 Create a complete React landing page component for this specific SaaS startup:
@@ -58,7 +61,7 @@ TARGET AUDIENCE: ${targetAudience || 'Business professionals'}
 UNIQUE VALUE PROPOSITION: ${uniqueValue || 'Innovative solution'}
 
 BUSINESS ANALYSIS CONTEXT:
-${analysisData ? analysisData.substring(0, 1000) : 'Use the business idea to create compelling content'}
+${analysisData ? JSON.stringify(analysisData).substring(0, 1000) : 'Use the business idea to create compelling content'}
 
 Create a landing page with these sections:
 1. Hero section with compelling headline and CTA
@@ -78,7 +81,7 @@ Make the content SPECIFIC to this business idea - not generic. Include:
 - Relevant testimonials and use cases
 - Compelling value propositions
 
-Return ONLY the complete React component code with proper TypeScript typing. No explanations, just the code.
+Return ONLY the complete React component code with proper TypeScript typing. No explanations, just the code. Start with imports and end with export default.
 `;
 
     console.log('Calling Anthropic API for landing page generation...');
@@ -86,12 +89,12 @@ Return ONLY the complete React component code with proper TypeScript typing. No 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${anthropicApiKey}`,
+        'x-api-key': anthropicApiKey,
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 4000,
         temperature: 0.3,
         messages: [

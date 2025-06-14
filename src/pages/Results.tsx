@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Results = () => {
   const [ideaData, setIdeaData] = useState<any>(null);
+  const [generatedReports, setGeneratedReports] = useState<Record<string, string>>({});
   const [executiveSummary, setExecutiveSummary] = useState({
     marketSize: '$15B+',
     targetMarket: 'Business professionals',
@@ -30,93 +30,83 @@ const Results = () => {
 
   useEffect(() => {
     const storedData = localStorage.getItem('saasIdea');
-    if (!storedData) {
+    const storedReports = localStorage.getItem('generatedReports');
+    
+    if (!storedData || !storedReports) {
       navigate('/submit-idea');
       return;
     }
     
     try {
       const parsedData = JSON.parse(storedData);
+      const parsedReports = JSON.parse(storedReports);
       setIdeaData(parsedData);
-      generateExecutiveSummary(parsedData);
+      setGeneratedReports(parsedReports);
+      generateDynamicExecutiveSummary(parsedData, parsedReports);
     } catch (error) {
       navigate('/submit-idea');
     }
   }, [navigate]);
 
-  const generateExecutiveSummary = (data: any) => {
-    // Generate more dynamic metrics based on the actual idea content
+  const generateDynamicExecutiveSummary = (data: any, reports: Record<string, string>) => {
+    // Extract insights from AI-generated reports to create dynamic metrics
     const idea = data.idea?.toLowerCase() || '';
-    const targetAudience = data.targetAudience || 'Business professionals';
+    const businessPlan = reports['business-plan'] || '';
+    const financial = reports['financial'] || '';
     
-    // Industry-based market sizing
+    // Analyze the financial report for revenue projections
+    let revenueProjection = '$100K-250K';
+    const revenueMatch = financial.match(/revenue.*?(\$[\d,]+(?:K|M)?)/i);
+    if (revenueMatch) {
+      revenueProjection = revenueMatch[1];
+    }
+
+    // Analyze business plan for market size
     let marketSize = '$15B+';
+    const marketMatch = businessPlan.match(/market.*?(\$[\d,]+(?:B|M)?)/i);
+    if (marketMatch) {
+      marketSize = marketMatch[1];
+    }
+
+    // Industry-based refinements
     let timeToMarket = '3-6 months';
     let initialInvestment = '$25K-75K';
-    let revenueProjection = '$100K-250K';
     
     if (idea.includes('restaurant') || idea.includes('food')) {
-      marketSize = '$45B+';
-      revenueProjection = '$150K-400K';
+      marketSize = marketSize || '$45B+';
       timeToMarket = '2-4 months';
-    } else if (idea.includes('design') || idea.includes('creative')) {
-      marketSize = '$13B+';
-      revenueProjection = '$75K-200K';
-      timeToMarket = '3-5 months';
-    } else if (idea.includes('hr') || idea.includes('recruiting') || idea.includes('job')) {
-      marketSize = '$30B+';
-      revenueProjection = '$200K-500K';
-      timeToMarket = '4-8 months';
-      initialInvestment = '$50K-150K';
-    } else if (idea.includes('e-commerce') || idea.includes('retail')) {
-      marketSize = '$120B+';
-      revenueProjection = '$250K-750K';
-      timeToMarket = '4-6 months';
-      initialInvestment = '$75K-200K';
     } else if (idea.includes('health') || idea.includes('medical')) {
-      marketSize = '$85B+';
-      revenueProjection = '$300K-800K';
       timeToMarket = '6-12 months';
       initialInvestment = '$100K-300K';
-    } else if (idea.includes('education') || idea.includes('learning')) {
-      marketSize = '$25B+';
-      revenueProjection = '$125K-350K';
-      timeToMarket = '3-6 months';
-    } else if (idea.includes('finance') || idea.includes('fintech')) {
-      marketSize = '$180B+';
-      revenueProjection = '$400K-1M';
+    } else if (idea.includes('fintech') || idea.includes('finance')) {
       timeToMarket = '6-12 months';
       initialInvestment = '$150K-500K';
     }
 
-    // Generate viability score based on multiple factors
+    // Calculate viability score based on report content quality
     let viabilityScore = 75;
     
     // Boost score for well-defined problems and solutions
     if (data.problemStatement && data.solution) viabilityScore += 10;
     if (data.uniqueValue) viabilityScore += 5;
     if (data.targetAudience && data.targetAudience !== 'Not specified') viabilityScore += 5;
-    if (data.companyName) viabilityScore += 3;
     
-    // Industry complexity adjustments
-    if (idea.includes('ai') || idea.includes('artificial intelligence')) viabilityScore += 5;
-    if (idea.includes('blockchain') || idea.includes('crypto')) viabilityScore -= 10;
-    if (idea.includes('social media') || idea.includes('content')) viabilityScore += 8;
+    // Analyze report content quality
+    if (businessPlan.length > 2000) viabilityScore += 3;
+    if (financial.includes('revenue model')) viabilityScore += 2;
+    if (reports['competitive']?.includes('competitor')) viabilityScore += 3;
     
-    // Cap at 97%
     viabilityScore = Math.min(viabilityScore, 97);
 
     setExecutiveSummary({
       marketSize,
-      targetMarket: targetAudience,
+      targetMarket: data.targetAudience || 'Business professionals',
       revenueProjection,
       timeToMarket,
       initialInvestment,
       viabilityScore: `${viabilityScore}%`
     });
   };
-
-  if (!ideaData) return null;
 
   const handleExportPDF = async () => {
     try {
@@ -202,6 +192,8 @@ const Results = () => {
       pages: "12-15 pages"
     }
   ];
+
+  if (!ideaData) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
