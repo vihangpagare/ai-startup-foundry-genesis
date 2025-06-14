@@ -19,9 +19,11 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
     errors: string[];
     warnings: string[];
   }>({ errors: [], warnings: [] });
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
     if (code) {
+      console.log('LandingPagePreview: Received code, length:', code.length);
       processAndCreateSandbox();
     }
   }, [code]);
@@ -29,28 +31,45 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
   const processAndCreateSandbox = async () => {
     setLoading(true);
     setError(null);
+    setDebugInfo('Starting code processing...');
 
     try {
+      console.log('Processing code for sandbox...');
+      
       // Step 1: Process the code
       const processingResult = CodeProcessor.processReactCode(code);
+      console.log('Processing result:', {
+        errors: processingResult.errors,
+        warnings: processingResult.warnings,
+        codeLength: processingResult.processedCode.length
+      });
+      
       setProcessingResults({
         errors: processingResult.errors,
         warnings: processingResult.warnings
       });
 
+      setDebugInfo(`Code processed. Errors: ${processingResult.errors.length}, Warnings: ${processingResult.warnings.length}`);
+
       // Step 2: If there are critical errors, don't proceed
       if (processingResult.errors.length > 0) {
-        setError(`Code processing errors: ${processingResult.errors.join(', ')}`);
+        const errorMsg = `Code processing errors: ${processingResult.errors.join(', ')}`;
+        console.error('Critical processing errors:', processingResult.errors);
+        setError(errorMsg);
         setLoading(false);
         return;
       }
 
+      setDebugInfo('Creating sandbox...');
+
       // Step 3: Create or get cached sandbox
       const sandboxResult = await SandboxManager.createOrUpdateSandbox(processingResult.processedCode);
+      console.log('Sandbox result:', sandboxResult);
 
       if (sandboxResult.success) {
         setSandboxUrl(sandboxResult.embedUrl);
         setSandboxId(sandboxResult.sandboxId);
+        setDebugInfo(`Sandbox created successfully: ${sandboxResult.sandboxId}`);
       } else {
         throw new Error(sandboxResult.error || 'Failed to create sandbox');
       }
@@ -59,6 +78,7 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
     } catch (err: any) {
       console.error('Preview creation error:', err);
       setError(err.message || 'Failed to create live preview');
+      setDebugInfo(`Error: ${err.message}`);
       setLoading(false);
     }
   };
@@ -82,6 +102,9 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
           <p className="text-gray-700 font-medium">Processing React Code...</p>
           <p className="text-sm text-gray-500 mt-2">Validating • Optimizing • Creating Live Environment</p>
+          {debugInfo && (
+            <p className="text-xs text-gray-400 mt-2 bg-gray-100 px-3 py-1 rounded">{debugInfo}</p>
+          )}
           <div className="mt-4 flex justify-center space-x-2">
             <Badge variant="secondary" className="bg-blue-100 text-blue-800">
               Code Processing
@@ -102,6 +125,13 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
           <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-600" />
           <h3 className="text-lg font-semibold text-red-800 mb-2">Preview Generation Failed</h3>
           <p className="text-red-700 mb-4">{error}</p>
+          
+          {debugInfo && (
+            <div className="bg-red-100 rounded-lg p-4 mb-4 text-left">
+              <h4 className="font-medium text-red-800 mb-2">Debug Information:</h4>
+              <p className="text-sm text-red-700">{debugInfo}</p>
+            </div>
+          )}
           
           {processingResults.errors.length > 0 && (
             <div className="bg-red-100 rounded-lg p-4 mb-4 text-left">
@@ -198,16 +228,10 @@ const LandingPagePreview = ({ code }: LandingPagePreviewProps) => {
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads"
             title="Live React Landing Page Preview"
             loading="lazy"
+            onLoad={() => console.log('Sandbox iframe loaded successfully')}
+            onError={(e) => console.error('Sandbox iframe error:', e)}
           />
         )}
-        
-        {/* Loading overlay for iframe */}
-        <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center pointer-events-none">
-          <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-2">
-            <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
-            <span className="text-sm text-gray-600">Loading React App...</span>
-          </div>
-        </div>
       </div>
     </div>
   );
