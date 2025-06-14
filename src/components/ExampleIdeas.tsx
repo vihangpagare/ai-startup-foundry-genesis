@@ -31,7 +31,7 @@ export const ExampleIdeas = ({ onExampleClick, isProcessing }: ExampleIdeasProps
   ];
 
   return (
-    <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+    <Card className="border shadow-xl bg-card/80 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-xl">Need Inspiration? Example SaaS Ideas</CardTitle>
         <CardDescription>
@@ -43,16 +43,16 @@ export const ExampleIdeas = ({ onExampleClick, isProcessing }: ExampleIdeasProps
           {exampleIdeas.map((example, index) => (
             <div 
               key={index}
-              className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg cursor-pointer hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 border border-gray-200 hover:border-indigo-200"
+              className="p-6 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-all duration-300 border border-border hover:border-primary/50"
               onClick={() => !isProcessing && onExampleClick(example.description)}
             >
               <div className="flex justify-between items-start mb-3">
-                <h4 className="font-semibold text-gray-900">{example.title}</h4>
-                <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
+                <h4 className="font-semibold text-foreground">{example.title}</h4>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full border border-primary/20">
                   {example.industry}
                 </span>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{example.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{example.description}</p>
             </div>
           ))}
         </div>

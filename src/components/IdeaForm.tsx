@@ -69,7 +69,7 @@ export const IdeaForm = ({ onExampleClick }: IdeaFormProps) => {
     <Card className="border shadow-xl bg-card/80 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Lightbulb className="h-5 w-5 text-indigo-600" />
+          <Lightbulb className="h-5 w-5 text-primary" />
           <span>Your SaaS Startup Details</span>
         </CardTitle>
         <CardDescription>
@@ -168,7 +168,7 @@ export const IdeaForm = ({ onExampleClick }: IdeaFormProps) => {
 
           {isProcessing && (
             <div className="text-center">
-              <p className="text-sm text-indigo-600 animate-pulse">{processingStep}</p>
+              <p className="text-sm text-primary animate-pulse">{processingStep}</p>
               <div className="w-full bg-muted rounded-full h-2 mt-2">
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
               </div>

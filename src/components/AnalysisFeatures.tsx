@@ -27,7 +27,7 @@ export const AnalysisFeatures = () => {
   ];
 
   return (
-    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+    <Card className="border shadow-lg bg-card/80 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-lg">What You'll Receive</CardTitle>
       </CardHeader>
@@ -35,12 +35,12 @@ export const AnalysisFeatures = () => {
         <div className="space-y-4">
           {analysisFeatures.map((feature, index) => (
             <div key={index} className="flex items-start space-x-3">
-              <div className="text-indigo-600 mt-1">
+              <div className="text-primary mt-1">
                 {feature.icon}
               </div>
               <div>
-                <h4 className="font-semibold text-sm">{feature.title}</h4>
-                <p className="text-xs text-gray-600">{feature.description}</p>
+                <h4 className="font-semibold text-sm text-foreground">{feature.title}</h4>
+                <p className="text-xs text-muted-foreground">{feature.description}</p>
               </div>
             </div>
           ))}
