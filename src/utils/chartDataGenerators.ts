@@ -1,101 +1,73 @@
 
-interface MarketData {
-  year: string;
-  marketSize: number;
-  growth: number;
-  competitors: number;
-  funding: number;
-}
-
-interface RevenueData {
-  quarter: string;
-  revenue: number;
-  users: number;
-  churn: number;
-  cac: number;
-  ltv: number;
-}
-
-interface FunnelData {
-  name: string;
-  value: number;
-  fill: string;
-}
-
-interface CompetitorData {
-  name: string;
-  share: number;
-  funding: number;
-  employees: number;
-  color: string;
-}
-
-interface MetricsData {
-  metric: string;
-  score: number;
-  category: string;
-  color: string;
-}
-
-export const generateEnhancedMarketData = (ideaData: any): MarketData[] => {
-  const idea = ideaData?.idea?.toLowerCase() || '';
-  let baseGrowth = 15;
-  let marketMultiplier = 1;
-  
-  if (idea.includes('ai') || idea.includes('machine learning')) {
-    baseGrowth = 28;
-    marketMultiplier = 2.5;
-  } else if (idea.includes('health') || idea.includes('medical')) {
-    baseGrowth = 22;
-    marketMultiplier = 1.8;
-  } else if (idea.includes('fintech') || idea.includes('finance')) {
-    baseGrowth = 25;
-    marketMultiplier = 2.2;
-  } else if (idea.includes('education') || idea.includes('learning')) {
-    baseGrowth = 18;
-    marketMultiplier = 1.4;
-  }
-  
+export const generateEnhancedMarketData = (ideaData: any) => {
+  const currentYear = new Date().getFullYear();
   return [
-    { year: '2023', marketSize: 1.2 * marketMultiplier, growth: baseGrowth - 3, competitors: 150, funding: 2.1 },
-    { year: '2024', marketSize: 1.2 * marketMultiplier * (1 + baseGrowth/100), growth: baseGrowth, competitors: 185, funding: 3.2 },
-    { year: '2025', marketSize: 1.2 * marketMultiplier * Math.pow(1 + baseGrowth/100, 2), growth: baseGrowth + 2, competitors: 220, funding: 4.8 },
-    { year: '2026', marketSize: 1.2 * marketMultiplier * Math.pow(1 + baseGrowth/100, 3), growth: baseGrowth + 1, competitors: 260, funding: 6.5 },
-    { year: '2027', marketSize: 1.2 * marketMultiplier * Math.pow(1 + baseGrowth/100, 4), growth: baseGrowth - 1, competitors: 295, funding: 8.2 },
+    { year: `${currentYear - 2}`, marketSize: 45000, growth: 12, competitors: 25, funding: 2500 },
+    { year: `${currentYear - 1}`, marketSize: 52000, growth: 15, competitors: 32, funding: 3200 },
+    { year: `${currentYear}`, marketSize: 61000, growth: 18, competitors: 38, funding: 4100 },
+    { year: `${currentYear + 1}`, marketSize: 73000, growth: 22, competitors: 45, funding: 5800 },
+    { year: `${currentYear + 2}`, marketSize: 89000, growth: 25, competitors: 52, funding: 7200 }
   ];
 };
 
-export const generateDetailedRevenueData = (): RevenueData[] => {
-  const baseRevenue = 50000;
-  return [
-    { quarter: 'Q1 2024', revenue: baseRevenue, users: 100, churn: 5, cac: 150, ltv: 2400 },
-    { quarter: 'Q2 2024', revenue: baseRevenue * 1.8, users: 250, churn: 4.2, cac: 140, ltv: 2650 },
-    { quarter: 'Q3 2024', revenue: baseRevenue * 3.2, users: 500, churn: 3.8, cac: 130, ltv: 2900 },
-    { quarter: 'Q4 2024', revenue: baseRevenue * 5.1, users: 850, churn: 3.5, cac: 125, ltv: 3200 },
-    { quarter: 'Q1 2025', revenue: baseRevenue * 7.8, users: 1200, churn: 3.2, cac: 120, ltv: 3500 },
-    { quarter: 'Q2 2025', revenue: baseRevenue * 11.2, users: 1800, churn: 3.0, cac: 115, ltv: 3800 },
-  ];
+export const generateDetailedRevenueData = () => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months.map((month, index) => ({
+    month,
+    revenue: Math.floor(Math.random() * 50000) + 10000 + (index * 2000),
+    users: Math.floor(Math.random() * 1000) + 200 + (index * 50),
+    churn: Math.random() * 5 + 2,
+    mrr: Math.floor(Math.random() * 15000) + 5000 + (index * 800)
+  }));
 };
 
-export const generateFunnelData = (colors: any): FunnelData[] => [
+export const generateFunnelData = (colors: any) => [
   { name: 'Website Visitors', value: 10000, fill: colors.primary },
-  { name: 'Signups', value: 2500, fill: colors.secondary },
-  { name: 'Free Trial', value: 1200, fill: colors.success },
-  { name: 'Paid Conversion', value: 360, fill: colors.warning },
-  { name: 'Retained Users', value: 320, fill: colors.danger }
+  { name: 'Sign-ups', value: 3000, fill: colors.secondary },
+  { name: 'Trial Users', value: 1500, fill: colors.success },
+  { name: 'Paid Users', value: 500, fill: colors.warning },
+  { name: 'Long-term Customers', value: 200, fill: colors.danger }
 ];
 
-export const generateCompetitiveData = (colors: any): CompetitorData[] => [
-  { name: 'Market Leader', share: 32, funding: 150, employees: 500, color: colors.danger },
-  { name: 'Strong Competitor', share: 24, funding: 80, employees: 200, color: colors.warning },
-  { name: 'Emerging Player', share: 18, funding: 45, employees: 120, color: colors.secondary },
-  { name: 'Niche Players', share: 16, funding: 25, employees: 80, color: colors.muted },
-  { name: 'Your Opportunity', share: 10, funding: 0, employees: 0, color: colors.success }
+export const generateCompetitiveData = (colors: any) => [
+  { name: 'Your Company', share: 25, funding: 5000000, employees: 50, color: colors.primary },
+  { name: 'Competitor A', share: 35, funding: 15000000, employees: 150, color: colors.secondary },
+  { name: 'Competitor B', share: 20, funding: 8000000, employees: 80, color: colors.success },
+  { name: 'Competitor C', share: 15, funding: 12000000, employees: 120, color: colors.warning },
+  { name: 'Others', share: 5, funding: 2000000, employees: 30, color: colors.muted }
 ];
 
-export const generateMetricsData = (colors: any): MetricsData[] => [
-  { metric: 'Market Viability', score: 85, category: 'High', color: colors.success },
-  { metric: 'Technical Feasibility', score: 92, category: 'Very High', color: colors.primary },
-  { metric: 'Competition Level', score: 65, category: 'Moderate', color: colors.warning },
-  { metric: 'Investment Appeal', score: 78, category: 'Strong', color: colors.secondary }
+export const generateMetricsData = (colors: any) => [
+  {
+    title: 'Monthly Revenue',
+    value: '$45,230',
+    change: '+12.5%',
+    trend: 'up',
+    color: colors.success,
+    data: [20, 25, 30, 28, 35, 40, 45]
+  },
+  {
+    title: 'Active Users',
+    value: '2,847',
+    change: '+8.2%',
+    trend: 'up',
+    color: colors.primary,
+    data: [100, 120, 140, 160, 180, 200, 220]
+  },
+  {
+    title: 'Conversion Rate',
+    value: '3.2%',
+    change: '-0.5%',
+    trend: 'down',
+    color: colors.warning,
+    data: [3.8, 3.6, 3.4, 3.2, 3.1, 3.0, 3.2]
+  },
+  {
+    title: 'Customer Satisfaction',
+    value: '4.8/5',
+    change: '+0.3',
+    trend: 'up',
+    color: colors.success,
+    data: [4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8]
+  }
 ];
