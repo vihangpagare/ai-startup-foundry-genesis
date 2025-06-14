@@ -42,7 +42,7 @@ export const generateMetricsData = (colors: any) => [
     title: 'Monthly Revenue',
     value: '$45,230',
     change: '+12.5%',
-    trend: 'up',
+    trend: 'up' as const,
     color: colors.success,
     data: [20, 25, 30, 28, 35, 40, 45]
   },
@@ -50,7 +50,7 @@ export const generateMetricsData = (colors: any) => [
     title: 'Active Users',
     value: '2,847',
     change: '+8.2%',
-    trend: 'up',
+    trend: 'up' as const,
     color: colors.primary,
     data: [100, 120, 140, 160, 180, 200, 220]
   },
@@ -58,7 +58,7 @@ export const generateMetricsData = (colors: any) => [
     title: 'Conversion Rate',
     value: '3.2%',
     change: '-0.5%',
-    trend: 'down',
+    trend: 'down' as const,
     color: colors.warning,
     data: [3.8, 3.6, 3.4, 3.2, 3.1, 3.0, 3.2]
   },
@@ -66,7 +66,7 @@ export const generateMetricsData = (colors: any) => [
     title: 'Customer Satisfaction',
     value: '4.8/5',
     change: '+0.3',
-    trend: 'up',
+    trend: 'up' as const,
     color: colors.success,
     data: [4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8]
   }
