@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,10 +10,14 @@ import TechnicalSpecs from '@/components/TechnicalSpecs';
 import FinancialProjections from '@/components/FinancialProjections';
 import CompetitiveAnalysis from '@/components/CompetitiveAnalysis';
 import UserExperience from '@/components/UserExperience';
+import LandingPageGenerator from '@/components/LandingPageGenerator';
+import { exportToPDF, downloadCompletePackage } from '@/utils/exportUtils';
+import { useToast } from '@/hooks/use-toast';
 
 const Results = () => {
   const [ideaData, setIdeaData] = useState<any>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const storedData = localStorage.getItem('saasIdea');
@@ -32,6 +35,46 @@ const Results = () => {
   }, [navigate]);
 
   if (!ideaData) return null;
+
+  const handleExportPDF = async () => {
+    try {
+      const success = await exportToPDF(ideaData);
+      if (success) {
+        toast({
+          title: "Export Successful",
+          description: "Your business plan has been exported. Check your downloads folder.",
+        });
+      } else {
+        throw new Error("Export failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting your business plan. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadPackage = async () => {
+    try {
+      const success = await downloadCompletePackage(ideaData);
+      if (success) {
+        toast({
+          title: "Download Complete",
+          description: "Your complete startup package has been downloaded. Check your downloads folder.",
+        });
+      } else {
+        throw new Error("Download failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Download Failed", 
+        description: "There was an error downloading your package. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const deliverables = [
     {
@@ -103,11 +146,14 @@ const Results = () => {
               <span>New Analysis</span>
             </Button>
             <div className="flex space-x-3">
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleExportPDF}>
                 <FileText className="mr-2 h-4 w-4" />
                 Export PDF
               </Button>
-              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+              <Button 
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                onClick={handleDownloadPackage}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Download Complete Package
               </Button>
@@ -211,13 +257,14 @@ const Results = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="business-plan" className="w-full">
-              <TabsList className="grid w-full grid-cols-6 bg-gray-100">
+              <TabsList className="grid w-full grid-cols-7 bg-gray-100">
                 <TabsTrigger value="business-plan" className="text-sm">Business Plan</TabsTrigger>
                 <TabsTrigger value="marketing" className="text-sm">Marketing</TabsTrigger>
                 <TabsTrigger value="competitive" className="text-sm">Competition</TabsTrigger>
                 <TabsTrigger value="technical" className="text-sm">Technical</TabsTrigger>
                 <TabsTrigger value="ux-design" className="text-sm">UX Design</TabsTrigger>
                 <TabsTrigger value="financial" className="text-sm">Financial</TabsTrigger>
+                <TabsTrigger value="landing-page" className="text-sm">Landing Page</TabsTrigger>
               </TabsList>
               
               <TabsContent value="business-plan" className="mt-6">
@@ -242,6 +289,10 @@ const Results = () => {
               
               <TabsContent value="financial" className="mt-6">
                 <FinancialProjections idea={ideaData.idea} ideaData={ideaData} />
+              </TabsContent>
+              
+              <TabsContent value="landing-page" className="mt-6">
+                <LandingPageGenerator idea={ideaData.idea} ideaData={ideaData} />
               </TabsContent>
             </Tabs>
           </CardContent>
