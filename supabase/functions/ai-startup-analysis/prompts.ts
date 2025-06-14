@@ -1,3 +1,4 @@
+
 export function getSystemPrompt(analysisType: string): string {
   const basePrompt = `You are an expert startup advisor with 20+ years of experience building successful SaaS companies. You provide detailed, actionable, and highly personalized analysis based on specific startup ideas. Your analysis must be:
 
@@ -160,7 +161,7 @@ You are a senior UX/UI designer with expertise in SaaS product design and user e
 - Accessibility checklist and recommendations
 - Length: 1200-1800 words with clear, actionable descriptions
 
-Provide specific design guidance tailored to this product and user base. Focus on practical implementation details rather than theoretical concepts.`;
+Provide specific design guidance tailored to this product and user base. Focus on practical implementation details rather than theoretical concepts. Keep the analysis concise and actionable without lengthy persona descriptions.`;
     
     case 'landing-page':
       return `You are a senior full-stack developer specializing in React and conversion-optimized landing pages. Generate production-ready landing page code for this SaaS startup.
@@ -286,3 +287,4 @@ Include specific examples, numbers, timelines, and recommendations that apply un
 
 Format your response with clear headers and organized sections for maximum readability.
 `;
+}
