@@ -18,8 +18,27 @@ const CompetitiveAnalysis = ({ idea, ideaData }: CompetitiveAnalysisProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    generateAnalysis();
-  }, [idea, ideaData]);
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
+        const reports = JSON.parse(storedReports);
+        if (reports['competitive']) {
+          setAnalysis(reports['competitive']);
+          setLoading(false);
+          return;
+        }
+      }
+      // If no pre-generated content, generate new
+      generateAnalysis();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateAnalysis();
+    }
+  };
 
   const generateAnalysis = async () => {
     setLoading(true);
@@ -67,8 +86,7 @@ const CompetitiveAnalysis = ({ idea, ideaData }: CompetitiveAnalysisProps) => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating AI-powered competitive analysis...</p>
-          <p className="text-sm text-gray-500 mt-2">Analyzing market positioning and competitors</p>
+          <p className="text-gray-600">Loading competitive analysis...</p>
         </div>
       </div>
     );

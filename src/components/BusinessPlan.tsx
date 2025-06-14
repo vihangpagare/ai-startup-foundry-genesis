@@ -19,8 +19,27 @@ const BusinessPlan = ({ idea, ideaData }: BusinessPlanProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    generateBusinessPlan();
-  }, [idea, ideaData]);
+    loadPreGeneratedContent();
+  }, []);
+
+  const loadPreGeneratedContent = () => {
+    try {
+      const storedReports = localStorage.getItem('generatedReports');
+      if (storedReports) {
+        const reports = JSON.parse(storedReports);
+        if (reports['business-plan']) {
+          setAnalysis(reports['business-plan']);
+          setLoading(false);
+          return;
+        }
+      }
+      // If no pre-generated content, generate new
+      generateBusinessPlan();
+    } catch (error) {
+      console.error('Error loading pre-generated content:', error);
+      generateBusinessPlan();
+    }
+  };
 
   const generateBusinessPlan = async () => {
     setLoading(true);
@@ -68,8 +87,7 @@ const BusinessPlan = ({ idea, ideaData }: BusinessPlanProps) => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating AI-powered business plan analysis...</p>
-          <p className="text-sm text-gray-500 mt-2">This may take 30-60 seconds</p>
+          <p className="text-gray-600">Loading business plan analysis...</p>
         </div>
       </div>
     );
