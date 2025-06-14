@@ -1,9 +1,8 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Download, FileText, TrendingUp, Code, CheckCircle, Sparkles, Building, Users, Zap, PieChart, Target, Rocket, Star, Globe, Brain } from 'lucide-react';
+import { ArrowLeft, Download, FileText, TrendingUp, Code, CheckCircle, Sparkles, Building, Users, Zap, PieChart, Target, Rocket, Star, Globe, Brain, Moon, Sun, BarChart, Presentation, Database, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BusinessPlan from '@/components/BusinessPlan';
 import MarketingStrategy from '@/components/MarketingStrategy';
@@ -12,10 +11,15 @@ import FinancialProjections from '@/components/FinancialProjections';
 import CompetitiveAnalysis from '@/components/CompetitiveAnalysis';
 import UserExperience from '@/components/UserExperience';
 import LandingPageGenerator from '@/components/LandingPageGenerator';
+import DataVisualization from '@/components/DataVisualization';
+import RealTimeMarketData from '@/components/RealTimeMarketData';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { exportToPDF, downloadCompletePackage } from '@/utils/exportUtils';
+import { exportToAdvancedPDF, exportToPowerPoint, exportToJSON } from '@/utils/enhancedExport';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-const Results = () => {
+const ResultsContent = () => {
   const [ideaData, setIdeaData] = useState<any>(null);
   const [generatedReports, setGeneratedReports] = useState<Record<string, string>>({});
   const [executiveSummary, setExecutiveSummary] = useState({
@@ -24,6 +28,8 @@ const Results = () => {
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const storedData = localStorage.getItem('saasIdea');
@@ -97,6 +103,60 @@ const Results = () => {
       toast({
         title: "Export Failed",
         description: "There was an error exporting your business plan. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportAdvanced = async () => {
+    try {
+      const success = await exportToAdvancedPDF(ideaData, generatedReports);
+      if (success) {
+        toast({
+          title: "Premium Export Successful",
+          description: "Your enhanced business analysis has been exported.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting your analysis.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportPresentation = async () => {
+    try {
+      const success = await exportToPowerPoint(ideaData, generatedReports);
+      if (success) {
+        toast({
+          title: "Presentation Export Successful", 
+          description: "Your presentation slides have been exported.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error creating your presentation.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      const success = await exportToJSON(ideaData, generatedReports);
+      if (success) {
+        toast({
+          title: "Data Export Successful",
+          description: "Your structured data has been exported as JSON.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting your data.",
         variant: "destructive",
       });
     }
@@ -177,7 +237,7 @@ const Results = () => {
 
   return (
     <div className="min-h-screen animated-bg">
-      {/* Enhanced Header with glassmorphism */}
+      {/* Enhanced Header with theme toggle */}
       <header className="glass sticky top-0 z-50 border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
@@ -189,17 +249,40 @@ const Results = () => {
               <ArrowLeft className="h-4 w-4" />
               <span>New Analysis</span>
             </Button>
-            <div className="flex space-x-3">
-              <Button variant="outline" onClick={handleExportPDF} className="glass border-white/30 text-white hover:bg-white/10">
-                <FileText className="mr-2 h-4 w-4" />
-                Export PDF
+            
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="text-white hover:bg-white/10"
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
+              
+              {!isMobile && (
+                <>
+                  <Button variant="outline" onClick={handleExportAdvanced} className="glass border-white/30 text-white hover:bg-white/10">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Premium PDF
+                  </Button>
+                  <Button variant="outline" onClick={handleExportPresentation} className="glass border-white/30 text-white hover:bg-white/10">
+                    <Presentation className="mr-2 h-4 w-4" />
+                    Slides
+                  </Button>
+                  <Button variant="outline" onClick={handleExportData} className="glass border-white/30 text-white hover:bg-white/10">
+                    <Database className="mr-2 h-4 w-4" />
+                    Data
+                  </Button>
+                </>
+              )}
+              
               <Button 
                 className="btn-vibrant"
-                onClick={handleDownloadPackage}
+                onClick={downloadCompletePackage}
               >
                 <Download className="mr-2 h-4 w-4" />
-                Download Complete Package
+                {isMobile ? 'Download' : 'Complete Package'}
               </Button>
             </div>
           </div>
@@ -207,6 +290,37 @@ const Results = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mobile Export Options */}
+        {isMobile && (
+          <Card className="mb-6 card-vibrant">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Smartphone className="h-5 w-5" />
+                <span>Export Options</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-3">
+                <Button variant="outline" onClick={handleExportAdvanced} className="text-xs">
+                  <FileText className="mr-1 h-3 w-3" />
+                  PDF
+                </Button>
+                <Button variant="outline" onClick={handleExportPresentation} className="text-xs">
+                  <Presentation className="mr-1 h-3 w-3" />
+                  Slides
+                </Button>
+                <Button variant="outline" onClick={handleExportData} className="text-xs">
+                  <Database className="mr-1 h-3 w-3" />
+                  Data
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Real-time Market Data */}
+        <RealTimeMarketData idea={ideaData.idea} />
+
         {/* Enhanced Success Banner */}
         <Card className="mb-8 card-vibrant gentle-glow">
           <CardHeader className="text-center">
@@ -274,6 +388,9 @@ const Results = () => {
           </Card>
         </div>
 
+        {/* Data Visualizations */}
+        <DataVisualization ideaData={ideaData} reports={generatedReports} />
+
         {/* Enhanced Deliverables Overview */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {deliverables.map((deliverable, index) => (
@@ -310,21 +427,98 @@ const Results = () => {
               </div>
               <span className="text-gradient">Complete AI-Powered Startup Analysis</span>
             </CardTitle>
-            <CardDescription className="text-xl text-gray-700 font-medium">
-              Comprehensive business foundation with AI-generated analysis across all critical startup dimensions
+            <CardDescription className="text-xl text-gray-700 dark:text-gray-300 font-medium">
+              Comprehensive business foundation with AI-generated analysis, live market data, and advanced visualizations
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="business-plan" className="w-full">
-              <TabsList className="grid w-full grid-cols-7 bg-gradient-primary p-2 rounded-2xl">
-                <TabsTrigger value="business-plan" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Business Plan</TabsTrigger>
-                <TabsTrigger value="marketing" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Marketing</TabsTrigger>
-                <TabsTrigger value="competitive" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Competition</TabsTrigger>
-                <TabsTrigger value="technical" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Technical</TabsTrigger>
-                <TabsTrigger value="ux-design" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">UX Design</TabsTrigger>
-                <TabsTrigger value="financial" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Financial</TabsTrigger>
-                <TabsTrigger value="landing-page" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Landing Page</TabsTrigger>
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className={`grid w-full ${isMobile ? 'grid-cols-4' : 'grid-cols-8'} bg-gradient-primary p-2 rounded-2xl`}>
+                <TabsTrigger value="overview" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">
+                  {isMobile ? '📊' : 'Overview'}
+                </TabsTrigger>
+                <TabsTrigger value="business-plan" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">
+                  {isMobile ? '📋' : 'Business'}
+                </TabsTrigger>
+                <TabsTrigger value="marketing" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">
+                  {isMobile ? '📈' : 'Marketing'}
+                </TabsTrigger>
+                <TabsTrigger value="competitive" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">
+                  {isMobile ? '🎯' : 'Competition'}
+                </TabsTrigger>
+                {!isMobile && (
+                  <>
+                    <TabsTrigger value="technical" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Technical</TabsTrigger>
+                    <TabsTrigger value="ux-design" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">UX Design</TabsTrigger>
+                    <TabsTrigger value="financial" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Financial</TabsTrigger>
+                    <TabsTrigger value="landing-page" className="text-sm font-medium text-white data-[state=active]:bg-white data-[state=active]:text-purple-600 rounded-xl transition-all">Landing Page</TabsTrigger>
+                  </>
+                )}
               </TabsList>
+              
+              <TabsContent value="overview" className="mt-6">
+                <div className="space-y-6">
+                  <DataVisualization ideaData={ideaData} reports={generatedReports} />
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <Card className="report-section">
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2">
+                          <BarChart className="h-5 w-5" />
+                          <span>Key Metrics Dashboard</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <span>Market Opportunity</span>
+                            <Badge className="bg-green-100 text-green-800">High</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span>Technical Feasibility</span>
+                            <Badge className="bg-blue-100 text-blue-800">Very High</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span>Competition Level</span>
+                            <Badge className="bg-yellow-100 text-yellow-800">Moderate</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span>Investment Appeal</span>
+                            <Badge className="bg-purple-100 text-purple-800">Strong</Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="report-section">
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2">
+                          <Target className="h-5 w-5" />
+                          <span>Next Steps Roadmap</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span className="text-sm">MVP Development (Month 1-2)</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span className="text-sm">Beta Testing (Month 3)</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                            <span className="text-sm">Market Launch (Month 4-5)</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-pink-500 rounded-full"></div>
+                            <span className="text-sm">Scale & Growth (Month 6+)</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
               
               <TabsContent value="business-plan" className="mt-6">
                 <div className="report-section">
@@ -372,6 +566,14 @@ const Results = () => {
         </Card>
       </main>
     </div>
+  );
+};
+
+const Results = () => {
+  return (
+    <ThemeProvider>
+      <ResultsContent />
+    </ThemeProvider>
   );
 };
 
