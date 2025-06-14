@@ -22,15 +22,15 @@ serve(async (req) => {
   }
 
   try {
-    // Use the provided hardcoded API keys
-    const anthropicApiKey = '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';
-    const exaApiKey = '7156ecfb-a3a4-4253-8995-44f41b7f351d';
+    // Get API keys from environment variables (Supabase secrets)
+    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    const exaApiKey = Deno.env.get('EXA_API_KEY');
     
     console.log('API Keys check:', {
-      anthropic: anthropicApiKey ? 'Present (hardcoded)' : 'Missing',
-      exa: exaApiKey ? 'Present (hardcoded)' : 'Missing',
-      anthropicKeyLength: anthropicApiKey.length,
-      exaKeyLength: exaApiKey.length
+      anthropic: anthropicApiKey ? 'Present' : 'Missing',
+      exa: exaApiKey ? 'Present' : 'Missing',
+      anthropicKeyLength: anthropicApiKey?.length || 0,
+      exaKeyLength: exaApiKey?.length || 0
     });
 
     if (!anthropicApiKey) {
@@ -83,17 +83,17 @@ serve(async (req) => {
     const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
     console.log('Calling Anthropic API...');
-    console.log('Using hardcoded API key starting with:', anthropicApiKey.substring(0, 15));
+    console.log('Using API key starting with:', anthropicApiKey.substring(0, 15));
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${anthropicApiKey}`,
+        'x-api-key': anthropicApiKey,
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 4000,
         temperature: 0.7,
         messages: [
