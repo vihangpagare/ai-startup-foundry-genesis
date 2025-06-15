@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Palette, Type, Layout, Spacing } from 'lucide-react';
+import { Palette, Type, Layout, Settings } from 'lucide-react';
 import { ColorScheme, TypographyConfig } from '@/types/template';
 
 interface AdvancedThemeBuilderProps {
@@ -135,7 +134,7 @@ const AdvancedThemeBuilder = ({
                 Layout
               </TabsTrigger>
               <TabsTrigger value="spacing">
-                <Spacing className="h-4 w-4 mr-2" />
+                <Settings className="h-4 w-4 mr-2" />
                 Spacing
               </TabsTrigger>
             </TabsList>
