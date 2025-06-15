@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,9 @@ import TechnicalSpecs from '@/components/TechnicalSpecs';
 import FinancialProjections from '@/components/FinancialProjections';
 import UserExperience from '@/components/UserExperience';
 import LandingPageGenerator from '@/components/LandingPageGenerator';
+
+// Import new app generator
+import AppGenerator from '@/components/AppGenerator';
 
 // Import enhanced components
 import EnhancedDataVisualization from '@/components/EnhancedDataVisualization';
@@ -162,7 +166,7 @@ const Results = () => {
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
+            <TabsList className="grid w-full grid-cols-8 lg:grid-cols-8">
               <TabsTrigger value="business-plan" className="flex items-center space-x-1">
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">Business</span>
@@ -190,6 +194,10 @@ const Results = () => {
               <TabsTrigger value="landing-page" className="flex items-center space-x-1">
                 <Code className="h-4 w-4" />
                 <span className="hidden sm:inline">Landing</span>
+              </TabsTrigger>
+              <TabsTrigger value="app-generator" className="flex items-center space-x-1">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Web App</span>
               </TabsTrigger>
             </TabsList>
 
@@ -280,6 +288,12 @@ const Results = () => {
             <TabsContent value="landing-page">
               <ErrorBoundary>
                 <LandingPageGenerator idea={ideaData.idea} ideaData={ideaData} />
+              </ErrorBoundary>
+            </TabsContent>
+
+            <TabsContent value="app-generator">
+              <ErrorBoundary>
+                <AppGenerator idea={ideaData.idea} ideaData={ideaData} />
               </ErrorBoundary>
             </TabsContent>
           </Tabs>
