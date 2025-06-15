@@ -1,8 +1,352 @@
-
 import { LandingPageTemplate, TemplateCustomization } from '@/types/template';
 
 class TemplateManager {
   private templates: LandingPageTemplate[] = [
+    {
+      id: 'advanced-saas',
+      name: 'Advanced SaaS Platform',
+      description: 'Enterprise-grade SaaS template with advanced analytics, interactive demos, and conversion optimization',
+      category: 'saas',
+      complexity: 'advanced',
+      features: ['Interactive Hero', 'Mega Navigation', 'Advanced Analytics', 'Video Testimonials', 'Live Chat', 'A/B Testing', 'API Documentation'],
+      previewImage: '/templates/advanced-saas.png',
+      tags: ['enterprise', 'analytics', 'interactive', 'conversion', 'ai-powered'],
+      version: '2.0.0',
+      popularity: 95,
+      lastUpdated: '2024-12-15',
+      author: 'Lovable AI',
+      premium: true,
+      config: {
+        customizableFields: [
+          { id: 'heroTitle', label: 'Hero Title', type: 'text', required: true, section: 'hero', placeholder: 'Transform Your Business with AI' },
+          { id: 'heroSubtitle', label: 'Hero Subtitle', type: 'textarea', required: true, section: 'hero', placeholder: 'Advanced analytics platform trusted by 50,000+ companies worldwide' },
+          { id: 'ctaText', label: 'CTA Button Text', type: 'text', required: true, section: 'hero', placeholder: 'Start Free Trial' },
+          { id: 'feature1Title', label: 'Feature 1 Title', type: 'text', required: true, section: 'features', placeholder: 'Advanced Analytics' },
+          { id: 'feature1Description', label: 'Feature 1 Description', type: 'textarea', required: true, section: 'features', placeholder: 'Real-time insights with predictive analytics and custom dashboards' },
+          { id: 'feature2Title', label: 'Feature 2 Title', type: 'text', required: true, section: 'features', placeholder: 'Lightning Fast' },
+          { id: 'feature2Description', label: 'Feature 2 Description', type: 'textarea', required: true, section: 'features', placeholder: 'Sub-second query responses with enterprise-grade performance' },
+          { id: 'feature3Title', label: 'Feature 3 Title', type: 'text', required: true, section: 'features', placeholder: 'Enterprise Security' },
+          { id: 'feature3Description', label: 'Feature 3 Description', type: 'textarea', required: true, section: 'features', placeholder: 'Bank-level security with SOC 2 compliance and encryption' }
+        ],
+        colorScheme: {
+          primary: '#3B82F6',
+          secondary: '#8B5CF6',
+          accent: '#F59E0B',
+          background: '#FFFFFF',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Inter, sans-serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
+        },
+        sections: [
+          { 
+            id: 'hero', 
+            name: 'Hero Section', 
+            description: 'Main landing section with CTA',
+            required: true, 
+            customizable: true, 
+            fields: ['heroTitle', 'heroSubtitle', 'ctaText'],
+            variants: [
+              { id: 'centered', name: 'Centered', description: 'Center-aligned hero', preview: '', complexity: 'simple' },
+              { id: 'split', name: 'Split Layout', description: 'Text and visual split', preview: '', complexity: 'moderate' },
+              { id: 'video', name: 'Video Background', description: 'Hero with video background', preview: '', complexity: 'advanced' }
+            ],
+            position: 1
+          },
+          { 
+            id: 'features', 
+            name: 'Features Section', 
+            description: 'Product features and benefits',
+            required: true, 
+            customizable: true, 
+            fields: ['feature1Title', 'feature1Description', 'feature2Title', 'feature2Description', 'feature3Title', 'feature3Description'],
+            variants: [
+              { id: 'grid', name: 'Grid Layout', description: 'Features in grid format', preview: '', complexity: 'simple' },
+              { id: 'cards', name: 'Card Layout', description: 'Features as cards', preview: '', complexity: 'moderate' },
+              { id: 'interactive', name: 'Interactive Cards', description: 'Hover effects and animations', preview: '', complexity: 'advanced' }
+            ],
+            position: 2
+          },
+          { 
+            id: 'testimonials', 
+            name: 'Testimonials', 
+            description: 'Customer testimonials and reviews',
+            required: false, 
+            customizable: true, 
+            fields: [],
+            variants: [
+              { id: 'carousel', name: 'Carousel', description: 'Sliding testimonials', preview: '', complexity: 'moderate' },
+              { id: 'grid', name: 'Grid', description: 'Static grid layout', preview: '', complexity: 'simple' },
+              { id: 'video', name: 'Video Testimonials', description: 'Video customer stories', preview: '', complexity: 'advanced' }
+            ],
+            position: 3
+          },
+          { 
+            id: 'pricing', 
+            name: 'Pricing Section', 
+            description: 'Pricing plans and packages',
+            required: false, 
+            customizable: true, 
+            fields: [],
+            variants: [
+              { id: 'simple', name: 'Simple', description: 'Basic pricing cards', preview: '', complexity: 'simple' },
+              { id: 'comparison', name: 'Comparison Table', description: 'Detailed feature comparison', preview: '', complexity: 'moderate' },
+              { id: 'calculator', name: 'Price Calculator', description: 'Interactive pricing calculator', preview: '', complexity: 'advanced' }
+            ],
+            position: 4
+          }
+        ],
+        layout: {
+          header: {
+            enabled: true,
+            variant: 'mega',
+            sticky: true,
+            transparent: false
+          },
+          navigation: {
+            enabled: true,
+            type: 'horizontal',
+            items: [
+              { label: 'Product', href: '#product' },
+              { label: 'Solutions', href: '#solutions' },
+              { label: 'Pricing', href: '#pricing' },
+              { label: 'Resources', href: '#resources' }
+            ]
+          },
+          hero: {
+            enabled: true,
+            variant: 'split',
+            backgroundType: 'gradient',
+            height: 'large'
+          },
+          features: true,
+          testimonials: true,
+          pricing: true,
+          footer: {
+            enabled: true,
+            variant: 'extended',
+            columns: 4
+          }
+        },
+        animations: {
+          enabled: true,
+          type: 'rich',
+          transitions: [
+            { element: '.hero-title', animation: 'fadeInUp', duration: 800, delay: 0, easing: 'easeOutCubic' },
+            { element: '.feature-card', animation: 'fadeInUp', duration: 600, delay: 200, easing: 'easeOutCubic' }
+          ],
+          parallax: true,
+          scrollAnimations: true
+        },
+        responsiveness: {
+          breakpoints: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px'
+          },
+          mobileFirst: true,
+          adaptiveImages: true,
+          touchOptimized: true
+        },
+        integrations: [
+          { id: 'google-analytics', name: 'Google Analytics', type: 'analytics', enabled: false, config: {} },
+          { id: 'stripe', name: 'Stripe Payments', type: 'payments', enabled: false, config: {} },
+          { id: 'mailchimp', name: 'Mailchimp', type: 'email', enabled: false, config: {} },
+          { id: 'intercom', name: 'Intercom Chat', type: 'chat', enabled: false, config: {} }
+        ]
+      },
+      component: `// Advanced SaaS template component code will be loaded dynamically`
+    },
+    {
+      id: 'advanced-ecommerce',
+      name: 'Advanced E-commerce Store',
+      description: 'Premium e-commerce template with product showcase, shopping cart, and checkout flow',
+      category: 'ecommerce',
+      complexity: 'advanced',
+      features: ['Product Catalog', 'Shopping Cart', 'User Reviews', 'Wishlist', 'Search & Filter', 'Payment Integration', 'Inventory Management'],
+      previewImage: '/templates/advanced-ecommerce.png',
+      tags: ['shopping', 'products', 'cart', 'payments', 'reviews'],
+      version: '2.0.0',
+      popularity: 88,
+      lastUpdated: '2024-12-15',
+      author: 'Lovable AI',
+      premium: true,
+      config: {
+        customizableFields: [
+          { id: 'heroTitle', label: 'Hero Title', type: 'text', required: true, section: 'hero', placeholder: 'Discover Your Perfect Style' },
+          { id: 'heroSubtitle', label: 'Hero Subtitle', type: 'textarea', required: true, section: 'hero', placeholder: 'Curated collection of premium fashion for the modern individual' },
+          { id: 'ctaText', label: 'CTA Button Text', type: 'text', required: true, section: 'hero', placeholder: 'Shop Collection' },
+          { id: 'featuredCategory1', label: 'Featured Category 1', type: 'text', required: true, section: 'categories', placeholder: 'Women\'s Fashion' },
+          { id: 'featuredCategory2', label: 'Featured Category 2', type: 'text', required: true, section: 'categories', placeholder: 'Men\'s Fashion' },
+          { id: 'featuredCategory3', label: 'Featured Category 3', type: 'text', required: true, section: 'categories', placeholder: 'Accessories' }
+        ],
+        colorScheme: {
+          primary: '#8B5CF6',
+          secondary: '#EC4899',
+          accent: '#F59E0B',
+          background: '#FFFFFF',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Playfair Display, serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
+        },
+        sections: [
+          { 
+            id: 'hero', 
+            name: 'Hero Section', 
+            description: 'Main product showcase',
+            required: true, 
+            customizable: true, 
+            fields: ['heroTitle', 'heroSubtitle', 'ctaText'],
+            variants: [
+              { id: 'product-focus', name: 'Product Focus', description: 'Highlight featured products', preview: '', complexity: 'moderate' },
+              { id: 'lifestyle', name: 'Lifestyle', description: 'Lifestyle imagery with products', preview: '', complexity: 'advanced' }
+            ],
+            position: 1
+          },
+          { 
+            id: 'categories', 
+            name: 'Product Categories', 
+            description: 'Product category showcase',
+            required: true, 
+            customizable: true, 
+            fields: ['featuredCategory1', 'featuredCategory2', 'featuredCategory3'],
+            variants: [
+              { id: 'grid', name: 'Grid Layout', description: 'Categories in grid', preview: '', complexity: 'simple' },
+              { id: 'masonry', name: 'Masonry Layout', description: 'Dynamic masonry layout', preview: '', complexity: 'advanced' }
+            ],
+            position: 2
+          },
+          { 
+            id: 'products', 
+            name: 'Featured Products', 
+            description: 'Product showcase and listings',
+            required: true, 
+            customizable: true, 
+            fields: [],
+            variants: [
+              { id: 'grid', name: 'Product Grid', description: 'Standard product grid', preview: '', complexity: 'simple' },
+              { id: 'carousel', name: 'Product Carousel', description: 'Sliding product showcase', preview: '', complexity: 'moderate' },
+              { id: 'interactive', name: 'Interactive Showcase', description: 'Hover effects and quick view', preview: '', complexity: 'advanced' }
+            ],
+            position: 3
+          }
+        ],
+        layout: {
+          header: {
+            enabled: true,
+            variant: 'standard',
+            sticky: true,
+            transparent: false
+          },
+          navigation: {
+            enabled: true,
+            type: 'horizontal',
+            items: [
+              { label: 'New Arrivals', href: '#new' },
+              { label: 'Women', href: '#women' },
+              { label: 'Men', href: '#men' },
+              { label: 'Accessories', href: '#accessories' },
+              { label: 'Sale', href: '#sale' }
+            ]
+          },
+          hero: {
+            enabled: true,
+            variant: 'split',
+            backgroundType: 'gradient',
+            height: 'large'
+          },
+          features: false,
+          testimonials: true,
+          pricing: false,
+          footer: {
+            enabled: true,
+            variant: 'extended',
+            columns: 4
+          }
+        },
+        animations: {
+          enabled: true,
+          type: 'moderate',
+          transitions: [
+            { element: '.product-card', animation: 'fadeInUp', duration: 600, delay: 100, easing: 'easeOutCubic' },
+            { element: '.category-card', animation: 'scaleIn', duration: 500, delay: 0, easing: 'easeOutBack' }
+          ],
+          parallax: false,
+          scrollAnimations: true
+        },
+        responsiveness: {
+          breakpoints: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px'
+          },
+          mobileFirst: true,
+          adaptiveImages: true,
+          touchOptimized: true
+        },
+        integrations: [
+          { id: 'stripe', name: 'Stripe Payments', type: 'payments', enabled: true, config: {} },
+          { id: 'reviews', name: 'Product Reviews', type: 'social', enabled: true, config: {} },
+          { id: 'analytics', name: 'E-commerce Analytics', type: 'analytics', enabled: false, config: {} }
+        ]
+      },
+      component: `// Advanced E-commerce template component code will be loaded dynamically`
+    },
     {
       id: 'saas-modern',
       name: 'Modern SaaS',
@@ -12,6 +356,11 @@ class TemplateManager {
       features: ['Hero Section', 'Feature Grid', 'Testimonials', 'Pricing', 'CTA'],
       previewImage: '/templates/saas-modern.png',
       tags: ['modern', 'clean', 'conversion', 'responsive'],
+      version: '1.0.0',
+      popularity: 75,
+      lastUpdated: '2024-11-15',
+      author: 'Lovable AI',
+      premium: false,
       config: {
         customizableFields: [
           { id: 'heroTitle', label: 'Hero Title', type: 'text', required: true, section: 'hero', placeholder: 'Transform Your Business' },
@@ -29,23 +378,137 @@ class TemplateManager {
           secondary: '#1E40AF',
           accent: '#F59E0B',
           background: '#FFFFFF',
-          text: '#1F2937'
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Inter, sans-serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
         },
         sections: [
-          { id: 'hero', name: 'Hero Section', required: true, customizable: true, fields: ['heroTitle', 'heroSubtitle', 'ctaText'] },
-          { id: 'features', name: 'Features', required: true, customizable: true, fields: ['feature1Title', 'feature1Description', 'feature2Title', 'feature2Description', 'feature3Title', 'feature3Description'] },
-          { id: 'testimonials', name: 'Testimonials', required: false, customizable: true, fields: [] },
-          { id: 'pricing', name: 'Pricing', required: false, customizable: true, fields: [] }
+          { 
+            id: 'hero', 
+            name: 'Hero Section', 
+            description: 'Main landing section',
+            required: true, 
+            customizable: true, 
+            fields: ['heroTitle', 'heroSubtitle', 'ctaText'],
+            variants: [
+              { id: 'centered', name: 'Centered', description: 'Center-aligned hero', preview: '', complexity: 'simple' }
+            ],
+            position: 1
+          },
+          { 
+            id: 'features', 
+            name: 'Features', 
+            description: 'Product features section',
+            required: true, 
+            customizable: true, 
+            fields: ['feature1Title', 'feature1Description', 'feature2Title', 'feature2Description', 'feature3Title', 'feature3Description'],
+            variants: [
+              { id: 'grid', name: 'Grid Layout', description: 'Features in grid', preview: '', complexity: 'simple' }
+            ],
+            position: 2
+          },
+          { 
+            id: 'testimonials', 
+            name: 'Testimonials', 
+            description: 'Customer testimonials',
+            required: false, 
+            customizable: true, 
+            fields: [],
+            variants: [
+              { id: 'cards', name: 'Card Layout', description: 'Testimonial cards', preview: '', complexity: 'simple' }
+            ],
+            position: 3
+          },
+          { 
+            id: 'pricing', 
+            name: 'Pricing', 
+            description: 'Pricing section',
+            required: false, 
+            customizable: true, 
+            fields: [],
+            variants: [
+              { id: 'simple', name: 'Simple', description: 'Basic pricing', preview: '', complexity: 'simple' }
+            ],
+            position: 4
+          }
         ],
         layout: {
-          header: true,
-          navigation: true,
-          hero: true,
+          header: {
+            enabled: true,
+            variant: 'standard',
+            sticky: false,
+            transparent: false
+          },
+          navigation: {
+            enabled: true,
+            type: 'horizontal',
+            items: [
+              { label: 'Features', href: '#features' },
+              { label: 'Pricing', href: '#pricing' },
+              { label: 'About', href: '#about' }
+            ]
+          },
+          hero: {
+            enabled: true,
+            variant: 'centered',
+            backgroundType: 'gradient',
+            height: 'large'
+          },
           features: true,
           testimonials: true,
           pricing: true,
-          footer: true
-        }
+          footer: {
+            enabled: true,
+            variant: 'standard',
+            columns: 4
+          }
+        },
+        animations: {
+          enabled: false,
+          type: 'none',
+          transitions: [],
+          parallax: false,
+          scrollAnimations: false
+        },
+        responsiveness: {
+          breakpoints: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px'
+          },
+          mobileFirst: true,
+          adaptiveImages: true,
+          touchOptimized: true
+        },
+        integrations: []
       },
       component: `import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -310,6 +773,11 @@ export default ModernSaaS;`
       features: ['Hero Section', 'Services Grid', 'About', 'Contact'],
       previewImage: '/templates/service-agency.png',
       tags: ['professional', 'services', 'agency', 'clean'],
+      version: '1.0.0',
+      popularity: 68,
+      lastUpdated: '2024-11-15',
+      author: 'Lovable AI',
+      premium: false,
       config: {
         customizableFields: [
           { id: 'heroTitle', label: 'Hero Title', type: 'text', required: true, section: 'hero', placeholder: 'Professional Services' },
@@ -323,23 +791,137 @@ export default ModernSaaS;`
           secondary: '#047857',
           accent: '#F59E0B',
           background: '#FFFFFF',
-          text: '#1F2937'
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Inter, sans-serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
         },
         sections: [
-          { id: 'hero', name: 'Hero Section', required: true, customizable: true, fields: ['heroTitle', 'heroSubtitle'] },
-          { id: 'services', name: 'Services', required: true, customizable: true, fields: ['service1', 'service2', 'service3'] },
-          { id: 'about', name: 'About', required: false, customizable: true, fields: [] },
-          { id: 'contact', name: 'Contact', required: true, customizable: false, fields: [] }
+          { 
+            id: 'hero', 
+            name: 'Hero Section', 
+            description: 'Main landing section',
+            required: true, 
+            customizable: true, 
+            fields: ['heroTitle', 'heroSubtitle'],
+            variants: [
+              { id: 'centered', name: 'Centered', description: 'Center-aligned hero', preview: '', complexity: 'simple' }
+            ],
+            position: 1
+          },
+          { 
+            id: 'services', 
+            name: 'Services', 
+            description: 'Services showcase',
+            required: true, 
+            customizable: true, 
+            fields: ['service1', 'service2', 'service3'],
+            variants: [
+              { id: 'grid', name: 'Grid Layout', description: 'Services in grid', preview: '', complexity: 'simple' }
+            ],
+            position: 2
+          },
+          { 
+            id: 'about', 
+            name: 'About', 
+            description: 'About section',
+            required: false, 
+            customizable: true, 
+            fields: [],
+            variants: [
+              { id: 'simple', name: 'Simple', description: 'Basic about section', preview: '', complexity: 'simple' }
+            ],
+            position: 3
+          },
+          { 
+            id: 'contact', 
+            name: 'Contact', 
+            description: 'Contact section',
+            required: true, 
+            customizable: false, 
+            fields: [],
+            variants: [
+              { id: 'form', name: 'Contact Form', description: 'Contact form', preview: '', complexity: 'simple' }
+            ],
+            position: 4
+          }
         ],
         layout: {
-          header: true,
-          navigation: true,
-          hero: true,
+          header: {
+            enabled: true,
+            variant: 'standard',
+            sticky: false,
+            transparent: false
+          },
+          navigation: {
+            enabled: true,
+            type: 'horizontal',
+            items: [
+              { label: 'Services', href: '#services' },
+              { label: 'About', href: '#about' },
+              { label: 'Contact', href: '#contact' }
+            ]
+          },
+          hero: {
+            enabled: true,
+            variant: 'centered',
+            backgroundType: 'solid',
+            height: 'medium'
+          },
           features: false,
           testimonials: false,
           pricing: false,
-          footer: true
-        }
+          footer: {
+            enabled: true,
+            variant: 'minimal',
+            columns: 3
+          }
+        },
+        animations: {
+          enabled: false,
+          type: 'none',
+          transitions: [],
+          parallax: false,
+          scrollAnimations: false
+        },
+        responsiveness: {
+          breakpoints: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px'
+          },
+          mobileFirst: true,
+          adaptiveImages: true,
+          touchOptimized: true
+        },
+        integrations: []
       },
       component: `// Service Agency template component would go here`
     }
@@ -357,12 +939,27 @@ export default ModernSaaS;`
     return this.templates.filter(template => template.category === category);
   }
 
+  getTemplatesByComplexity(complexity: string): LandingPageTemplate[] {
+    return this.templates.filter(template => template.complexity === complexity);
+  }
+
+  getFeaturedTemplates(): LandingPageTemplate[] {
+    return this.templates
+      .sort((a, b) => b.popularity - a.popularity)
+      .slice(0, 6);
+  }
+
+  getPremiumTemplates(): LandingPageTemplate[] {
+    return this.templates.filter(template => template.premium);
+  }
+
   searchTemplates(query: string): LandingPageTemplate[] {
     const lowercaseQuery = query.toLowerCase();
     return this.templates.filter(template => 
       template.name.toLowerCase().includes(lowercaseQuery) ||
       template.description.toLowerCase().includes(lowercaseQuery) ||
-      template.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+      template.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery)) ||
+      template.features.some(feature => feature.toLowerCase().includes(lowercaseQuery))
     );
   }
 
@@ -370,6 +967,13 @@ export default ModernSaaS;`
     const template = this.getTemplateById(templateId);
     if (!template) {
       throw new Error(`Template not found: ${templateId}`);
+    }
+
+    // For advanced templates, load the actual component
+    if (templateId === 'advanced-saas') {
+      return this.loadAdvancedSaaSTemplate(customization);
+    } else if (templateId === 'advanced-ecommerce') {
+      return this.loadAdvancedEcommerceTemplate(customization);
     }
 
     // Replace placeholders in the template component with actual values
@@ -390,10 +994,37 @@ export default ModernSaaS;`
     return customizedCode;
   }
 
+  private loadAdvancedSaaSTemplate(customization: TemplateCustomization): string {
+    // Return the advanced SaaS template with customization applied
+    return `import React from 'react';
+import AdvancedSaaSTemplate from '@/components/templates/AdvancedSaaSTemplate';
+
+const CustomizedLandingPage = () => {
+  const customization = ${JSON.stringify(customization, null, 2)};
+  
+  return <AdvancedSaaSTemplate customization={customization} />;
+};
+
+export default CustomizedLandingPage;`;
+  }
+
+  private loadAdvancedEcommerceTemplate(customization: TemplateCustomization): string {
+    // Return the advanced e-commerce template with customization applied
+    return `import React from 'react';
+import AdvancedEcommerceTemplate from '@/components/templates/AdvancedEcommerceTemplate';
+
+const CustomizedLandingPage = () => {
+  const customization = ${JSON.stringify(customization, null, 2)};
+  
+  return <AdvancedEcommerceTemplate customization={customization} />;
+};
+
+export default CustomizedLandingPage;`;
+  }
+
   private escapeString(str: string): string {
     if (typeof str !== 'string') return String(str);
     
-    // Escape quotes and special characters
     return str
       .replace(/\\/g, '\\\\')
       .replace(/"/g, '\\"')
@@ -404,7 +1035,6 @@ export default ModernSaaS;`
   }
 
   recommendTemplates(businessType: string, industry: string): LandingPageTemplate[] {
-    // Simple recommendation logic based on business type and industry
     const recommendations: LandingPageTemplate[] = [];
     
     if (businessType.toLowerCase().includes('saas') || businessType.toLowerCase().includes('software')) {
@@ -419,12 +1049,32 @@ export default ModernSaaS;`
       recommendations.push(...this.getTemplatesByCategory('ecommerce'));
     }
 
-    // If no specific matches, return most popular templates
-    if (recommendations.length === 0) {
-      return this.templates.slice(0, 3);
+    if (businessType.toLowerCase().includes('portfolio') || businessType.toLowerCase().includes('creative')) {
+      recommendations.push(...this.getTemplatesByCategory('portfolio'));
     }
 
-    return recommendations;
+    if (recommendations.length === 0) {
+      return this.getFeaturedTemplates();
+    }
+
+    return recommendations.slice(0, 6);
+  }
+
+  getTemplateCategories() {
+    const categories = [
+      { id: 'saas', name: 'SaaS & Software', icon: 'Monitor', count: 0 },
+      { id: 'ecommerce', name: 'E-commerce', icon: 'ShoppingCart', count: 0 },
+      { id: 'service', name: 'Service & Agency', icon: 'Users', count: 0 },
+      { id: 'portfolio', name: 'Portfolio', icon: 'Palette', count: 0 },
+      { id: 'corporate', name: 'Corporate', icon: 'Building', count: 0 },
+      { id: 'startup', name: 'Startup', icon: 'Rocket', count: 0 }
+    ];
+
+    categories.forEach(category => {
+      category.count = this.getTemplatesByCategory(category.id).length;
+    });
+
+    return categories;
   }
 }
 
