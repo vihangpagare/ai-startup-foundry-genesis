@@ -1,5 +1,5 @@
 
-import { AppTemplate, AppCustomization } from '@/types/appTemplate';
+import { AppTemplate, AppCustomization, AppPage, AppComponent } from '@/types/appTemplate';
 
 class AppTemplateManager {
   private templates: AppTemplate[] = [
