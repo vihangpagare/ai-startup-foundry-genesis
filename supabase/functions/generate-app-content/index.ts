@@ -289,6 +289,64 @@ Required JSON structure:
 }`;
 };
 
+const generateBusinessSpecificContentPrompt = (startupData: any, businessAnalysis: any, templateId: string) => {
+  return `You are an expert application content creator specializing in ${businessAnalysis?.industry || 'business'} software customization.
+
+STARTUP INFORMATION:
+- Company: ${startupData?.companyName || 'Not specified'}
+- Business Idea: ${startupData?.idea || 'Not specified'}
+- Target Market: ${startupData?.targetAudience || 'Not specified'}
+- Industry: ${businessAnalysis?.industry || 'Technology'}
+
+BUSINESS ANALYSIS:
+- Business Type: ${businessAnalysis?.businessType || 'SaaS'}
+- Core Features: ${businessAnalysis?.coreFeatures?.join(', ') || 'Standard features'}
+- User Personas: ${businessAnalysis?.userPersonas?.map(p => p.name).join(', ') || 'Business users'}
+- Key Terms: ${businessAnalysis?.keyTerms?.join(', ') || 'Standard terminology'}
+
+TEMPLATE: ${templateId}
+
+TASK: Generate business-specific content and terminology that transforms the generic ${templateId} template into a specialized ${businessAnalysis?.industry || 'business'} application.
+
+CRITICAL: Respond with ONLY a valid JSON object, no additional text.
+
+Required JSON structure:
+{
+  "appName": "Business-specific application name that reflects actual functionality",
+  "dashboardTitle": "Industry-appropriate dashboard title",
+  "primaryEntityName": "Main business entity (Students/Patients/Customers/etc)",
+  "actionVerbs": ["Primary action", "Secondary action", "Management action"],
+  "metricNames": ["Key performance indicator", "Important metric", "Success measure"],
+  "pageLabels": {
+    "dashboard": "Industry-specific dashboard name",
+    "users": "User management page name",
+    "analytics": "Analytics page name",
+    "settings": "Settings page name"
+  },
+  "buttonTexts": {
+    "primary": "Main action button text",
+    "secondary": "Secondary button text", 
+    "action": "Call-to-action text"
+  },
+  "mockData": {
+    "${businessAnalysis?.keyTerms?.[0]?.toLowerCase() || 'entities'}": [
+      {"name": "Realistic ${businessAnalysis?.industry || 'business'} entity", "status": "Appropriate status", "metric": "Relevant number", "details": "Industry context"},
+      {"name": "Another specific entity", "status": "Different status", "metric": "Different metric", "details": "More context"}
+    ],
+    "activities": [
+      {"action": "Business-specific action", "user": "Industry professional", "result": "Meaningful outcome", "timestamp": "recent"},
+      {"action": "Important business process", "user": "Different role", "result": "Positive impact", "timestamp": "recent"}
+    ]
+  },
+  "industryTerminology": {
+    "Users": "Industry-specific term for users",
+    "Items": "Business-specific term for main entities",
+    "Performance": "Industry-appropriate performance term",
+    "Analytics": "Sector-specific analytics term"
+  }
+}`;
+};
+
 const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: string): GeneratedAppContent => {
   const companyName = startupData?.companyName || 'Your Business';
   const idea = startupData?.idea || '';
@@ -436,20 +494,21 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
-    const { startupData, reports, businessAnalysis, baseCustomization, enhancementRequest } = await req.json();
+    const { startupData, reports, businessAnalysis, templateId, contentRequest } = await req.json();
     
     console.log('Enhanced app content generation:', {
       company: startupData?.companyName,
+      templateId,
+      contentRequest,
       hasBusinessAnalysis: !!businessAnalysis,
-      enhancementRequest,
       reportsCount: Object.keys(reports || {}).length
     });
 
-    // If this is an enhancement request with business analysis, use enhanced prompt
-    if (enhancementRequest === 'business-specific-content' && businessAnalysis) {
-      const prompt = generateAdvancedBusinessAnalysisPrompt(startupData, reports || {}, businessAnalysis);
+    // Handle business-specific content requests
+    if (contentRequest === 'business-specific-terminology-and-data') {
+      const prompt = generateBusinessSpecificContentPrompt(startupData, businessAnalysis, templateId);
       
-      console.log('Using enhanced business analysis prompt...');
+      console.log('Generating business-specific content...');
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -459,7 +518,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           model: 'claude-3-5-sonnet-20241022',
-          max_tokens: 3000,
+          max_tokens: 2000,
           messages: [{
             role: 'user',
             content: prompt
@@ -472,18 +531,18 @@ serve(async (req) => {
       }
 
       const data = await response.json();
-      const enhancedContent = extractJsonFromResponse(data.content[0].text);
+      const businessContent = extractJsonFromResponse(data.content[0].text);
       
       return new Response(JSON.stringify({
         success: true,
-        content: enhancedContent
+        content: businessContent
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     // Advanced template selection - always use new advanced templates
-    const selectedTemplateId = baseCustomization?.templateId || detectAdvancedBusinessModelTemplate(startupData, reports || {});
+    const selectedTemplateId = templateId || detectAdvancedBusinessModelTemplate(startupData, reports || {});
     console.log('Selected advanced template:', selectedTemplateId);
 
     let generatedContent: GeneratedAppContent;
