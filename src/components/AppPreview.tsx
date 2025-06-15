@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,8 +34,15 @@ interface AppPreviewProps {
 }
 
 // Navigation Component
-const AppNavigation = ({ customization }: { customization: AppCustomization }) => {
-  const location = useLocation();
+const AppNavigation = ({ 
+  customization, 
+  currentPage, 
+  onPageChange 
+}: { 
+  customization: AppCustomization;
+  currentPage: string;
+  onPageChange: (page: string) => void;
+}) => {
   const navItems = customization.routing.navigation;
   
   return (
@@ -51,22 +57,22 @@ const AppNavigation = ({ customization }: { customization: AppCustomization }) =
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {navItems.map(item => (
-                <Link
+                <button
                   key={item.href}
-                  to={item.href}
-                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 ${
-                    location.pathname === item.href
+                  onClick={() => onPageChange(item.href)}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors ${
+                    currentPage === item.href
                       ? 'border-current'
                       : 'border-transparent hover:border-gray-300'
                   }`}
                   style={{ 
-                    color: location.pathname === item.href 
+                    color: currentPage === item.href 
                       ? customization.colorScheme.primary 
                       : customization.colorScheme.muted 
                   }}
                 >
                   {item.label}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -313,27 +319,39 @@ const AccountPage = ({ customization }: { customization: AppCustomization }) => 
   );
 };
 
-// Router Component for the App Preview
-const AppRouterContent = ({ customization }: { customization: AppCustomization }) => {
+// Main App Content Component (replaces Router)
+const AppContent = ({ customization, currentPage }: { customization: AppCustomization; currentPage: string }) => {
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case '/':
+        return <DashboardPage customization={customization} />;
+      case '/features':
+      case '/cart':
+      case '/bookings':
+        return <FeaturesPage customization={customization} />;
+      case '/account':
+      case '/profile':
+        return <AccountPage customization={customization} />;
+      default:
+        return <DashboardPage customization={customization} />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <AppNavigation customization={customization} />
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <Routes>
-          <Route path="/" element={<DashboardPage customization={customization} />} />
-          <Route path="/features" element={<FeaturesPage customization={customization} />} />
-          <Route path="/cart" element={<FeaturesPage customization={customization} />} />
-          <Route path="/bookings" element={<FeaturesPage customization={customization} />} />
-          <Route path="/account" element={<AccountPage customization={customization} />} />
-          <Route path="/profile" element={<AccountPage customization={customization} />} />
-        </Routes>
+        {renderCurrentPage()}
       </main>
     </div>
   );
 };
 
 const AppPreview = ({ customization, onEdit }: AppPreviewProps) => {
-  const [currentPath, setCurrentPath] = useState('/');
+  const [currentPage, setCurrentPage] = useState('/');
+
+  const handlePageChange = (page: string) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="space-y-4">
@@ -371,14 +389,17 @@ const AppPreview = ({ customization, onEdit }: AppPreviewProps) => {
           </div>
           <div className="flex-1">
             <div className="bg-white rounded px-3 py-1 text-sm text-gray-600">
-              {customization.appName.toLowerCase().replace(/\s+/g, '')}.app{currentPath}
+              {customization.appName.toLowerCase().replace(/\s+/g, '')}.app{currentPage}
             </div>
           </div>
         </div>
         <div className="h-[600px] overflow-auto">
-          <Router>
-            <AppRouterContent customization={customization} />
-          </Router>
+          <AppNavigation 
+            customization={customization} 
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+          <AppContent customization={customization} currentPage={currentPage} />
         </div>
       </div>
 
