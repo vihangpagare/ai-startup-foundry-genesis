@@ -52,8 +52,36 @@ const extractJsonFromResponse = (text: string): any => {
   return JSON.parse(jsonText);
 };
 
-const generateDeepBusinessAnalysisPrompt = (startupData: any, reports: Record<string, string>) => {
-  return `You are an expert SaaS architect and business analyst. Analyze this startup deeply and design a complete SaaS application prototype that embodies their specific business model.
+const detectBusinessModelTemplate = (startupData: any, reports: Record<string, string>): string => {
+  const idea = (startupData?.idea || '').toLowerCase();
+  const businessPlan = (reports['business-plan'] || '').toLowerCase();
+  const combined = `${idea} ${businessPlan}`;
+
+  // Smart business model detection with existing template mapping
+  if (combined.includes('inventory') || combined.includes('stock') || combined.includes('supply') || combined.includes('warehouse')) {
+    return 'ecommerce-store'; // Inventory management maps to ecommerce
+  }
+  
+  if (combined.includes('marketplace') || combined.includes('platform') || combined.includes('connect') || combined.includes('match')) {
+    return 'service-platform'; // Marketplace/platform maps to service platform
+  }
+  
+  if (combined.includes('consulting') || combined.includes('service') || combined.includes('agency') || combined.includes('professional')) {
+    return 'service-platform'; // Service business maps to service platform
+  }
+  
+  // Default to SaaS dashboard for software, analytics, tools, etc.
+  return 'saas-dashboard';
+};
+
+const generateEnhancedBusinessAnalysisPrompt = (startupData: any, reports: Record<string, string>, templateId: string) => {
+  const templateContext = {
+    'saas-dashboard': 'a SaaS dashboard application with analytics, user management, and core business tools',
+    'ecommerce-store': 'an ecommerce platform with product management, inventory tracking, and sales features',
+    'service-platform': 'a service platform with client management, project tracking, and professional tools'
+  };
+
+  return `You are an expert SaaS architect. Create a business-specific application using the ${templateId} template structure.
 
 STARTUP DETAILS:
 - Company: ${startupData?.companyName || 'Not specified'}
@@ -61,121 +89,117 @@ STARTUP DETAILS:
 - Target Audience: ${startupData?.targetAudience || 'Not specified'}
 - Problem Statement: ${startupData?.problemStatement || 'Not specified'}
 - Solution: ${startupData?.solution || 'Not specified'}
-- Unique Value: ${startupData?.uniqueValue || 'Not specified'}
 
 BUSINESS ANALYSIS REPORTS:
 ${Object.entries(reports).slice(0, 4).map(([type, content]) => 
   `${type.toUpperCase()}: ${content.substring(0, 1200)}...`
 ).join('\n\n')}
 
-YOUR TASK: Design a complete SaaS application that IS the startup's product, not a dashboard to manage the startup.
+TEMPLATE STRUCTURE: ${templateContext[templateId]}
 
-For example:
-- If it's "EcoStock" (sustainable inventory management), create the actual inventory management SaaS platform
-- If it's a marketplace, create the actual marketplace interface
-- If it's an analytics tool, create the actual analytics application
+YOUR TASK: Customize ${templateContext[templateId]} to perfectly embody this startup's business model.
 
 CRITICAL: You must respond with ONLY a valid JSON object, no additional text.
 
 Return this exact structure:
 {
-  "templateId": "custom-saas-app",
-  "reasoning": "Why this specific app design perfectly embodies the startup's core business model",
+  "templateId": "${templateId}",
+  "reasoning": "Why this ${templateId} template perfectly suits the startup's business model with specific customizations",
   "confidence": 0.95,
   "appName": "${startupData?.companyName || 'Your SaaS'}",
-  "appDescription": "Clear description of what this SaaS application does for end users",
-  "businessModel": "Detailed explanation of how this SaaS operates (B2B, B2C, marketplace, etc.)",
+  "appDescription": "Clear description of what this business-specific application does for end users",
+  "businessModel": "Detailed explanation of how this business operates and generates value",
   "coreFeatures": [
-    "Primary feature that solves the main customer problem",
-    "Secondary feature that adds unique value",
+    "Primary feature that solves the main customer problem using ${templateId} structure",
+    "Secondary feature that adds unique business value",
     "Third feature that completes the core offering"
   ],
   "userPersonas": [
     {
       "name": "Primary User Type",
-      "role": "Their role/job title",
-      "needs": "What they need from this SaaS",
-      "painPoints": "Current problems they face",
-      "workflow": "How they would use this app daily"
+      "role": "Their role/job title in this business context",
+      "needs": "What they need from this business application",
+      "painPoints": "Current problems they face in this industry",
+      "workflow": "How they would use this business app daily"
     }
   ],
   "workflows": [
     {
-      "name": "Core User Journey",
-      "steps": ["Step 1", "Step 2", "Step 3"],
-      "outcome": "What user achieves"
+      "name": "Core Business Journey",
+      "steps": ["Business-specific step 1", "Step 2", "Step 3"],
+      "outcome": "What user achieves in this business context"
     }
   ],
   "pages": [
     {
-      "name": "Main Interface",
-      "purpose": "Core product functionality",
-      "features": ["Feature 1", "Feature 2"],
-      "userActions": ["Action 1", "Action 2"]
+      "name": "Main Business Interface",
+      "purpose": "Core business functionality adapted to ${templateId}",
+      "features": ["Business Feature 1", "Business Feature 2"],
+      "userActions": ["Business Action 1", "Business Action 2"]
     },
     {
-      "name": "Dashboard/Analytics",
-      "purpose": "User insights and management",
-      "features": ["Analytics", "Settings"],
-      "userActions": ["View data", "Configure"]
+      "name": "Business Analytics",
+      "purpose": "Industry-specific insights and metrics",
+      "features": ["Business Analytics", "Custom Reports"],
+      "userActions": ["View business data", "Generate industry reports"]
     },
     {
-      "name": "User Management",
-      "purpose": "Account and preferences",
-      "features": ["Profile", "Billing"],
-      "userActions": ["Update profile", "Manage subscription"]
+      "name": "Account Management",
+      "purpose": "Business account and preferences",
+      "features": ["Business Profile", "Business Settings"],
+      "userActions": ["Update business profile", "Manage business preferences"]
     }
   ],
   "fields": {
-    "appName": "SaaS application name",
-    "primaryFeature": "Main feature name",
-    "userType": "Primary user type",
-    "dataType": "Main data/content type",
-    "actionVerb": "Primary user action",
-    "metricName": "Key success metric"
+    "appName": "Business-specific application name",
+    "primaryFeature": "Main business feature name",
+    "userType": "Primary business user type",
+    "dataType": "Main business data/content type (Products/Users/Projects/Items)",
+    "actionVerb": "Primary business action (Manage/Track/Analyze/Connect)",
+    "metricName": "Key business success metric"
   },
   "companyData": {
-    "name": "${startupData?.companyName || 'Your SaaS'}",
-    "tagline": "Value proposition in one compelling line",
-    "description": "What the SaaS application accomplishes for users",
+    "name": "${startupData?.companyName || 'Your Business'}",
+    "tagline": "Business value proposition in one compelling line",
+    "description": "What this business application accomplishes for users",
     "industry": "Primary industry/market vertical"
   },
   "mockData": {
     "primaryEntities": [
-      {"name": "Entity relevant to the business", "status": "Active", "metric": "100", "category": "Relevant category"},
-      {"name": "Another entity", "status": "Pending", "metric": "85", "category": "Different category"}
+      {"name": "Business entity relevant to this industry", "status": "Active", "metric": "100", "category": "Business category"},
+      {"name": "Another business entity", "status": "Processing", "metric": "85", "category": "Different business category"}
     ],
     "users": [
-      {"name": "Realistic user for target audience", "role": "Relevant role", "status": "Active", "joined": "2024-01-15"},
-      {"name": "Another target user", "role": "Different role", "status": "Active", "joined": "2024-02-20"}
+      {"name": "Realistic business user for this industry", "role": "Industry-relevant role", "status": "Active", "joined": "2024-01-15"},
+      {"name": "Another business user", "role": "Different industry role", "status": "Active", "joined": "2024-02-20"}
     ],
     "activities": [
-      {"action": "Relevant action for this business", "user": "User name", "timestamp": "2 hours ago", "result": "Positive outcome"},
-      {"action": "Another business action", "user": "Another user", "timestamp": "1 day ago", "result": "Success"}
+      {"action": "Industry-specific business action", "user": "Business user", "timestamp": "2 hours ago", "result": "Business outcome"},
+      {"action": "Another business process", "user": "Another user", "timestamp": "1 day ago", "result": "Success"}
     ],
     "metrics": [
-      {"name": "Core business metric", "value": "Realistic value", "change": "+X%", "trend": "up"},
-      {"name": "Important KPI", "value": "Realistic value", "change": "+X%", "trend": "up"}
+      {"name": "Core business metric for this industry", "value": "Industry-realistic value", "change": "+X%", "trend": "up"},
+      {"name": "Important business KPI", "value": "Business value", "change": "+X%", "trend": "up"}
     ]
   },
   "features": [
-    "Core feature that defines the SaaS",
-    "Unique differentiator feature",
-    "Essential user management feature"
+    "Core business feature that defines this application",
+    "Unique business differentiator feature",
+    "Essential business management feature"
   ],
   "colorScheme": {
     "primary": "#2563EB",
-    "secondary": "#1E40AF",
+    "secondary": "#1E40AF", 
     "accent": "#10B981"
   }
 }`;
 };
 
-const createBusinessSpecificFallback = (startupData: any): GeneratedAppContent => {
-  const companyName = startupData?.companyName || 'Your SaaS';
+const createBusinessSpecificFallback = (startupData: any, templateId: string): GeneratedAppContent => {
+  const companyName = startupData?.companyName || 'Your Business';
   const idea = startupData?.idea || '';
   
-  // Determine business type from idea
+  // Business type specific customization based on template
   let businessType = 'platform';
   let features = ['User Management', 'Analytics Dashboard', 'Settings'];
   let mockEntities = [
@@ -183,23 +207,23 @@ const createBusinessSpecificFallback = (startupData: any): GeneratedAppContent =
     { name: 'Another Item', status: 'Pending', metric: '85', category: 'Important' }
   ];
 
-  if (idea.toLowerCase().includes('inventory') || idea.toLowerCase().includes('stock')) {
+  if (templateId === 'ecommerce-store') {
     businessType = 'inventory-management';
-    features = ['Inventory Tracking', 'Supplier Management', 'Stock Analytics'];
+    features = ['Inventory Tracking', 'Product Management', 'Sales Analytics'];
     mockEntities = [
       { name: 'Product A', status: 'In Stock', metric: '250', category: 'Electronics' },
       { name: 'Product B', status: 'Low Stock', metric: '45', category: 'Accessories' }
     ];
-  } else if (idea.toLowerCase().includes('marketplace') || idea.toLowerCase().includes('platform')) {
-    businessType = 'marketplace';
-    features = ['Product Listings', 'User Matching', 'Transaction Management'];
+  } else if (templateId === 'service-platform') {
+    businessType = 'service-platform';
+    features = ['Client Management', 'Project Tracking', 'Service Analytics'];
     mockEntities = [
-      { name: 'Seller Profile A', status: 'Verified', metric: '4.8', category: 'Premium' },
-      { name: 'Seller Profile B', status: 'Active', metric: '4.2', category: 'Standard' }
+      { name: 'Client A', status: 'Active', metric: '4.8', category: 'Premium' },
+      { name: 'Client B', status: 'Pending', metric: '4.2', category: 'Standard' }
     ];
-  } else if (idea.toLowerCase().includes('analytics') || idea.toLowerCase().includes('data')) {
-    businessType = 'analytics-platform';
-    features = ['Data Visualization', 'Report Generation', 'Custom Dashboards'];
+  } else {
+    businessType = 'saas-dashboard';
+    features = ['Dashboard Analytics', 'Data Management', 'User Insights'];
     mockEntities = [
       { name: 'Dataset A', status: 'Updated', metric: '1.2M', category: 'Real-time' },
       { name: 'Dataset B', status: 'Processing', metric: '850K', category: 'Batch' }
@@ -207,12 +231,12 @@ const createBusinessSpecificFallback = (startupData: any): GeneratedAppContent =
   }
 
   return {
-    templateId: 'custom-saas-app',
-    reasoning: `Generated business-specific SaaS application for ${companyName} based on their ${businessType} business model`,
+    templateId,
+    reasoning: `Using ${templateId} template customized for ${companyName}'s ${businessType} business model`,
     confidence: 0.8,
     appName: companyName,
     appDescription: `A comprehensive ${businessType} solution that ${idea}`,
-    businessModel: `${businessType} SaaS serving ${startupData?.targetAudience || 'businesses'}`,
+    businessModel: `${businessType} serving ${startupData?.targetAudience || 'businesses'}`,
     coreFeatures: features,
     userPersonas: [
       {
@@ -242,7 +266,7 @@ const createBusinessSpecificFallback = (startupData: any): GeneratedAppContent =
       appName: companyName,
       primaryFeature: features[0],
       userType: startupData?.targetAudience || 'User',
-      dataType: 'Business Data',
+      dataType: templateId === 'ecommerce-store' ? 'Products' : templateId === 'service-platform' ? 'Clients' : 'Data',
       actionVerb: 'Manage',
       metricName: 'Success Rate'
     },
@@ -288,19 +312,23 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
-    const { startupData, reports }: AppContentGenerationRequest = await req.json();
+    const { startupData, reports, targetTemplateId }: AppContentGenerationRequest = await req.json();
     
-    console.log('Generating business-specific SaaS app content for:', {
+    console.log('Generating business-specific app content for:', {
       company: startupData?.companyName,
       idea: startupData?.idea?.substring(0, 100),
       reportsCount: Object.keys(reports || {}).length
     });
 
+    // Smart template selection - always use existing templates
+    const selectedTemplateId = targetTemplateId || detectBusinessModelTemplate(startupData, reports || {});
+    console.log('Selected template:', selectedTemplateId);
+
     let generatedContent: GeneratedAppContent;
 
-    const prompt = generateDeepBusinessAnalysisPrompt(startupData, reports || {});
+    const prompt = generateEnhancedBusinessAnalysisPrompt(startupData, reports || {}, selectedTemplateId);
     
-    console.log('Calling Claude API for deep business analysis...');
+    console.log('Calling Claude API for business-specific customization...');
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -336,23 +364,35 @@ serve(async (req) => {
 
     try {
       generatedContent = extractJsonFromResponse(data.content[0].text);
+      
+      // Ensure we always use the selected template ID
+      generatedContent.templateId = selectedTemplateId;
+      
       console.log('Successfully parsed JSON from Claude response');
     } catch (parseError) {
       console.error('JSON parsing failed:', parseError.message);
       console.error('Raw response:', data.content[0].text);
       
       console.log('Using business-specific fallback content');
-      generatedContent = createBusinessSpecificFallback(startupData);
+      generatedContent = createBusinessSpecificFallback(startupData, selectedTemplateId);
     }
 
     // Validate and enhance generated content
     if (!generatedContent.fields || !generatedContent.companyData || !generatedContent.mockData) {
       console.error('Generated content missing required fields:', generatedContent);
-      generatedContent = createBusinessSpecificFallback(startupData);
+      generatedContent = createBusinessSpecificFallback(startupData, selectedTemplateId);
     }
 
-    console.log('Successfully generated business-specific SaaS app content:', {
+    // Final validation - ensure template ID is always from existing templates
+    const validTemplateIds = ['saas-dashboard', 'ecommerce-store', 'service-platform'];
+    if (!validTemplateIds.includes(generatedContent.templateId)) {
+      console.warn('Invalid template ID generated, using fallback:', generatedContent.templateId);
+      generatedContent.templateId = selectedTemplateId;
+    }
+
+    console.log('Successfully generated business-specific app content:', {
       appName: generatedContent.appName,
+      templateId: generatedContent.templateId,
       businessModel: generatedContent.businessModel,
       coreFeatures: generatedContent.coreFeatures?.length || 0,
       confidence: generatedContent.confidence
@@ -366,11 +406,12 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('SaaS app content generation error:', error);
+    console.error('App content generation error:', error);
     
     try {
-      const { startupData } = await req.json().catch(() => ({}));
-      const fallbackContent = createBusinessSpecificFallback(startupData || {});
+      const { startupData, targetTemplateId } = await req.json().catch(() => ({}));
+      const fallbackTemplateId = targetTemplateId || 'saas-dashboard';
+      const fallbackContent = createBusinessSpecificFallback(startupData || {}, fallbackTemplateId);
       
       return new Response(JSON.stringify({
         success: true,
@@ -384,7 +425,7 @@ serve(async (req) => {
       
       return new Response(JSON.stringify({
         success: false,
-        error: error.message || 'SaaS app content generation failed'
+        error: error.message || 'App content generation failed'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

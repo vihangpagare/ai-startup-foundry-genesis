@@ -1,3 +1,4 @@
+
 import { AppTemplate, AppCustomization } from '@/types/appTemplate';
 import { appTemplateManager } from './appTemplateManager';
 import { supabase } from '@/integrations/supabase/client';
@@ -109,98 +110,19 @@ class ClaudeAIAppSelector {
       const aiContent: AIGeneratedAppContent = response.content;
       console.log('AI generated business-specific content:', aiContent);
 
-      // For business-specific apps, we use a custom template approach
-      const customTemplate = this.createBusinessSpecificTemplate(aiContent);
+      // Get the existing template that the AI selected
+      const selectedTemplate = appTemplateManager.getTemplate(aiContent.templateId);
+      if (!selectedTemplate) {
+        throw new Error(`Template ${aiContent.templateId} not found in available templates`);
+      }
       
-      return this.createAppCustomizationFromAIContent(customTemplate, aiContent, startupData);
+      return this.createAppCustomizationFromAIContent(selectedTemplate, aiContent, startupData);
 
     } catch (error) {
       console.error('Claude AI business-specific app error:', error);
       
       return this.createFallbackBusinessApp(startupData, targetTemplateId, error.message);
     }
-  }
-
-  private createBusinessSpecificTemplate(aiContent: AIGeneratedAppContent): AppTemplate {
-    return {
-      id: 'business-specific-saas',
-      name: `${aiContent.appName} Prototype`,
-      description: aiContent.appDescription,
-      category: 'saas-dashboard' as any,
-      complexity: 'moderate' as any,
-      features: aiContent.features || [],
-      previewImage: '/placeholder.svg',
-      tags: ['business-specific', 'ai-generated', 'prototype'],
-      pages: [],
-      config: {
-        customizableFields: [],
-        colorScheme: {
-          primary: aiContent.colorScheme?.primary || '#2563EB',
-          secondary: aiContent.colorScheme?.secondary || '#1E40AF',
-          accent: aiContent.colorScheme?.accent || '#10B981',
-          background: '#FFFFFF',
-          text: '#1F2937',
-          muted: '#6B7280',
-          border: '#E5E7EB',
-          success: '#10B981',
-          warning: '#F59E0B',
-          error: '#EF4444'
-        },
-        typography: {
-          fontFamily: {
-            heading: 'Inter, sans-serif',
-            body: 'Inter, sans-serif',
-            mono: 'JetBrains Mono, monospace'
-          },
-          fontSize: {
-            xs: '0.75rem',
-            sm: '0.875rem',
-            base: '1rem',
-            lg: '1.125rem',
-            xl: '1.25rem',
-            '2xl': '1.5rem',
-            '3xl': '1.875rem',
-            '4xl': '2.25rem'
-          },
-          fontWeight: {
-            normal: '400',
-            medium: '500',
-            semibold: '600',
-            bold: '700'
-          }
-        },
-        routing: {
-          pages: [
-            { path: '/', name: 'Main Interface', component: 'MainInterfacePage', protected: false, exact: true },
-            { path: '/analytics', name: 'Analytics', component: 'AnalyticsDashboardPage', protected: false, exact: true },
-            { path: '/account', name: 'Account', component: 'UserManagementPage', protected: false, exact: true }
-          ],
-          navigation: [
-            { label: aiContent.fields?.primaryFeature || 'Dashboard', href: '/', icon: 'Zap' },
-            { label: 'Analytics', href: '/analytics', icon: 'BarChart3' },
-            { label: 'Account', href: '/account', icon: 'User' }
-          ],
-          defaultRoute: '/'
-        },
-        dataStructure: {
-          entities: [],
-          relationships: [],
-          apiEndpoints: []
-        },
-        mockData: {
-          enabled: true,
-          realistic: true,
-          industrySpecific: true,
-          dataSize: 'medium' as any
-        },
-        features: []
-      },
-      version: '1.0.0',
-      popularity: 100,
-      lastUpdated: new Date().toISOString(),
-      author: 'Claude AI',
-      premium: false
-    };
   }
 
   private createAppCustomizationFromAIContent(
@@ -318,9 +240,30 @@ class ClaudeAIAppSelector {
 
   private createFallbackBusinessApp(startupData: any, targetTemplateId?: string, errorMessage?: string) {
     const templates = appTemplateManager.getTemplates();
-    const fallbackTemplate = targetTemplateId 
-      ? appTemplateManager.getTemplate(targetTemplateId) || templates[0]
-      : templates[0];
+    
+    // Smart fallback template selection
+    let fallbackTemplate: AppTemplate | null = null;
+    
+    if (targetTemplateId) {
+      fallbackTemplate = appTemplateManager.getTemplate(targetTemplateId);
+    }
+    
+    if (!fallbackTemplate) {
+      // Intelligent fallback based on business type
+      const idea = (startupData?.idea || '').toLowerCase();
+      
+      if (idea.includes('inventory') || idea.includes('stock') || idea.includes('product')) {
+        fallbackTemplate = appTemplateManager.getTemplate('ecommerce-store');
+      } else if (idea.includes('service') || idea.includes('consulting') || idea.includes('agency')) {
+        fallbackTemplate = appTemplateManager.getTemplate('service-platform');
+      } else {
+        fallbackTemplate = appTemplateManager.getTemplate('saas-dashboard');
+      }
+    }
+    
+    if (!fallbackTemplate) {
+      fallbackTemplate = templates[0]; // Final fallback to first available template
+    }
 
     if (!fallbackTemplate) {
       throw new Error('No app templates available for fallback');
@@ -368,7 +311,7 @@ class ClaudeAIAppSelector {
     return {
       template: fallbackTemplate,
       customization: fallbackCustomization,
-      reasoning: `Generated business-specific fallback SaaS application${errorMessage ? ` due to: ${errorMessage}` : ''}. Application designed based on startup idea and target audience.`,
+      reasoning: `Generated business-specific fallback app using ${fallbackTemplate.name} template${errorMessage ? ` due to: ${errorMessage}` : ''}. Application designed based on startup idea and target audience.`,
       confidence: 0.7
     };
   }
