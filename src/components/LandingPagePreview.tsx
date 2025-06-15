@@ -1,9 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Download, RefreshCw } from 'lucide-react';
-import { LandingPageTemplate, TemplateCustomization } from '@/types/template';
+import { TemplateCustomization } from '@/types/template';
 import { templateManager } from '@/services/templateManager';
+import ModernSaaSTemplate from '@/components/templates/ModernSaaSTemplate';
+import MinimalPortfolioTemplate from '@/components/templates/MinimalPortfolioTemplate';
+import BusinessServiceTemplate from '@/components/templates/BusinessServiceTemplate';
 
 interface LandingPagePreviewProps {
   customization: TemplateCustomization | null;
@@ -47,7 +51,7 @@ const LandingPagePreview = ({ customization, onEdit }: LandingPagePreviewProps) 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'landing-page.jsx';
+    a.download = 'landing-page.tsx';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -88,7 +92,7 @@ const LandingPagePreview = ({ customization, onEdit }: LandingPagePreviewProps) 
     );
   }
 
-  if (!generatedCode) {
+  if (!customization) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Card className="max-w-md w-full mx-4">
@@ -107,6 +111,23 @@ const LandingPagePreview = ({ customization, onEdit }: LandingPagePreviewProps) 
       </div>
     );
   }
+
+  const renderTemplate = () => {
+    switch (customization.templateId) {
+      case 'modern-saas':
+        return <ModernSaaSTemplate customization={customization} />;
+      case 'minimal-portfolio':
+        return <MinimalPortfolioTemplate customization={customization} />;
+      case 'business-service':
+        return <BusinessServiceTemplate customization={customization} />;
+      default:
+        return (
+          <div className="p-8 text-center">
+            <p className="text-gray-600">Template not found: {customization.templateId}</p>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -155,100 +176,15 @@ const LandingPagePreview = ({ customization, onEdit }: LandingPagePreviewProps) 
               </div>
             </div>
             
-            {/* Render the generated component safely */}
+            {/* Render the actual template component */}
             <div className="w-full">
-              <PreviewRenderer code={generatedCode} />
+              {renderTemplate()}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-// Safe preview renderer component
-const PreviewRenderer = ({ code }: { code: string }) => {
-  const [Component, setComponent] = useState<React.ComponentType | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      // Create a safe environment to render the component
-      const ComponentFromCode = () => {
-        return (
-          <div style={{ 
-            minHeight: '100vh', 
-            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-            padding: '2rem',
-            fontFamily: 'system-ui, sans-serif'
-          }}>
-            <div style={{ 
-              maxWidth: '800px', 
-              margin: '0 auto', 
-              textAlign: 'center' as const,
-              backgroundColor: 'white',
-              padding: '3rem',
-              borderRadius: '1rem',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
-              <h1 style={{ 
-                fontSize: '3rem', 
-                fontWeight: 'bold', 
-                color: '#1f2937',
-                marginBottom: '1rem'
-              }}>
-                Your Landing Page
-              </h1>
-              <p style={{ 
-                fontSize: '1.25rem', 
-                color: '#6b7280',
-                marginBottom: '2rem'
-              }}>
-                Preview generated successfully
-              </p>
-              <button style={{
-                backgroundColor: '#3b82f6',
-                color: 'white',
-                padding: '1rem 2rem',
-                borderRadius: '0.5rem',
-                border: 'none',
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}>
-                Get Started
-              </button>
-            </div>
-          </div>
-        );
-      };
-
-      setComponent(() => ComponentFromCode);
-      setError(null);
-    } catch (err) {
-      console.error('Error rendering component:', err);
-      setError(err instanceof Error ? err.message : 'Rendering error');
-    }
-  }, [code]);
-
-  if (error) {
-    return (
-      <div className="p-8 text-center">
-        <div className="text-red-600 mb-4">Preview Error</div>
-        <p className="text-gray-600">{error}</p>
-      </div>
-    );
-  }
-
-  if (!Component) {
-    return (
-      <div className="p-8 text-center">
-        <div className="animate-pulse">Loading preview...</div>
-      </div>
-    );
-  }
-
-  return <Component />;
 };
 
 export default LandingPagePreview;
