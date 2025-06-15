@@ -301,13 +301,13 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
               <AdvancedThemeBuilder
                 colorScheme={customization.colorScheme}
                 typography={customization.typography}
-                onColorChange={(colors) => setCustomization(prev => ({
+                onColorChange={(partialColors) => setCustomization(prev => ({
                   ...prev,
-                  colorScheme: { ...prev.colorScheme, ...colors }
+                  colorScheme: { ...prev.colorScheme, ...partialColors }
                 }))}
-                onTypographyChange={(typography) => setCustomization(prev => ({
+                onTypographyChange={(partialTypography) => setCustomization(prev => ({
                   ...prev,
-                  typography: { ...prev.typography, ...typography }
+                  typography: { ...prev.typography, ...partialTypography }
                 }))}
                 onSpacingChange={(spacing) => {
                   // Handle spacing changes
