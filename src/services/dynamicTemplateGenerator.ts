@@ -1,4 +1,3 @@
-
 import { AppTemplate, AppCustomization } from '@/types/appTemplate';
 import { BusinessAnalysis, BusinessFunction, UserPersona, BusinessWorkflow } from './businessAnalysisEngine';
 
@@ -16,7 +15,7 @@ class DynamicTemplateGenerator {
       id: `dynamic-${businessAnalysis.businessType}`,
       name: `${startupData?.companyName || 'Business'} Application`,
       description: this.generateDescription(businessAnalysis, startupData),
-      category: businessAnalysis.businessType,
+      category: this.mapBusinessTypeToCategory(businessAnalysis.businessType),
       complexity: 'advanced',
       features: this.generateFeatureList(businessAnalysis),
       previewImage: `/preview-${businessAnalysis.businessType}.jpg`,
@@ -37,7 +36,7 @@ class DynamicTemplateGenerator {
     return {
       templateId: `dynamic-${businessAnalysis.businessType}`,
       fields: this.generateCustomFields(businessAnalysis, startupData),
-      colorScheme: businessAnalysis.brandIdentity.colors,
+      colorScheme: this.generateCompleteColorScheme(businessAnalysis.brandIdentity.colors),
       typography: {
         fontFamily: {
           heading: 'Inter, sans-serif',
@@ -72,6 +71,34 @@ class DynamicTemplateGenerator {
       routing: this.generateRouting(businessAnalysis),
       appName: startupData?.companyName || 'Business App',
       appDescription: this.generateDescription(businessAnalysis, startupData)
+    };
+  }
+
+  private mapBusinessTypeToCategory(businessType: string): 'saas-dashboard' | 'ecommerce' | 'service-platform' | 'analytics' | 'portfolio' {
+    const typeMap: Record<string, 'saas-dashboard' | 'ecommerce' | 'service-platform' | 'analytics' | 'portfolio'> = {
+      'edtech-platform': 'saas-dashboard',
+      'marketplace': 'ecommerce',
+      'analytics-platform': 'analytics',
+      'service-platform': 'service-platform',
+      'portfolio-platform': 'portfolio',
+      'saas-dashboard': 'saas-dashboard'
+    };
+    
+    return typeMap[businessType] || 'saas-dashboard';
+  }
+
+  private generateCompleteColorScheme(partialColors: any): any {
+    return {
+      primary: partialColors.primary || '#3b82f6',
+      secondary: partialColors.secondary || '#64748b',
+      accent: partialColors.accent || '#8b5cf6',
+      background: partialColors.background || '#ffffff',
+      text: '#1f2937',
+      muted: '#6b7280',
+      border: '#e5e7eb',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444'
     };
   }
 
@@ -212,7 +239,7 @@ class DynamicTemplateGenerator {
   private generateConfig(businessAnalysis: BusinessAnalysis, startupData: any): any {
     return {
       customizableFields: this.generateCustomizableFields(businessAnalysis, startupData),
-      colorScheme: businessAnalysis.brandIdentity.colors,
+      colorScheme: this.generateCompleteColorScheme(businessAnalysis.brandIdentity.colors),
       typography: {
         fontFamily: {
           heading: 'Inter, sans-serif',

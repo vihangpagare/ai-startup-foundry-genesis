@@ -2,6 +2,7 @@ import { AppTemplate, AppCustomization } from '@/types/appTemplate';
 import { supabase } from '@/integrations/supabase/client';
 import { businessAnalysisEngine, BusinessAnalysis } from './businessAnalysisEngine';
 import { dynamicTemplateGenerator } from './dynamicTemplateGenerator';
+import { appTemplateManager } from './appTemplateManager';
 
 interface AIGeneratedAppContent {
   templateId: string;
