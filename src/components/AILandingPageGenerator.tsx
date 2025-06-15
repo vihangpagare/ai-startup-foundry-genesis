@@ -140,8 +140,8 @@ const AILandingPageGenerator = ({
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center space-x-4">
+            {/* Action Button */}
+            <div className="flex items-center justify-center">
               <Button 
                 onClick={handleAIGenerate} 
                 disabled={isAnalyzing}
@@ -158,9 +158,6 @@ const AILandingPageGenerator = ({
                     Generate with Claude AI
                   </>
                 )}
-              </Button>
-              <Button variant="outline" onClick={onManualSelection} className="text-gray-700 border-gray-300">
-                Manual Selection
               </Button>
             </div>
           </div>

@@ -85,14 +85,6 @@ const AppGenerator = ({ idea, ideaData }: AppGeneratorProps) => {
     }
   };
 
-  const handleManualSelection = () => {
-    // For now, just show a message about manual selection
-    toast({
-      title: "Manual Selection",
-      description: "Manual template selection will be available in the next update. Please use AI generation for now.",
-    });
-  };
-
   const handleBackToAI = () => {
     setSelectedTemplate(null);
     setCustomization(null);
@@ -205,7 +197,6 @@ const AppGenerator = ({ idea, ideaData }: AppGeneratorProps) => {
           ideaData={ideaData}
           reports={reports}
           onAppSelected={handleAIAppSelected}
-          onManualSelection={handleManualSelection}
         />
       )}
 

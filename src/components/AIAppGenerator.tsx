@@ -12,10 +12,9 @@ interface AIAppGeneratorProps {
   ideaData: any;
   reports: Record<string, string>;
   onAppSelected: (template: AppTemplate, customization: AppCustomization) => void;
-  onManualSelection: () => void;
 }
 
-const AIAppGenerator = ({ ideaData, reports, onAppSelected, onManualSelection }: AIAppGeneratorProps) => {
+const AIAppGenerator = ({ ideaData, reports, onAppSelected }: AIAppGeneratorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [analysis, setAnalysis] = useState<string>('');
   const [confidence, setConfidence] = useState<number>(0);
@@ -57,7 +56,7 @@ const AIAppGenerator = ({ ideaData, reports, onAppSelected, onManualSelection }:
       setAnalysis('');
       toast({
         title: "AI Generation Failed",
-        description: error.message || "Could not generate app. Please try manual selection.",
+        description: error.message || "Could not generate app. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -220,8 +219,8 @@ const AIAppGenerator = ({ ideaData, reports, onAppSelected, onManualSelection }:
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Action Button */}
+          <div className="flex justify-center">
             <Button 
               onClick={generateAppWithAI}
               size="lg"
@@ -230,15 +229,6 @@ const AIAppGenerator = ({ ideaData, reports, onAppSelected, onManualSelection }:
               <Brain className="h-5 w-5 mr-2" />
               Generate My App with Claude AI
               <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-            
-            <Button 
-              onClick={onManualSelection}
-              variant="outline"
-              size="lg"
-              className="border-gray-300 text-gray-700 px-8 py-3 text-lg"
-            >
-              Choose Template Manually
             </Button>
           </div>
 

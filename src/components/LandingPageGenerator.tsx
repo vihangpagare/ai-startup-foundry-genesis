@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play, CheckCircle, AlertTriangle, Sparkles, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LandingPagePreview from './LandingPagePreview';
 import TemplateGallery from './TemplateGallery';
 import TemplateCustomizer from './TemplateCustomizer';
@@ -331,64 +331,53 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       )}
 
       {currentView === 'code' && generatedCode && (
-        <Tabs defaultValue="preview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-100">
-            <TabsTrigger value="preview" className="text-gray-700">
-              <Eye className="h-4 w-4 mr-2" />
-              Live Preview
-            </TabsTrigger>
-            <TabsTrigger value="code" className="text-gray-700">
-              <Code className="h-4 w-4 mr-2" />
-              Source Code
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="preview" className="mt-6">
-            {customization && (
-              <LandingPagePreview customization={customization} onEdit={() => setCurrentView('customizer')} />
-            )}
-          </TabsContent>
-          
-          <TabsContent value="code" className="mt-6">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-600">
-                    Claude AI-Generated React Component ({generatedCode.split('\n').length} lines)
-                  </span>
-                  <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
-                    Zero Syntax Errors
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
-                    Template: {selectedTemplate?.name}
-                  </Badge>
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => copyToClipboard(generatedCode)}
-                    variant="outline"
-                    size="sm"
-                    className="text-gray-700 border-gray-300"
-                  >
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Code
-                  </Button>
-                  <Button onClick={downloadCode} variant="outline" size="sm" className="text-gray-700 border-gray-300">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
-                </div>
-              </div>
-              
-              <Textarea
-                value={generatedCode}
-                readOnly
-                className="font-mono text-sm min-h-[500px] bg-gray-50 text-gray-900 border-gray-300"
-                placeholder="Generated React code will appear here..."
-              />
+        <div className="space-y-6">
+          {/* Code Header with Actions */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h3 className="text-xl font-semibold text-gray-900">Generated Source Code</h3>
+              <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
+                Zero Syntax Errors
+              </Badge>
+              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
+                Template: {selectedTemplate?.name}
+              </Badge>
             </div>
-          </TabsContent>
-        </Tabs>
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={() => setCurrentView('preview')} className="text-gray-700 border-gray-300">
+                <Eye className="h-4 w-4 mr-2" />
+                View Preview
+              </Button>
+              <Button
+                onClick={() => copyToClipboard(generatedCode)}
+                variant="outline"
+                className="text-gray-700 border-gray-300"
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Code
+              </Button>
+              <Button onClick={downloadCode} variant="outline" className="text-gray-700 border-gray-300">
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </div>
+          </div>
+
+          {/* Code Stats */}
+          <div className="flex items-center space-x-6 text-sm text-gray-600">
+            <span>Claude AI-Generated React Component</span>
+            <span>{generatedCode.split('\n').length} lines</span>
+            <span>Production ready</span>
+          </div>
+
+          {/* Code Display */}
+          <Textarea
+            value={generatedCode}
+            readOnly
+            className="font-mono text-sm min-h-[500px] bg-gray-50 text-gray-900 border-gray-300"
+            placeholder="Generated React code will appear here..."
+          />
+        </div>
       )}
 
       {/* Benefits Overview */}
