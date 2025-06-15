@@ -51,6 +51,276 @@ class AppTemplateManager {
     return this.templates.slice(0, 3);
   }
 
+  generateCustomizedApp(customization: any): string {
+    try {
+      const template = this.getTemplate(customization.templateId);
+      if (!template) {
+        throw new Error(`Template not found: ${customization.templateId}`);
+      }
+
+      // Generate the customized React application code based on the template
+      const componentName = this.getComponentNameFromTemplate(template);
+      const code = `import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  BarChart3, Users, TrendingUp, Settings, ShoppingCart, Calendar, 
+  DollarSign, Activity, PieChart, LineChart, ArrowUpRight, Star,
+  Search, Filter, Plus, Edit, Trash2, Eye, Download, Upload,
+  Bell, Mail, Phone, MapPin, Clock, Check, X, Heart, Share2
+} from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell } from 'recharts';
+
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('${template.pages[0]?.id || 'dashboard'}');
+  
+  ${this.generateMockData(template)}
+  
+  ${this.generatePageComponents(template, customization)}
+  
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      ${template.pages.map(page => `
+        case '${page.id}':
+          return <${this.capitalizeFirst(page.id)}Page />;`).join('')}
+      default:
+        return <${this.capitalizeFirst(template.pages[0]?.id || 'dashboard')}Page />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      ${this.generateNavigation(template, customization)}
+      <main className="flex-1">
+        {renderCurrentPage()}
+      </main>
+    </div>
+  );
+};
+
+export default App;`;
+
+      return code;
+    } catch (error) {
+      console.error('Error generating customized app:', error);
+      throw error;
+    }
+  }
+
+  private getComponentNameFromTemplate(template: AppTemplate): string {
+    switch (template.id) {
+      case 'advanced-saas-dashboard':
+        return 'AdvancedSaaSDashboardTemplate';
+      case 'modern-ecommerce-platform':
+        return 'ModernEcommerceTemplate';
+      case 'business-service-platform':
+        return 'BusinessPlatformTemplate';
+      default:
+        return 'DefaultTemplate';
+    }
+  }
+
+  private generateMockData(template: AppTemplate): string {
+    let mockDataCode = '';
+    
+    template.config.dataStructure.entities.forEach(entity => {
+      mockDataCode += `
+  const mock${entity.name}s = ${JSON.stringify(this.generateEntityMockData(entity), null, 2)};`;
+    });
+
+    return mockDataCode;
+  }
+
+  private generateEntityMockData(entity: any): any[] {
+    const mockData = [];
+    for (let i = 0; i < Math.min(entity.mockCount || 10, 20); i++) {
+      const item: any = {};
+      entity.fields.forEach((field: any) => {
+        item[field.name] = this.generateFieldValue(field, i);
+      });
+      mockData.push(item);
+    }
+    return mockData;
+  }
+
+  private generateFieldValue(field: any, index: number): any {
+    switch (field.type) {
+      case 'string':
+        if (field.name === 'id') return `id-${index + 1}`;
+        if (field.name === 'name') return `Sample ${field.name} ${index + 1}`;
+        if (field.name === 'email') return `user${index + 1}@example.com`;
+        if (field.name === 'status') return ['active', 'pending', 'completed'][index % 3];
+        if (field.name === 'role') return ['admin', 'user', 'manager'][index % 3];
+        return `Sample ${field.name}`;
+      case 'number':
+        if (field.name === 'progress') return Math.floor(Math.random() * 100);
+        if (field.name === 'price') return Math.floor(Math.random() * 1000) + 10;
+        return Math.floor(Math.random() * 100);
+      case 'date':
+        return new Date(Date.now() - Math.random() * 10000000000).toISOString();
+      default:
+        return `Sample ${field.name}`;
+    }
+  }
+
+  private generatePageComponents(template: AppTemplate, customization: any): string {
+    return template.pages.map(page => {
+      return `
+  const ${this.capitalizeFirst(page.id)}Page = () => {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">${page.name}</h1>
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Add New
+          </Button>
+        </div>
+        
+        ${this.generatePageContent(page, template)}
+      </div>
+    );
+  };`;
+    }).join('\n');
+  }
+
+  private generatePageContent(page: any, template: AppTemplate): string {
+    let content = '';
+    
+    page.components.forEach((component: any) => {
+      switch (component.type) {
+        case 'chart':
+          content += `
+        <Card>
+          <CardHeader>
+            <CardTitle>${component.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={mockProjects || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="progress" stroke="#3B82F6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>`;
+          break;
+        case 'table':
+          content += `
+        <Card>
+          <CardHeader>
+            <CardTitle>${component.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {(mockUsers || mockProjects || []).slice(0, 5).map((item, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>{item.status}</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>`;
+          break;
+        case 'card':
+          content += `
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <BarChart3 className="h-8 w-8 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">42</div>
+                  <div className="text-sm text-gray-500">Total Items</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Users className="h-8 w-8 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">128</div>
+                  <div className="text-sm text-gray-500">Active Users</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>`;
+          break;
+        default:
+          content += `
+        <Card>
+          <CardHeader>
+            <CardTitle>${component.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">Content for ${component.name} component.</p>
+          </CardContent>
+        </Card>`;
+      }
+    });
+
+    return content;
+  }
+
+  private generateNavigation(template: AppTemplate, customization: any): string {
+    return `
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold text-gray-900">${customization?.fields?.companyName || 'My App'}</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              ${template.pages.map(page => `
+                <Button 
+                  variant={currentPage === '${page.id}' ? 'default' : 'ghost'}
+                  onClick={() => setCurrentPage('${page.id}')}
+                  className="text-sm"
+                >
+                  ${page.name}
+                </Button>`).join('')}
+            </div>
+          </div>
+        </div>
+      </nav>`;
+  }
+
+  private capitalizeFirst(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   private generateAdvancedSaaSDashboardTemplate(): AppTemplate {
     return {
       id: 'advanced-saas-dashboard',
@@ -446,7 +716,7 @@ class AppTemplateManager {
             }
           ],
           relationships: [
-            { from: 'Product', to: 'Category', type: 'many-to-one' }
+            { from: 'Product', to: 'Category', type: 'one-to-many' }
           ],
           apiEndpoints: [
             { path: '/api/products', method: 'GET', entity: 'Product', mockResponse: [] },
@@ -552,7 +822,7 @@ class AppTemplateManager {
           route: '/appointments',
           description: 'Appointment scheduling and management interface',
           components: [
-            { id: 'calendar', type: 'calendar', name: 'Appointment Calendar', props: {}, customizable: false, required: true },
+            { id: 'appointment-table', type: 'table', name: 'Appointment Schedule', props: {}, customizable: false, required: true },
             { id: 'appointment-form', type: 'form', name: 'Appointment Form', props: {}, customizable: true, required: true }
           ],
           layout: 'default',
@@ -660,8 +930,8 @@ class AppTemplateManager {
             }
           ],
           relationships: [
-            { from: 'Appointment', to: 'Service', type: 'many-to-one' },
-            { from: 'Appointment', to: 'Client', type: 'many-to-one' }
+            { from: 'Appointment', to: 'Service', type: 'one-to-many' },
+            { from: 'Appointment', to: 'Client', type: 'one-to-many' }
           ],
           apiEndpoints: [
             { path: '/api/services', method: 'GET', entity: 'Service', mockResponse: [] },
@@ -682,7 +952,7 @@ class AppTemplateManager {
             description: 'Automated reminders for upcoming appointments',
             enabled: true,
             page: 'appointments',
-            component: 'calendar',
+            component: 'appointment-table',
             dependencies: []
           },
           {
