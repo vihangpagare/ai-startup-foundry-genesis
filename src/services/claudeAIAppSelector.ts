@@ -35,13 +35,13 @@ class ClaudeAIAppSelector {
       );
       console.log('Business analysis completed:', businessAnalysis);
 
-      // Step 3: Select the best existing template
+      // Step 3: Select the best existing template with validation
       let selectedTemplate: AppTemplate | null = null;
       let reasoning = '';
       let confidence = 0.8;
 
       if (targetTemplateId) {
-        // User specified a template
+        // User specified a template - validate it exists
         selectedTemplate = appTemplateManager.getTemplate(targetTemplateId);
         if (selectedTemplate) {
           reasoning = `Using specified template: ${selectedTemplate.name}`;
@@ -49,25 +49,35 @@ class ClaudeAIAppSelector {
           console.log('Using specified template:', selectedTemplate.id);
         } else {
           console.warn('Specified template not found:', targetTemplateId);
+          console.log('Available templates:', appTemplateManager.getTemplates().map(t => t.id));
         }
       }
 
       if (!selectedTemplate) {
-        // AI-powered template selection
+        // AI-powered template selection with validation
         try {
           const templateMatch = intelligentTemplateSelector.selectBestTemplate(businessAnalysis);
+          
+          // Validate the selected template exists
           selectedTemplate = appTemplateManager.getTemplate(templateMatch.templateId);
-          reasoning = templateMatch.reasoning;
-          confidence = templateMatch.confidence;
-          console.log('AI selected template:', templateMatch);
+          if (selectedTemplate) {
+            reasoning = templateMatch.reasoning;
+            confidence = templateMatch.confidence;
+            console.log('AI selected template:', templateMatch);
+          } else {
+            console.error('AI selected non-existent template:', templateMatch.templateId);
+            throw new Error(`Selected template ${templateMatch.templateId} not found`);
+          }
         } catch (error) {
           console.error('Template selection failed:', error);
         }
       }
 
       if (!selectedTemplate) {
-        // Fallback to feature-centric template
+        // Fallback to feature-centric template with validation
         const templates = appTemplateManager.getTemplates();
+        console.log('Available templates for fallback:', templates.map(t => t.id));
+        
         selectedTemplate = templates.find(t => t.id === 'advanced-saas-dashboard') || templates[0];
         reasoning = 'Using feature-centric dashboard template as fallback';
         confidence = 0.7;
@@ -112,6 +122,14 @@ class ClaudeAIAppSelector {
       // Step 6: Validate the customization
       if (!customization || !customization.templateId) {
         throw new Error('Failed to create valid app customization');
+      }
+
+      // Final validation - ensure template ID matches available templates
+      const finalTemplate = appTemplateManager.getTemplate(customization.templateId);
+      if (!finalTemplate) {
+        console.error('Customization template ID invalid:', customization.templateId);
+        // Fix the template ID to match available templates
+        customization.templateId = selectedTemplate.id;
       }
 
       console.log('✓ App customization created:', {
@@ -173,11 +191,16 @@ The resulting application demonstrates ${companyName}'s specific value propositi
     
     try {
       const templates = appTemplateManager.getTemplates();
+      console.log('Available templates for fallback:', templates.map(t => t.id));
+      
       let fallbackTemplate = null;
       
-      // Try specified template first
+      // Try specified template first with validation
       if (targetTemplateId) {
         fallbackTemplate = appTemplateManager.getTemplate(targetTemplateId);
+        if (!fallbackTemplate) {
+          console.warn('Target template not found:', targetTemplateId);
+        }
       }
       
       // Intelligent fallback based on startup idea

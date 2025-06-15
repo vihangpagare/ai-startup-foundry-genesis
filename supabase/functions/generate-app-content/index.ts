@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -59,7 +60,7 @@ const detectAdvancedBusinessModelTemplate = (startupData: any, reports: Record<s
   const businessPlan = (reports['business-plan'] || '').toLowerCase();
   const combined = `${idea} ${businessPlan}`;
 
-  // Advanced template mapping based on business complexity and features
+  // Use exact template IDs that exist in the system
   if (combined.includes('saas') || combined.includes('software') || combined.includes('platform') || 
       combined.includes('analytics') || combined.includes('dashboard') || combined.includes('data') ||
       combined.includes('metrics') || combined.includes('tracking') || combined.includes('management')) {
@@ -351,6 +352,12 @@ const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: st
   const companyName = startupData?.companyName || 'Your Business';
   const idea = startupData?.idea || '';
   
+  // Validate template ID and use fallback if needed
+  const validTemplateIds = ['advanced-saas-dashboard', 'modern-ecommerce-platform', 'business-service-platform'];
+  const validatedTemplateId = validTemplateIds.includes(templateId) ? templateId : 'advanced-saas-dashboard';
+  
+  console.log('Creating fallback for template:', validatedTemplateId, 'Original:', templateId);
+  
   // Advanced template specific customization
   let businessType = 'platform';
   let features = ['Advanced Analytics', 'Team Management', 'Real-time Updates'];
@@ -360,7 +367,7 @@ const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: st
     { name: 'Business Entity C', status: 'Completed', metric: '200', category: 'Premium' }
   ];
 
-  if (templateId === 'modern-ecommerce-platform') {
+  if (validatedTemplateId === 'modern-ecommerce-platform') {
     businessType = 'e-commerce-platform';
     features = ['Product Management', 'Order Processing', 'Customer Analytics', 'Inventory Tracking'];
     mockEntities = [
@@ -368,7 +375,7 @@ const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: st
       { name: 'Bestseller Collection', status: 'Low Stock', metric: '75', category: 'Fashion' },
       { name: 'New Arrivals', status: 'Available', metric: '120', category: 'Home & Garden' }
     ];
-  } else if (templateId === 'business-service-platform') {
+  } else if (validatedTemplateId === 'business-service-platform') {
     businessType = 'service-platform';
     features = ['Client Management', 'Project Tracking', 'Invoice Generation', 'Calendar Scheduling'];
     mockEntities = [
@@ -387,8 +394,8 @@ const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: st
   }
 
   return {
-    templateId,
-    reasoning: `Advanced ${templateId} template selected for ${companyName}'s ${businessType} business model with comprehensive features and modern architecture`,
+    templateId: validatedTemplateId,
+    reasoning: `Advanced ${validatedTemplateId} template selected for ${companyName}'s ${businessType} business model with comprehensive features and modern architecture`,
     confidence: 0.85,
     appName: companyName,
     appDescription: `A comprehensive ${businessType} solution that ${idea} with advanced features and professional-grade functionality`,
@@ -440,7 +447,7 @@ const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: st
       appName: companyName,
       primaryFeature: features[0],
       userType: startupData?.targetAudience || 'Professional',
-      dataType: templateId === 'modern-ecommerce-platform' ? 'Products' : templateId === 'business-service-platform' ? 'Clients' : 'Analytics',
+      dataType: validatedTemplateId === 'modern-ecommerce-platform' ? 'Products' : validatedTemplateId === 'business-service-platform' ? 'Clients' : 'Analytics',
       actionVerb: 'Optimize',
       metricName: 'Performance Score'
     },
@@ -541,7 +548,7 @@ serve(async (req) => {
       });
     }
 
-    // Advanced template selection - always use new advanced templates
+    // Advanced template selection - ensure we use correct template IDs
     const selectedTemplateId = templateId || detectAdvancedBusinessModelTemplate(startupData, reports || {});
     console.log('Selected advanced template:', selectedTemplateId);
 
@@ -604,7 +611,7 @@ serve(async (req) => {
       generatedContent = createAdvancedBusinessSpecificFallback(startupData, selectedTemplateId);
     }
 
-    // Final validation - ensure template ID is from advanced templates
+    // Final validation - ensure template ID is from valid templates
     const validAdvancedTemplateIds = ['advanced-saas-dashboard', 'modern-ecommerce-platform', 'business-service-platform'];
     if (!validAdvancedTemplateIds.includes(generatedContent.templateId)) {
       console.warn('Invalid advanced template ID generated, using fallback:', generatedContent.templateId);

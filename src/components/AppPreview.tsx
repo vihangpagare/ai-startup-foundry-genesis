@@ -43,36 +43,50 @@ const AppPreview = ({ customization, onEdit }: AppPreviewProps) => {
     );
   }
 
+  // Template ID mapping for backward compatibility
+  const getTemplateComponent = (templateId: string) => {
+    // Map legacy template IDs to current ones
+    const templateIdMap: Record<string, string> = {
+      'modern-ecommerce': 'modern-ecommerce-platform',
+      'business-service': 'business-service-platform',
+      'advanced-saas': 'advanced-saas-dashboard'
+    };
+
+    const normalizedTemplateId = templateIdMap[templateId] || templateId;
+    
+    console.log('Rendering template:', normalizedTemplateId, 'Original:', templateId);
+    
+    switch (normalizedTemplateId) {
+      case 'advanced-saas-dashboard':
+        return <AdvancedSaaSDashboardTemplate customization={customization} />;
+      case 'modern-ecommerce-platform':
+        return <ModernEcommerceTemplate customization={customization} />;
+      case 'business-service-platform':
+        return <BusinessPlatformTemplate customization={customization} />;
+      default:
+        console.error('Unknown template ID:', normalizedTemplateId);
+        return (
+          <div className="p-8 text-center bg-red-50 border border-red-200 rounded-lg">
+            <AlertTriangle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-800 mb-2">Template Not Found</h3>
+            <p className="text-red-700 mb-4">
+              Template "{templateId}" is not supported or available.
+            </p>
+            <p className="text-sm text-red-600 mb-4">
+              Available templates: advanced-saas-dashboard, modern-ecommerce-platform, business-service-platform
+            </p>
+            <Button onClick={onEdit} variant="outline" className="border-red-300 text-red-700">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Different Template
+            </Button>
+          </div>
+        );
+    }
+  };
+
   const renderTemplate = () => {
     try {
-      console.log('Rendering template:', customization.templateId);
-      
-      switch (customization.templateId) {
-        case 'advanced-saas-dashboard':
-          return <AdvancedSaaSDashboardTemplate customization={customization} />;
-        case 'modern-ecommerce-platform':
-          return <ModernEcommerceTemplate customization={customization} />;
-        case 'business-service-platform':
-          return <BusinessPlatformTemplate customization={customization} />;
-        default:
-          console.error('Unknown template ID:', customization.templateId);
-          return (
-            <div className="p-8 text-center bg-red-50 border border-red-200 rounded-lg">
-              <AlertTriangle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Template Not Found</h3>
-              <p className="text-red-700 mb-4">
-                Template "{customization.templateId}" is not supported or available.
-              </p>
-              <p className="text-sm text-red-600 mb-4">
-                Available templates: advanced-saas-dashboard, modern-ecommerce-platform, business-service-platform
-              </p>
-              <Button onClick={onEdit} variant="outline" className="border-red-300 text-red-700">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Try Different Template
-              </Button>
-            </div>
-          );
-      }
+      return getTemplateComponent(customization.templateId);
     } catch (error) {
       console.error('Template rendering error:', error);
       return (

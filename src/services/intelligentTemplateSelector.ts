@@ -1,4 +1,3 @@
-
 import { AppTemplate, AppCustomization } from '@/types/appTemplate';
 import { appTemplateManager } from './appTemplateManager';
 
@@ -131,6 +130,8 @@ class IntelligentTemplateSelector {
         throw new Error('No templates available for selection');
       }
 
+      console.log('Available templates:', templates.map(t => ({ id: t.id, name: t.name })));
+
       const scores: TemplateMatch[] = [];
 
       templates.forEach(template => {
@@ -156,6 +157,20 @@ class IntelligentTemplateSelector {
       scores.sort((a, b) => b.score - a.score);
       const bestMatch = scores[0];
       
+      // Validate that the selected template actually exists
+      const selectedTemplate = appTemplateManager.getTemplate(bestMatch.templateId);
+      if (!selectedTemplate) {
+        console.error('Selected template not found:', bestMatch.templateId);
+        // Fallback to first available template
+        const fallbackTemplate = templates[0];
+        return {
+          templateId: fallbackTemplate.id,
+          score: 0.7,
+          reasoning: 'Fallback template due to validation error',
+          confidence: 0.7
+        };
+      }
+      
       console.log('Best template match:', bestMatch);
       return bestMatch;
 
@@ -180,14 +195,14 @@ class IntelligentTemplateSelector {
     let reasoning = '';
 
     try {
-      // Business type matching (40% weight)
-      if (analysis.businessType === 'ecommerce' && template.id.includes('ecommerce')) {
+      // Business type matching (40% weight) - Use exact template ID matching
+      if (analysis.businessType === 'ecommerce' && template.id === 'modern-ecommerce-platform') {
         score += 0.4;
         reasoning += 'Perfect match for e-commerce business model. ';
-      } else if (analysis.businessType === 'service' && template.id.includes('business')) {
+      } else if (analysis.businessType === 'service' && template.id === 'business-service-platform') {
         score += 0.4;
         reasoning += 'Ideal for service-based business operations. ';
-      } else if (analysis.businessType === 'saas' && template.id.includes('saas')) {
+      } else if (analysis.businessType === 'saas' && template.id === 'advanced-saas-dashboard') {
         score += 0.4;
         reasoning += 'Excellent fit for SaaS/technology platform. ';
       } else {
@@ -208,7 +223,7 @@ class IntelligentTemplateSelector {
           reasoning += 'Feature-centric dashboard excellent for data-driven industries. ';
         }
       } else if (analysis.industry === 'Retail' || analysis.industry === 'Finance') {
-        if (template.id.includes('ecommerce')) {
+        if (template.id === 'modern-ecommerce-platform') {
           score += 0.25;
           reasoning += 'Commerce template perfect for retail/finance industry. ';
         } else if (template.id === 'advanced-saas-dashboard') {
