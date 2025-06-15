@@ -27,8 +27,8 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
   const [customization, setCustomization] = useState<TemplateCustomization>({
     templateId: template.id,
     fields: {},
-    colorScheme: { ...template.config.colorScheme },
-    typography: { ...template.config.typography },
+    colorScheme: template.config.colorScheme,
+    typography: template.config.typography,
     enabledSections: template.config.sections.filter(s => s.required).map(s => s.id),
     sectionVariants: {},
     animations: { ...template.config.animations },

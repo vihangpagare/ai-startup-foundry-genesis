@@ -205,8 +205,8 @@ export interface IntegrationConfig {
 export interface TemplateCustomization {
   templateId: string;
   fields: Record<string, any>;
-  colorScheme: Partial<ColorScheme>;
-  typography: Partial<TypographyConfig>;
+  colorScheme: ColorScheme;
+  typography: TypographyConfig;
   enabledSections: string[];
   sectionVariants: Record<string, string>;
   animations: Partial<AnimationConfig>;
