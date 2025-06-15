@@ -18,7 +18,7 @@ import {
   generateDetailedRevenueData,
   generateFunnelData,
   generateCompetitiveData,
-  generateMetricsData
+  generateStartupMetrics
 } from '@/utils/chartDataGenerators';
 
 interface EnhancedDataVisualizationProps {
@@ -49,7 +49,7 @@ const EnhancedDataVisualization: React.FC<EnhancedDataVisualizationProps> = ({ i
   const revenueData = generateDetailedRevenueData();
   const funnelData = generateFunnelData(colors);
   const competitorData = generateCompetitiveData(colors);
-  const metricsData = generateMetricsData(colors);
+  const startupMetrics = generateStartupMetrics(ideaData, colors);
 
   const exportChart = (chartType: string) => {
     console.log(`Exporting ${chartType} chart...`);
@@ -63,7 +63,7 @@ const EnhancedDataVisualization: React.FC<EnhancedDataVisualizationProps> = ({ i
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center space-x-2">
                 <BarChart3 className="h-6 w-6 text-primary" />
-                <span>Advanced Market Analytics Dashboard</span>
+                <span>Startup Analytics Dashboard</span>
               </CardTitle>
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm" onClick={() => setZoomLevel(prev => Math.min(prev + 0.2, 2))}>
@@ -82,7 +82,7 @@ const EnhancedDataVisualization: React.FC<EnhancedDataVisualizationProps> = ({ i
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="overview" className="flex items-center space-x-1">
                   <Activity className="h-4 w-4" />
-                  <span className="hidden sm:inline">Overview</span>
+                  <span className="hidden sm:inline">Analytics</span>
                 </TabsTrigger>
                 <TabsTrigger value="market" className="flex items-center space-x-1">
                   <TrendingUp className="h-4 w-4" />
@@ -104,7 +104,7 @@ const EnhancedDataVisualization: React.FC<EnhancedDataVisualizationProps> = ({ i
 
               <TabsContent value="overview" className="space-y-6">
                 <ErrorBoundary>
-                  <MetricsOverview metricsData={metricsData} colors={colors} />
+                  <MetricsOverview metricsData={startupMetrics} colors={colors} />
                 </ErrorBoundary>
               </TabsContent>
 

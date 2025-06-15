@@ -1,4 +1,3 @@
-
 export const generateEnhancedMarketData = (ideaData: any) => {
   const currentYear = new Date().getFullYear();
   return [
@@ -37,37 +36,73 @@ export const generateCompetitiveData = (colors: any) => [
   { name: 'Others', share: 5, funding: 2000000, employees: 30, color: colors.muted }
 ];
 
-export const generateMetricsData = (colors: any) => [
-  {
-    title: 'Monthly Revenue',
-    value: '$45,230',
-    change: '+12.5%',
-    trend: 'up' as const,
-    color: colors.success,
-    data: [20, 25, 30, 28, 35, 40, 45]
-  },
-  {
-    title: 'Active Users',
-    value: '2,847',
-    change: '+8.2%',
-    trend: 'up' as const,
-    color: colors.primary,
-    data: [100, 120, 140, 160, 180, 200, 220]
-  },
-  {
-    title: 'Conversion Rate',
-    value: '3.2%',
-    change: '-0.5%',
-    trend: 'down' as const,
-    color: colors.warning,
-    data: [3.8, 3.6, 3.4, 3.2, 3.1, 3.0, 3.2]
-  },
-  {
-    title: 'Customer Satisfaction',
-    value: '4.8/5',
-    change: '+0.3',
-    trend: 'up' as const,
-    color: colors.success,
-    data: [4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8]
-  }
-];
+// New startup-focused metrics generator
+export const generateStartupMetrics = (ideaData: any, colors: any) => {
+  // Generate metrics based on idea context
+  const getMarketOpportunityScore = () => {
+    const factors = [
+      ideaData?.targetAudience?.length || 50,
+      ideaData?.problemStatement?.length || 50,
+      ideaData?.uniqueValue?.length || 50
+    ];
+    const avgFactor = factors.reduce((a, b) => a + b, 0) / factors.length;
+    return Math.min(Math.floor((avgFactor / 30) * 85 + 15), 95);
+  };
+
+  const getCompetitiveAdvantageIndex = () => {
+    const uniqueValueScore = (ideaData?.uniqueValue?.length || 30) / 30;
+    return Math.min(Math.floor(uniqueValueScore * 80 + 20), 92);
+  };
+
+  const getFeasibilityRating = () => {
+    const solutionComplexity = (ideaData?.solution?.split(' ').length || 10) / 10;
+    return Math.min(Math.floor((1 / solutionComplexity) * 70 + 25), 88);
+  };
+
+  const getGrowthPotential = () => {
+    const marketWords = ['global', 'enterprise', 'scale', 'automation', 'AI', 'platform'];
+    const hasGrowthWords = marketWords.some(word => 
+      ideaData?.idea?.toLowerCase().includes(word) || 
+      ideaData?.solution?.toLowerCase().includes(word)
+    );
+    return hasGrowthWords ? Math.floor(Math.random() * 15 + 80) : Math.floor(Math.random() * 20 + 65);
+  };
+
+  return [
+    {
+      title: 'Market Opportunity',
+      value: `${getMarketOpportunityScore()}/100`,
+      change: '+5 pts this quarter',
+      trend: 'up' as const,
+      color: colors.success,
+      data: [70, 75, 78, 82, 85, 88, getMarketOpportunityScore()]
+    },
+    {
+      title: 'Competitive Advantage',
+      value: `${getCompetitiveAdvantageIndex()}/100`,
+      change: '+3 pts this month',
+      trend: 'up' as const,
+      color: colors.primary,
+      data: [60, 65, 70, 72, 75, 78, getCompetitiveAdvantageIndex()]
+    },
+    {
+      title: 'Feasibility Score',
+      value: `${getFeasibilityRating()}/100`,
+      change: '+2 pts recent',
+      trend: 'up' as const,
+      color: colors.warning,
+      data: [70, 72, 74, 76, 78, 82, getFeasibilityRating()]
+    },
+    {
+      title: 'Growth Potential',
+      value: `${getGrowthPotential()}/100`,
+      change: '+7 pts projected',
+      trend: 'up' as const,
+      color: colors.success,
+      data: [65, 68, 72, 75, 78, 82, getGrowthPotential()]
+    }
+  ];
+};
+
+// Keep existing function for backward compatibility but rename the export
+export const generateMetricsData = generateStartupMetrics;

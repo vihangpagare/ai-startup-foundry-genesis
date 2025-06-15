@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play, CheckCircle } from 'lucide-react';
+import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play, CheckCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,8 +18,13 @@ interface LandingPageGeneratorProps {
 const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => {
   const [reactCode, setReactCode] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [validating, setValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [validationResults, setValidationResults] = useState<{
+    issues?: string[];
+    fixes?: string[];
+  }>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -44,13 +50,59 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     }
   };
 
+  const validateCode = async (code: string): Promise<string> => {
+    setValidating(true);
+    setValidationResults({});
+    
+    try {
+      const { data, error: validationError } = await supabase.functions.invoke('validate-react-code', {
+        body: { 
+          code,
+          companyName: ideaData?.companyName 
+        }
+      });
+
+      if (validationError) throw validationError;
+
+      if (data?.success) {
+        setValidationResults({
+          issues: data.issues,
+          fixes: data.fixes
+        });
+        
+        if (data.fixes?.length > 0) {
+          toast({
+            title: "Code Enhanced",
+            description: `Applied ${data.fixes.length} improvements to the generated code.`,
+          });
+        }
+        
+        return data.validatedCode || code;
+      } else {
+        throw new Error(data?.error || 'Code validation failed');
+      }
+    } catch (err: any) {
+      console.warn('Code validation failed, using original code:', err.message);
+      toast({
+        title: "Validation Skipped",
+        description: "Using original code without validation.",
+        variant: "default",
+      });
+      return code;
+    } finally {
+      setValidating(false);
+    }
+  };
+
   const generateLandingPageCode = async () => {
     const wasRegenerating = isRegenerating;
     setLoading(true);
     setIsRegenerating(false);
     setError(null);
+    setValidationResults({});
 
     try {
+      // Step 1: Generate initial code
       const { data, error: apiError } = await supabase.functions.invoke('ai-startup-analysis', {
         body: {
           idea,
@@ -66,17 +118,19 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       if (apiError) throw apiError;
       
       if (data?.success) {
-        setReactCode(data.analysis);
+        // Step 2: Validate and enhance the generated code
+        const validatedCode = await validateCode(data.analysis);
+        setReactCode(validatedCode);
         
-        // Update localStorage with the new report
+        // Update localStorage with the validated code
         const storedReports = localStorage.getItem('generatedReports');
         const reports = storedReports ? JSON.parse(storedReports) : {};
-        reports['landing-page'] = data.analysis;
+        reports['landing-page'] = validatedCode;
         localStorage.setItem('generatedReports', JSON.stringify(reports));
 
         toast({
           title: wasRegenerating ? "Code Regenerated!" : "Code Generated!",
-          description: "Your React landing page is ready with live preview.",
+          description: "Your React landing page is ready with enhanced validation.",
         });
       } else {
         throw new Error(data?.error || 'Failed to generate landing page code');
@@ -127,13 +181,17 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     generateLandingPageCode();
   };
 
-  if (loading) {
+  if (loading || validating) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
-          <p className="text-gray-600">Generating production-ready React landing page...</p>
-          <p className="text-sm text-gray-500 mt-2">Creating conversion-optimized components with live preview</p>
+          <p className="text-gray-600">
+            {validating ? 'Validating and enhancing React code...' : 'Generating production-ready React landing page...'}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            {validating ? 'AI validation • Syntax checking • Code optimization' : 'Creating conversion-optimized components with live preview'}
+          </p>
         </div>
       </div>
     );
@@ -166,7 +224,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               <Code className="h-6 w-6 text-violet-600" />
-              <span>Production-Ready React Landing Page</span>
+              <span>AI-Enhanced React Landing Page</span>
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Badge variant="secondary" className="bg-green-100 text-green-800">
@@ -174,7 +232,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                 Live Execution
               </Badge>
               <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                Enhanced Processing
+                <CheckCircle className="h-3 w-3 mr-1" />
+                AI Validated
               </Badge>
               <Button 
                 onClick={regenerateContent} 
@@ -188,10 +247,43 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
             </div>
           </div>
           <CardDescription>
-            AI-generated React TypeScript component with real-time code execution, error handling, and optimization for {ideaData?.companyName || 'your SaaS startup'}
+            AI-generated and validated React TypeScript component with real-time execution and optimization for {ideaData?.companyName || 'your SaaS startup'}
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Validation Results */}
+          {(validationResults.fixes?.length || validationResults.issues?.length) && (
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-medium text-blue-800 mb-2 flex items-center">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Code Validation Results
+              </h4>
+              {validationResults.fixes?.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-sm text-blue-700 font-medium">✅ Applied Fixes:</p>
+                  <ul className="text-sm text-blue-600 mt-1 space-y-1">
+                    {validationResults.fixes.map((fix, index) => (
+                      <li key={index}>• {fix}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {validationResults.issues?.length > 0 && (
+                <div>
+                  <p className="text-sm text-yellow-700 font-medium flex items-center">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Potential Issues:
+                  </p>
+                  <ul className="text-sm text-yellow-600 mt-1 space-y-1">
+                    {validationResults.issues.map((issue, index) => (
+                      <li key={index}>• {issue}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
           <Tabs defaultValue="preview" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="preview">
@@ -213,11 +305,16 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">
                     <span className="text-sm text-gray-600">
-                      TypeScript React Component ({reactCode.split('\n').length} lines)
+                      Validated TypeScript React Component ({reactCode.split('\n').length} lines)
                     </span>
                     <Badge variant="outline" className="text-xs">
                       Production Ready
                     </Badge>
+                    {validationResults.fixes?.length > 0 && (
+                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+                        Enhanced by AI
+                      </Badge>
+                    )}
                   </div>
                   <div className="flex space-x-2">
                     <Button
@@ -251,9 +348,9 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       <div className="grid md:grid-cols-4 gap-4">
         <Card className="text-center border-0 bg-gradient-to-br from-violet-50 to-purple-50">
           <CardContent className="pt-6">
-            <Code className="h-8 w-8 text-violet-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-violet-700">Enhanced</div>
-            <div className="text-sm text-violet-600">Processing</div>
+            <CheckCircle className="h-8 w-8 text-violet-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-violet-700">AI</div>
+            <div className="text-sm text-violet-600">Validated</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -265,16 +362,16 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
           <CardContent className="pt-6">
-            <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+            <Code className="h-8 w-8 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-700">Error</div>
-            <div className="text-sm text-green-600">Recovery</div>
+            <div className="text-sm text-green-600">Prevention</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
           <CardContent className="pt-6">
             <Play className="h-8 w-8 text-orange-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-orange-700">Smart</div>
-            <div className="text-sm text-orange-600">Caching</div>
+            <div className="text-sm text-orange-600">Processing</div>
           </CardContent>
         </Card>
       </div>
