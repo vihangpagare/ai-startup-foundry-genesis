@@ -52,140 +52,168 @@ const extractJsonFromResponse = (text: string): any => {
   return JSON.parse(jsonText);
 };
 
-const detectBusinessModelTemplate = (startupData: any, reports: Record<string, string>): string => {
+const detectAdvancedBusinessModelTemplate = (startupData: any, reports: Record<string, string>): string => {
   const idea = (startupData?.idea || '').toLowerCase();
   const businessPlan = (reports['business-plan'] || '').toLowerCase();
   const combined = `${idea} ${businessPlan}`;
 
-  // Smart business model detection with existing template mapping
-  if (combined.includes('inventory') || combined.includes('stock') || combined.includes('supply') || combined.includes('warehouse')) {
-    return 'ecommerce-store'; // Inventory management maps to ecommerce
+  // Advanced template mapping based on business complexity and features
+  if (combined.includes('saas') || combined.includes('software') || combined.includes('platform') || 
+      combined.includes('analytics') || combined.includes('dashboard') || combined.includes('data') ||
+      combined.includes('metrics') || combined.includes('tracking') || combined.includes('management')) {
+    return 'advanced-saas-dashboard';
   }
   
-  if (combined.includes('marketplace') || combined.includes('platform') || combined.includes('connect') || combined.includes('match')) {
-    return 'service-platform'; // Marketplace/platform maps to service platform
+  if (combined.includes('ecommerce') || combined.includes('shopping') || combined.includes('retail') || 
+      combined.includes('products') || combined.includes('store') || combined.includes('marketplace') ||
+      combined.includes('inventory') || combined.includes('catalog') || combined.includes('orders')) {
+    return 'modern-ecommerce-platform';
   }
   
-  if (combined.includes('consulting') || combined.includes('service') || combined.includes('agency') || combined.includes('professional')) {
-    return 'service-platform'; // Service business maps to service platform
+  if (combined.includes('service') || combined.includes('consulting') || combined.includes('agency') || 
+      combined.includes('professional') || combined.includes('clients') || combined.includes('projects') ||
+      combined.includes('crm') || combined.includes('business') || combined.includes('freelance')) {
+    return 'business-service-platform';
   }
   
-  // Default to SaaS dashboard for software, analytics, tools, etc.
-  return 'saas-dashboard';
+  // Default to advanced SaaS for most business applications
+  return 'advanced-saas-dashboard';
 };
 
-const generateEnhancedBusinessAnalysisPrompt = (startupData: any, reports: Record<string, string>, templateId: string) => {
+const generateAdvancedBusinessAnalysisPrompt = (startupData: any, reports: Record<string, string>, templateId: string) => {
   const templateContext = {
-    'saas-dashboard': 'a SaaS dashboard application with analytics, user management, and core business tools',
-    'ecommerce-store': 'an ecommerce platform with product management, inventory tracking, and sales features',
-    'service-platform': 'a service platform with client management, project tracking, and professional tools'
+    'advanced-saas-dashboard': 'an advanced SaaS dashboard with real-time analytics, team management, project tracking, and comprehensive business intelligence',
+    'modern-ecommerce-platform': 'a modern e-commerce platform with advanced product management, customer analytics, inventory tracking, and sales optimization',
+    'business-service-platform': 'a business service platform with CRM, project management, client portal, invoicing, and professional service delivery tools'
   };
 
-  return `You are an expert SaaS architect. Create a business-specific application using the ${templateId} template structure.
+  return `You are an expert application architect specializing in modern business software. Create a comprehensive business-specific application using the ${templateId} template.
 
-STARTUP DETAILS:
+STARTUP INFORMATION:
 - Company: ${startupData?.companyName || 'Not specified'}
 - Business Idea: ${startupData?.idea || 'Not specified'}
-- Target Audience: ${startupData?.targetAudience || 'Not specified'}
-- Problem Statement: ${startupData?.problemStatement || 'Not specified'}
+- Target Market: ${startupData?.targetAudience || 'Not specified'}
+- Problem: ${startupData?.problemStatement || 'Not specified'}
 - Solution: ${startupData?.solution || 'Not specified'}
 
 BUSINESS ANALYSIS REPORTS:
 ${Object.entries(reports).slice(0, 4).map(([type, content]) => 
-  `${type.toUpperCase()}: ${content.substring(0, 1200)}...`
+  `${type.toUpperCase()}: ${content.substring(0, 1500)}...`
 ).join('\n\n')}
 
-TEMPLATE STRUCTURE: ${templateContext[templateId]}
+TEMPLATE ARCHITECTURE: ${templateContext[templateId]}
 
-YOUR TASK: Customize ${templateContext[templateId]} to perfectly embody this startup's business model.
+TASK: Design a production-ready business application that perfectly embodies this startup's vision using the ${templateId} template structure.
 
-CRITICAL: You must respond with ONLY a valid JSON object, no additional text.
+CRITICAL: Respond with ONLY a valid JSON object, no additional text.
 
-Return this exact structure:
+Required JSON structure:
 {
   "templateId": "${templateId}",
-  "reasoning": "Why this ${templateId} template perfectly suits the startup's business model with specific customizations",
+  "reasoning": "Detailed explanation of why this ${templateId} template is ideal for this specific business, including how the advanced features align with business needs",
   "confidence": 0.95,
-  "appName": "${startupData?.companyName || 'Your SaaS'}",
-  "appDescription": "Clear description of what this business-specific application does for end users",
-  "businessModel": "Detailed explanation of how this business operates and generates value",
+  "appName": "${startupData?.companyName || 'Business App'}",
+  "appDescription": "Clear, compelling description of what this business application accomplishes for end users and how it solves their problems",
+  "businessModel": "Comprehensive explanation of the business model, revenue streams, and value proposition",
   "coreFeatures": [
-    "Primary feature that solves the main customer problem using ${templateId} structure",
-    "Secondary feature that adds unique business value",
-    "Third feature that completes the core offering"
+    "Primary feature that leverages ${templateId} capabilities to solve core business problem",
+    "Secondary feature that provides competitive advantage using template's advanced functionality",
+    "Third feature that completes the core value proposition with template's professional tools"
   ],
   "userPersonas": [
     {
-      "name": "Primary User Type",
-      "role": "Their role/job title in this business context",
+      "name": "Primary Business User",
+      "role": "Specific job title/role in target market",
       "needs": "What they need from this business application",
-      "painPoints": "Current problems they face in this industry",
-      "workflow": "How they would use this business app daily"
+      "painPoints": "Current challenges in their workflow that this app solves",
+      "workflow": "How they would use this app in their daily business operations"
+    },
+    {
+      "name": "Secondary User Type",
+      "role": "Another key user type for this business",
+      "needs": "Their specific requirements from the application",
+      "painPoints": "Different challenges they face",
+      "workflow": "Their usage pattern and interaction with the app"
     }
   ],
   "workflows": [
     {
-      "name": "Core Business Journey",
-      "steps": ["Business-specific step 1", "Step 2", "Step 3"],
-      "outcome": "What user achieves in this business context"
+      "name": "Core Business Process",
+      "steps": ["Step 1 using template features", "Step 2 with business logic", "Step 3 delivering value"],
+      "outcome": "What users achieve through this workflow"
+    },
+    {
+      "name": "Secondary Business Process",
+      "steps": ["Another important workflow", "Using template capabilities", "Business value creation"],
+      "outcome": "Additional value delivered"
     }
   ],
   "pages": [
     {
       "name": "Main Business Interface",
-      "purpose": "Core business functionality adapted to ${templateId}",
-      "features": ["Business Feature 1", "Business Feature 2"],
-      "userActions": ["Business Action 1", "Business Action 2"]
+      "purpose": "Core functionality leveraging ${templateId} features",
+      "features": ["Business Feature 1", "Business Feature 2", "Business Feature 3"],
+      "userActions": ["Primary Action", "Secondary Action", "Management Action"]
     },
     {
-      "name": "Business Analytics",
-      "purpose": "Industry-specific insights and metrics",
-      "features": ["Business Analytics", "Custom Reports"],
-      "userActions": ["View business data", "Generate industry reports"]
+      "name": "Analytics & Insights",
+      "purpose": "Business intelligence and performance tracking",
+      "features": ["Advanced Analytics", "Custom Reports", "KPI Tracking"],
+      "userActions": ["View metrics", "Generate reports", "Track performance"]
     },
     {
-      "name": "Account Management",
-      "purpose": "Business account and preferences",
-      "features": ["Business Profile", "Business Settings"],
-      "userActions": ["Update business profile", "Manage business preferences"]
+      "name": "Management Center",
+      "purpose": "Administrative and configuration interface",
+      "features": ["User Management", "Settings", "Billing"],
+      "userActions": ["Manage users", "Configure settings", "Handle billing"]
     }
   ],
   "fields": {
-    "appName": "Business-specific application name",
-    "primaryFeature": "Main business feature name",
-    "userType": "Primary business user type",
-    "dataType": "Main business data/content type (Products/Users/Projects/Items)",
-    "actionVerb": "Primary business action (Manage/Track/Analyze/Connect)",
-    "metricName": "Key business success metric"
+    "appName": "Business-specific application name that reflects the value proposition",
+    "primaryFeature": "Main business capability name",
+    "userType": "Primary business user designation",
+    "dataType": "Main business data/content managed (Projects/Clients/Products/Orders)",
+    "actionVerb": "Primary business action (Manage/Track/Optimize/Analyze)",
+    "metricName": "Key business success indicator"
   },
   "companyData": {
-    "name": "${startupData?.companyName || 'Your Business'}",
-    "tagline": "Business value proposition in one compelling line",
-    "description": "What this business application accomplishes for users",
-    "industry": "Primary industry/market vertical"
+    "name": "${startupData?.companyName || 'Business Name'}",
+    "tagline": "Compelling value proposition that captures the business essence",
+    "description": "What this business application accomplishes and why it matters",
+    "industry": "Specific industry vertical or market segment"
   },
   "mockData": {
     "primaryEntities": [
-      {"name": "Business entity relevant to this industry", "status": "Active", "metric": "100", "category": "Business category"},
-      {"name": "Another business entity", "status": "Processing", "metric": "85", "category": "Different business category"}
+      {"name": "Realistic business entity for this industry", "status": "Active", "metric": "Relevant number", "category": "Business category"},
+      {"name": "Another business entity", "status": "Processing", "metric": "Another metric", "category": "Different category"},
+      {"name": "Third business entity", "status": "Completed", "metric": "Success metric", "category": "Important category"}
     ],
     "users": [
-      {"name": "Realistic business user for this industry", "role": "Industry-relevant role", "status": "Active", "joined": "2024-01-15"},
-      {"name": "Another business user", "role": "Different industry role", "status": "Active", "joined": "2024-02-20"}
+      {"name": "Realistic business user name", "role": "Industry-appropriate role", "status": "Active", "joined": "2024-01-15", "activity": "Recent business action"},
+      {"name": "Another business user", "role": "Different business role", "status": "Active", "joined": "2024-02-20", "activity": "Business interaction"},
+      {"name": "Third team member", "role": "Supporting role", "status": "Active", "joined": "2024-01-10", "activity": "Team collaboration"}
     ],
     "activities": [
-      {"action": "Industry-specific business action", "user": "Business user", "timestamp": "2 hours ago", "result": "Business outcome"},
-      {"action": "Another business process", "user": "Another user", "timestamp": "1 day ago", "result": "Success"}
+      {"action": "Business-specific action relevant to this industry", "user": "Business user", "timestamp": "2 hours ago", "result": "Business outcome", "type": "success"},
+      {"action": "Another important business process", "user": "Different user", "timestamp": "1 day ago", "result": "Positive result", "type": "info"},
+      {"action": "Third business activity", "user": "Team member", "timestamp": "3 hours ago", "result": "Achievement", "type": "milestone"}
     ],
     "metrics": [
-      {"name": "Core business metric for this industry", "value": "Industry-realistic value", "change": "+X%", "trend": "up"},
-      {"name": "Important business KPI", "value": "Business value", "change": "+X%", "trend": "up"}
+      {"name": "Core business KPI for this industry", "value": "Industry-realistic value", "change": "+X%", "trend": "up", "importance": "critical"},
+      {"name": "Important operational metric", "value": "Business-relevant number", "change": "+Y%", "trend": "up", "importance": "high"},
+      {"name": "Growth indicator", "value": "Performance metric", "change": "+Z%", "trend": "up", "importance": "moderate"}
+    ],
+    "projects": [
+      {"name": "Business project relevant to this industry", "status": "In Progress", "progress": 75, "team": 4, "deadline": "2024-02-15", "priority": "High"},
+      {"name": "Another business initiative", "status": "Planning", "progress": 25, "team": 3, "deadline": "2024-03-01", "priority": "Medium"},
+      {"name": "Completed business project", "status": "Completed", "progress": 100, "team": 5, "deadline": "2024-01-20", "priority": "High"}
     ]
   },
   "features": [
-    "Core business feature that defines this application",
-    "Unique business differentiator feature",
-    "Essential business management feature"
+    "Advanced feature that differentiates this business application",
+    "Core capability that drives business value",
+    "Essential functionality for this industry",
+    "Competitive advantage feature"
   ],
   "colorScheme": {
     "primary": "#2563EB",
@@ -195,100 +223,130 @@ Return this exact structure:
 }`;
 };
 
-const createBusinessSpecificFallback = (startupData: any, templateId: string): GeneratedAppContent => {
+const createAdvancedBusinessSpecificFallback = (startupData: any, templateId: string): GeneratedAppContent => {
   const companyName = startupData?.companyName || 'Your Business';
   const idea = startupData?.idea || '';
   
-  // Business type specific customization based on template
+  // Advanced template specific customization
   let businessType = 'platform';
-  let features = ['User Management', 'Analytics Dashboard', 'Settings'];
+  let features = ['Advanced Analytics', 'Team Management', 'Real-time Updates'];
   let mockEntities = [
-    { name: 'Sample Item', status: 'Active', metric: '100', category: 'General' },
-    { name: 'Another Item', status: 'Pending', metric: '85', category: 'Important' }
+    { name: 'Business Entity A', status: 'Active', metric: '150', category: 'Priority' },
+    { name: 'Business Entity B', status: 'Processing', metric: '89', category: 'Standard' },
+    { name: 'Business Entity C', status: 'Completed', metric: '200', category: 'Premium' }
   ];
 
-  if (templateId === 'ecommerce-store') {
-    businessType = 'inventory-management';
-    features = ['Inventory Tracking', 'Product Management', 'Sales Analytics'];
+  if (templateId === 'modern-ecommerce-platform') {
+    businessType = 'e-commerce-platform';
+    features = ['Product Management', 'Order Processing', 'Customer Analytics', 'Inventory Tracking'];
     mockEntities = [
-      { name: 'Product A', status: 'In Stock', metric: '250', category: 'Electronics' },
-      { name: 'Product B', status: 'Low Stock', metric: '45', category: 'Accessories' }
+      { name: 'Premium Product Line', status: 'In Stock', metric: '350', category: 'Electronics' },
+      { name: 'Bestseller Collection', status: 'Low Stock', metric: '75', category: 'Fashion' },
+      { name: 'New Arrivals', status: 'Available', metric: '120', category: 'Home & Garden' }
     ];
-  } else if (templateId === 'service-platform') {
+  } else if (templateId === 'business-service-platform') {
     businessType = 'service-platform';
-    features = ['Client Management', 'Project Tracking', 'Service Analytics'];
+    features = ['Client Management', 'Project Tracking', 'Invoice Generation', 'Calendar Scheduling'];
     mockEntities = [
-      { name: 'Client A', status: 'Active', metric: '4.8', category: 'Premium' },
-      { name: 'Client B', status: 'Pending', metric: '4.2', category: 'Standard' }
+      { name: 'Enterprise Client A', status: 'Active', metric: '4.9', category: 'Enterprise' },
+      { name: 'Growing Business B', status: 'Engaged', metric: '4.6', category: 'SMB' },
+      { name: 'Startup Client C', status: 'New', metric: '4.2', category: 'Startup' }
     ];
   } else {
     businessType = 'saas-dashboard';
-    features = ['Dashboard Analytics', 'Data Management', 'User Insights'];
+    features = ['Real-time Dashboard', 'Advanced Analytics', 'Team Collaboration', 'API Integration'];
     mockEntities = [
-      { name: 'Dataset A', status: 'Updated', metric: '1.2M', category: 'Real-time' },
-      { name: 'Dataset B', status: 'Processing', metric: '850K', category: 'Batch' }
+      { name: 'Data Stream Alpha', status: 'Live', metric: '2.3M', category: 'Real-time' },
+      { name: 'Analytics Pipeline', status: 'Processing', metric: '1.8M', category: 'Batch' },
+      { name: 'User Insights', status: 'Updated', metric: '950K', category: 'Insights' }
     ];
   }
 
   return {
     templateId,
-    reasoning: `Using ${templateId} template customized for ${companyName}'s ${businessType} business model`,
-    confidence: 0.8,
+    reasoning: `Advanced ${templateId} template selected for ${companyName}'s ${businessType} business model with comprehensive features and modern architecture`,
+    confidence: 0.85,
     appName: companyName,
-    appDescription: `A comprehensive ${businessType} solution that ${idea}`,
-    businessModel: `${businessType} serving ${startupData?.targetAudience || 'businesses'}`,
+    appDescription: `A comprehensive ${businessType} solution that ${idea} with advanced features and professional-grade functionality`,
+    businessModel: `Advanced ${businessType} serving ${startupData?.targetAudience || 'businesses'} with enterprise-grade capabilities`,
     coreFeatures: features,
     userPersonas: [
       {
-        name: 'Primary User',
-        role: startupData?.targetAudience || 'Business User',
-        needs: 'Efficient management and insights',
-        painPoints: 'Manual processes and lack of visibility',
-        workflow: 'Daily monitoring and management tasks'
+        name: 'Business Manager',
+        role: startupData?.targetAudience || 'Business Professional',
+        needs: 'Advanced analytics and comprehensive management capabilities',
+        painPoints: 'Limited visibility and complex manual processes',
+        workflow: 'Daily monitoring, analysis, and strategic decision making'
+      },
+      {
+        name: 'Team Lead',
+        role: 'Department Head',
+        needs: 'Team coordination and performance tracking',
+        painPoints: 'Communication gaps and progress visibility',
+        workflow: 'Team management and project oversight'
       }
     ],
     workflows: [
       {
-        name: 'Core Workflow',
-        steps: ['Access platform', 'View dashboard', 'Take action', 'Monitor results'],
-        outcome: 'Improved efficiency and insights'
+        name: 'Primary Business Process',
+        steps: ['Access dashboard', 'Analyze metrics', 'Take strategic action', 'Monitor results'],
+        outcome: 'Improved business performance and efficiency'
+      },
+      {
+        name: 'Team Collaboration Flow',
+        steps: ['Assign tasks', 'Track progress', 'Communicate updates', 'Achieve goals'],
+        outcome: 'Enhanced team productivity and coordination'
       }
     ],
     pages: [
       {
-        name: 'Main Interface',
-        purpose: 'Core functionality',
+        name: 'Advanced Dashboard',
+        purpose: 'Comprehensive business overview with real-time insights',
         features: features,
-        userActions: ['View', 'Manage', 'Analyze']
+        userActions: ['Monitor', 'Analyze', 'Optimize']
+      },
+      {
+        name: 'Management Interface',
+        purpose: 'Core business functionality and operations',
+        features: ['Management Tools', 'Configuration', 'Reporting'],
+        userActions: ['Manage', 'Configure', 'Report']
       }
     ],
     fields: {
       appName: companyName,
       primaryFeature: features[0],
-      userType: startupData?.targetAudience || 'User',
-      dataType: templateId === 'ecommerce-store' ? 'Products' : templateId === 'service-platform' ? 'Clients' : 'Data',
-      actionVerb: 'Manage',
-      metricName: 'Success Rate'
+      userType: startupData?.targetAudience || 'Professional',
+      dataType: templateId === 'modern-ecommerce-platform' ? 'Products' : templateId === 'business-service-platform' ? 'Clients' : 'Analytics',
+      actionVerb: 'Optimize',
+      metricName: 'Performance Score'
     },
     companyData: {
       name: companyName,
-      tagline: `Transforming ${businessType} operations`,
-      description: idea || `A powerful ${businessType} solution`,
+      tagline: `Advanced ${businessType} transformation`,
+      description: idea || `A powerful ${businessType} solution with enterprise features`,
       industry: startupData?.targetAudience || 'Technology'
     },
     mockData: {
       primaryEntities: mockEntities,
       users: [
-        { name: 'Alex Chen', role: 'Manager', status: 'Active', joined: '2024-01-15' },
-        { name: 'Sarah Wilson', role: 'Analyst', status: 'Active', joined: '2024-02-20' }
+        { name: 'Sarah Chen', role: 'Senior Manager', status: 'Active', joined: '2024-01-15', activity: 'Generated monthly report' },
+        { name: 'Mike Rodriguez', role: 'Team Lead', status: 'Active', joined: '2024-02-20', activity: 'Updated project status' },
+        { name: 'Emily Wang', role: 'Analyst', status: 'Active', joined: '2024-01-25', activity: 'Analyzed performance metrics' }
       ],
       activities: [
-        { action: 'Updated records', user: 'Alex Chen', timestamp: '2 hours ago', result: 'Success' },
-        { action: 'Generated report', user: 'Sarah Wilson', timestamp: '1 day ago', result: 'Completed' }
+        { action: 'Performance optimization completed', user: 'Sarah Chen', timestamp: '2 hours ago', result: 'Success', type: 'success' },
+        { action: 'Team collaboration session', user: 'Mike Rodriguez', timestamp: '1 day ago', result: 'Productive', type: 'info' },
+        { action: 'Analytics report generated', user: 'Emily Wang', timestamp: '4 hours ago', result: 'Insights gained', type: 'milestone' }
       ],
       metrics: [
-        { name: 'Success Rate', value: '94%', change: '+8%', trend: 'up' },
-        { name: 'User Satisfaction', value: '4.7/5', change: '+0.3', trend: 'up' }
+        { name: 'Performance Score', value: '96%', change: '+12%', trend: 'up', importance: 'critical' },
+        { name: 'User Satisfaction', value: '4.8/5', change: '+0.4', trend: 'up', importance: 'high' },
+        { name: 'Growth Rate', value: '28%', change: '+5%', trend: 'up', importance: 'moderate' }
+      ],
+      projects: [
+        { name: 'Platform Enhancement', status: 'In Progress', progress: 78, team: 5, deadline: '2024-02-15', priority: 'High' },
+        { name: 'User Experience Optimization', status: 'Planning', progress: 25, team: 3, deadline: '2024-03-01', priority: 'Medium' },
+        { name: 'Analytics Integration', status: 'Completed', progress: 100, team: 4, deadline: '2024-01-20', priority: 'High' }
       ]
     },
     features: features,
@@ -314,21 +372,21 @@ serve(async (req) => {
 
     const { startupData, reports, targetTemplateId }: AppContentGenerationRequest = await req.json();
     
-    console.log('Generating business-specific app content for:', {
+    console.log('Generating advanced business-specific app content for:', {
       company: startupData?.companyName,
       idea: startupData?.idea?.substring(0, 100),
       reportsCount: Object.keys(reports || {}).length
     });
 
-    // Smart template selection - always use existing templates
-    const selectedTemplateId = targetTemplateId || detectBusinessModelTemplate(startupData, reports || {});
-    console.log('Selected template:', selectedTemplateId);
+    // Advanced template selection - always use new advanced templates
+    const selectedTemplateId = targetTemplateId || detectAdvancedBusinessModelTemplate(startupData, reports || {});
+    console.log('Selected advanced template:', selectedTemplateId);
 
     let generatedContent: GeneratedAppContent;
 
-    const prompt = generateEnhancedBusinessAnalysisPrompt(startupData, reports || {}, selectedTemplateId);
+    const prompt = generateAdvancedBusinessAnalysisPrompt(startupData, reports || {}, selectedTemplateId);
     
-    console.log('Calling Claude API for business-specific customization...');
+    console.log('Calling Claude API for advanced business-specific customization...');
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -355,7 +413,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Claude API response received, parsing content...');
+    console.log('Claude API response received, parsing advanced content...');
     
     if (!data.content || !data.content[0] || !data.content[0].text) {
       console.error('Invalid Claude API response structure:', data);
@@ -365,32 +423,32 @@ serve(async (req) => {
     try {
       generatedContent = extractJsonFromResponse(data.content[0].text);
       
-      // Ensure we always use the selected template ID
+      // Ensure we always use the selected advanced template ID
       generatedContent.templateId = selectedTemplateId;
       
-      console.log('Successfully parsed JSON from Claude response');
+      console.log('Successfully parsed advanced JSON from Claude response');
     } catch (parseError) {
-      console.error('JSON parsing failed:', parseError.message);
+      console.error('Advanced JSON parsing failed:', parseError.message);
       console.error('Raw response:', data.content[0].text);
       
-      console.log('Using business-specific fallback content');
-      generatedContent = createBusinessSpecificFallback(startupData, selectedTemplateId);
+      console.log('Using advanced business-specific fallback content');
+      generatedContent = createAdvancedBusinessSpecificFallback(startupData, selectedTemplateId);
     }
 
-    // Validate and enhance generated content
+    // Validate and enhance generated content for advanced templates
     if (!generatedContent.fields || !generatedContent.companyData || !generatedContent.mockData) {
       console.error('Generated content missing required fields:', generatedContent);
-      generatedContent = createBusinessSpecificFallback(startupData, selectedTemplateId);
+      generatedContent = createAdvancedBusinessSpecificFallback(startupData, selectedTemplateId);
     }
 
-    // Final validation - ensure template ID is always from existing templates
-    const validTemplateIds = ['saas-dashboard', 'ecommerce-store', 'service-platform'];
-    if (!validTemplateIds.includes(generatedContent.templateId)) {
-      console.warn('Invalid template ID generated, using fallback:', generatedContent.templateId);
+    // Final validation - ensure template ID is from advanced templates
+    const validAdvancedTemplateIds = ['advanced-saas-dashboard', 'modern-ecommerce-platform', 'business-service-platform'];
+    if (!validAdvancedTemplateIds.includes(generatedContent.templateId)) {
+      console.warn('Invalid advanced template ID generated, using fallback:', generatedContent.templateId);
       generatedContent.templateId = selectedTemplateId;
     }
 
-    console.log('Successfully generated business-specific app content:', {
+    console.log('Successfully generated advanced business-specific app content:', {
       appName: generatedContent.appName,
       templateId: generatedContent.templateId,
       businessModel: generatedContent.businessModel,
@@ -406,26 +464,26 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('App content generation error:', error);
+    console.error('Advanced app content generation error:', error);
     
     try {
       const { startupData, targetTemplateId } = await req.json().catch(() => ({}));
-      const fallbackTemplateId = targetTemplateId || 'saas-dashboard';
-      const fallbackContent = createBusinessSpecificFallback(startupData || {}, fallbackTemplateId);
+      const fallbackTemplateId = targetTemplateId || 'advanced-saas-dashboard';
+      const fallbackContent = createAdvancedBusinessSpecificFallback(startupData || {}, fallbackTemplateId);
       
       return new Response(JSON.stringify({
         success: true,
         content: fallbackContent,
-        warning: 'Used business-specific fallback content due to AI generation failure'
+        warning: 'Used advanced business-specific fallback content due to AI generation failure'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     } catch (fallbackError) {
-      console.error('Fallback content generation failed:', fallbackError);
+      console.error('Advanced fallback content generation failed:', fallbackError);
       
       return new Response(JSON.stringify({
         success: false,
-        error: error.message || 'App content generation failed'
+        error: error.message || 'Advanced app content generation failed'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

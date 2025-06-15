@@ -3,6 +3,412 @@ import { AppTemplate, AppCustomization, AppPage, AppComponent } from '@/types/ap
 class AppTemplateManager {
   private templates: AppTemplate[] = [
     {
+      id: 'advanced-saas-dashboard',
+      name: 'Advanced SaaS Dashboard',
+      description: 'Complete SaaS platform with analytics, team management, project tracking, and billing',
+      category: 'saas-dashboard',
+      complexity: 'advanced',
+      features: ['Real-time Analytics', 'Team Collaboration', 'Project Management', 'Billing System', 'User Management', 'API Integration'],
+      previewImage: '/placeholder.svg',
+      tags: ['dashboard', 'analytics', 'saas', 'business', 'real-time', 'collaboration'],
+      pages: [
+        {
+          id: 'overview',
+          name: 'Dashboard Overview',
+          route: '/',
+          description: 'Main dashboard with key metrics, charts, and recent activity',
+          components: [
+            { id: 'metrics-grid', type: 'card', name: 'Key Metrics', props: {}, customizable: true, required: true },
+            { id: 'revenue-chart', type: 'chart', name: 'Revenue Chart', props: {}, customizable: true, required: true },
+            { id: 'activity-feed', type: 'content', name: 'Recent Activity', props: {}, customizable: true, required: true }
+          ],
+          layout: 'sidebar',
+          navigation: {
+            type: 'sidebar',
+            items: [
+              { label: 'Overview', href: '/', icon: 'BarChart3' },
+              { label: 'Projects', href: '/projects', icon: 'Calendar' },
+              { label: 'Team', href: '/team', icon: 'Users' },
+              { label: 'Analytics', href: '/analytics', icon: 'TrendingUp' },
+              { label: 'Settings', href: '/settings', icon: 'Settings' }
+            ],
+            position: 'left'
+          }
+        },
+        {
+          id: 'projects',
+          name: 'Project Management',
+          route: '/projects',
+          description: 'Project tracking with progress monitoring and team assignment',
+          components: [
+            { id: 'project-cards', type: 'card', name: 'Project Cards', props: {}, customizable: true, required: true },
+            { id: 'progress-tracking', type: 'content', name: 'Progress Tracking', props: {}, customizable: true, required: true }
+          ],
+          layout: 'default',
+          navigation: {
+            type: 'sidebar',
+            items: [
+              { label: 'Overview', href: '/', icon: 'BarChart3' },
+              { label: 'Projects', href: '/projects', icon: 'Calendar' },
+              { label: 'Team', href: '/team', icon: 'Users' },
+              { label: 'Analytics', href: '/analytics', icon: 'TrendingUp' },
+              { label: 'Settings', href: '/settings', icon: 'Settings' }
+            ],
+            position: 'left'
+          }
+        },
+        {
+          id: 'team',
+          name: 'Team Management',
+          route: '/team',
+          description: 'Team member management with roles and activity tracking',
+          components: [
+            { id: 'team-grid', type: 'card', name: 'Team Members', props: {}, customizable: true, required: true },
+            { id: 'team-activity', type: 'content', name: 'Team Activity', props: {}, customizable: true, required: true }
+          ],
+          layout: 'default',
+          navigation: {
+            type: 'sidebar',
+            items: [
+              { label: 'Overview', href: '/', icon: 'BarChart3' },
+              { label: 'Projects', href: '/projects', icon: 'Calendar' },
+              { label: 'Team', href: '/team', icon: 'Users' },
+              { label: 'Analytics', href: '/analytics', icon: 'TrendingUp' },
+              { label: 'Settings', href: '/settings', icon: 'Settings' }
+            ],
+            position: 'left'
+          }
+        }
+      ],
+      config: {
+        customizableFields: [
+          { id: 'appName', label: 'App Name', type: 'text', required: true, page: 'all', component: 'header' },
+          { id: 'primaryMetric', label: 'Primary Metric', type: 'text', required: true, page: 'overview', component: 'metrics-grid' },
+          { id: 'teamSize', label: 'Team Size', type: 'number', required: false, page: 'team', component: 'team-grid' }
+        ],
+        colorScheme: {
+          primary: '#3B82F6',
+          secondary: '#1E40AF',
+          accent: '#10B981',
+          background: '#F8FAFC',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: { heading: 'Inter', body: 'Inter', mono: 'JetBrains Mono' },
+          fontSize: { xs: '0.75rem', sm: '0.875rem', base: '1rem', lg: '1.125rem', xl: '1.25rem', '2xl': '1.5rem', '3xl': '1.875rem', '4xl': '2.25rem' },
+          fontWeight: { normal: '400', medium: '500', semibold: '600', bold: '700' }
+        },
+        routing: {
+          pages: [
+            { path: '/', name: 'Overview', component: 'DashboardOverview', protected: true, exact: true },
+            { path: '/projects', name: 'Projects', component: 'ProjectManagement', protected: true, exact: true },
+            { path: '/team', name: 'Team', component: 'TeamManagement', protected: true, exact: true },
+            { path: '/analytics', name: 'Analytics', component: 'AnalyticsDashboard', protected: true, exact: true },
+            { path: '/settings', name: 'Settings', component: 'AppSettings', protected: true, exact: true }
+          ],
+          navigation: [
+            { label: 'Overview', href: '/' },
+            { label: 'Projects', href: '/projects' },
+            { label: 'Team', href: '/team' },
+            { label: 'Analytics', href: '/analytics' },
+            { label: 'Settings', href: '/settings' }
+          ],
+          defaultRoute: '/'
+        },
+        dataStructure: {
+          entities: [
+            { name: 'User', fields: [{ name: 'name', type: 'string', required: true, mockStrategy: 'realistic' }], mockCount: 15 },
+            { name: 'Project', fields: [{ name: 'name', type: 'string', required: true, mockStrategy: 'realistic' }], mockCount: 8 },
+            { name: 'Metric', fields: [{ name: 'value', type: 'number', required: true, mockStrategy: 'realistic' }], mockCount: 10 }
+          ],
+          relationships: [],
+          apiEndpoints: [
+            { path: '/api/users', method: 'GET', entity: 'User', mockResponse: [] },
+            { path: '/api/projects', method: 'GET', entity: 'Project', mockResponse: [] },
+            { path: '/api/metrics', method: 'GET', entity: 'Metric', mockResponse: [] }
+          ]
+        },
+        mockData: { enabled: true, realistic: true, industrySpecific: true, dataSize: 'large' },
+        features: [
+          { id: 'real-time-analytics', name: 'Real-time Analytics', description: 'Live data visualization and metrics', enabled: true, page: 'overview', component: 'revenue-chart', dependencies: [] },
+          { id: 'team-collaboration', name: 'Team Collaboration', description: 'Team management and communication tools', enabled: true, page: 'team', component: 'team-grid', dependencies: [] }
+        ]
+      },
+      version: '2.0.0',
+      popularity: 98,
+      lastUpdated: '2024-01-15',
+      author: 'Advanced Templates',
+      premium: true
+    },
+    {
+      id: 'modern-ecommerce-platform',
+      name: 'Modern E-commerce Platform',
+      description: 'Complete e-commerce solution with advanced product management, cart, orders, and analytics',
+      category: 'ecommerce',
+      complexity: 'advanced',
+      features: ['Product Catalog', 'Advanced Search', 'Shopping Cart', 'Order Management', 'Customer Reviews', 'Inventory Tracking'],
+      previewImage: '/placeholder.svg',
+      tags: ['ecommerce', 'shopping', 'retail', 'products', 'payments', 'inventory'],
+      pages: [
+        {
+          id: 'products',
+          name: 'Product Catalog',
+          route: '/',
+          description: 'Advanced product browsing with filters, search, and detailed views',
+          components: [
+            { id: 'product-grid', type: 'card', name: 'Product Grid', props: {}, customizable: true, required: true },
+            { id: 'search-filters', type: 'form', name: 'Search & Filters', props: {}, customizable: true, required: true }
+          ],
+          layout: 'default',
+          navigation: {
+            type: 'header',
+            items: [
+              { label: 'Products', href: '/', icon: 'Package' },
+              { label: 'Orders', href: '/orders', icon: 'ShoppingCart' },
+              { label: 'Wishlist', href: '/wishlist', icon: 'Heart' },
+              { label: 'Account', href: '/account', icon: 'User' }
+            ],
+            position: 'top'
+          }
+        },
+        {
+          id: 'orders',
+          name: 'Order Management',
+          route: '/orders',
+          description: 'Order history, tracking, and management interface',
+          components: [
+            { id: 'order-history', type: 'table', name: 'Order History', props: {}, customizable: true, required: true },
+            { id: 'order-tracking', type: 'content', name: 'Order Tracking', props: {}, customizable: true, required: true }
+          ],
+          layout: 'default',
+          navigation: {
+            type: 'header',
+            items: [
+              { label: 'Products', href: '/', icon: 'Package' },
+              { label: 'Orders', href: '/orders', icon: 'ShoppingCart' },
+              { label: 'Wishlist', href: '/wishlist', icon: 'Heart' },
+              { label: 'Account', href: '/account', icon: 'User' }
+            ],
+            position: 'top'
+          }
+        }
+      ],
+      config: {
+        customizableFields: [
+          { id: 'storeName', label: 'Store Name', type: 'text', required: true, page: 'all', component: 'header' },
+          { id: 'productCategory', label: 'Main Product Category', type: 'text', required: true, page: 'products', component: 'product-grid' },
+          { id: 'currency', label: 'Currency', type: 'select', required: true, page: 'all', component: 'pricing', options: [
+            { value: 'USD', label: 'US Dollar' },
+            { value: 'EUR', label: 'Euro' },
+            { value: 'GBP', label: 'British Pound' }
+          ] }
+        ],
+        colorScheme: {
+          primary: '#059669',
+          secondary: '#047857',
+          accent: '#F59E0B',
+          background: '#FFFFFF',
+          text: '#111827',
+          muted: '#6B7280',
+          border: '#D1D5DB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: { heading: 'Inter', body: 'Inter', mono: 'JetBrains Mono' },
+          fontSize: { xs: '0.75rem', sm: '0.875rem', base: '1rem', lg: '1.125rem', xl: '1.25rem', '2xl': '1.5rem', '3xl': '1.875rem', '4xl': '2.25rem' },
+          fontWeight: { normal: '400', medium: '500', semibold: '600', bold: '700' }
+        },
+        routing: {
+          pages: [
+            { path: '/', name: 'Products', component: 'ProductCatalog', protected: false, exact: true },
+            { path: '/orders', name: 'Orders', component: 'OrderManagement', protected: true, exact: true },
+            { path: '/wishlist', name: 'Wishlist', component: 'WishlistPage', protected: true, exact: true },
+            { path: '/account', name: 'Account', component: 'UserAccount', protected: true, exact: true }
+          ],
+          navigation: [
+            { label: 'Products', href: '/' },
+            { label: 'Orders', href: '/orders' },
+            { label: 'Wishlist', href: '/wishlist' },
+            { label: 'Account', href: '/account' }
+          ],
+          defaultRoute: '/'
+        },
+        dataStructure: {
+          entities: [
+            { name: 'Product', fields: [
+              { name: 'name', type: 'string', required: true, mockStrategy: 'realistic' }, 
+              { name: 'price', type: 'number', required: true, mockStrategy: 'realistic' },
+              { name: 'category', type: 'string', required: true, mockStrategy: 'realistic' },
+              { name: 'rating', type: 'number', required: true, mockStrategy: 'realistic' }
+            ], mockCount: 50 },
+            { name: 'Order', fields: [
+              { name: 'total', type: 'number', required: true, mockStrategy: 'realistic' },
+              { name: 'status', type: 'string', required: true, mockStrategy: 'realistic' }
+            ], mockCount: 15 }
+          ],
+          relationships: [{ from: 'Order', to: 'Product', type: 'many-to-many' }],
+          apiEndpoints: [
+            { path: '/api/products', method: 'GET', entity: 'Product', mockResponse: [] },
+            { path: '/api/orders', method: 'GET', entity: 'Order', mockResponse: [] }
+          ]
+        },
+        mockData: { enabled: true, realistic: true, industrySpecific: true, dataSize: 'large' },
+        features: [
+          { id: 'advanced-search', name: 'Advanced Search', description: 'Search with filters and sorting', enabled: true, page: 'products', component: 'search-filters', dependencies: [] },
+          { id: 'reviews', name: 'Customer Reviews', description: 'Product reviews and ratings', enabled: true, page: 'products', component: 'product-grid', dependencies: [] }
+        ]
+      },
+      version: '2.0.0',
+      popularity: 92,
+      lastUpdated: '2024-01-15',
+      author: 'Advanced Templates',
+      premium: true
+    },
+    {
+      id: 'business-service-platform',
+      name: 'Business Service Platform',
+      description: 'Professional service platform with CRM, project management, invoicing, and client portal',
+      category: 'service-platform',
+      complexity: 'advanced',
+      features: ['Client Management', 'Project Tracking', 'Invoice Generation', 'Calendar Scheduling', 'File Management', 'Team Collaboration'],
+      previewImage: '/placeholder.svg',
+      tags: ['services', 'crm', 'business', 'clients', 'invoicing', 'professional'],
+      pages: [
+        {
+          id: 'dashboard',
+          name: 'Business Dashboard',
+          route: '/',
+          description: 'Overview of business metrics, recent activity, and key insights',
+          components: [
+            { id: 'business-metrics', type: 'card', name: 'Business Metrics', props: {}, customizable: true, required: true },
+            { id: 'project-overview', type: 'chart', name: 'Project Overview', props: {}, customizable: true, required: true }
+          ],
+          layout: 'default',
+          navigation: {
+            type: 'header',
+            items: [
+              { label: 'Dashboard', href: '/', icon: 'BarChart3' },
+              { label: 'Clients', href: '/clients', icon: 'Users' },
+              { label: 'Projects', href: '/projects', icon: 'Briefcase' },
+              { label: 'Calendar', href: '/calendar', icon: 'Calendar' },
+              { label: 'Invoices', href: '/invoices', icon: 'FileText' }
+            ],
+            position: 'top'
+          }
+        },
+        {
+          id: 'clients',
+          name: 'Client Management',
+          route: '/clients',
+          description: 'Comprehensive client relationship management system',
+          components: [
+            { id: 'client-list', type: 'card', name: 'Client List', props: {}, customizable: true, required: true },
+            { id: 'client-details', type: 'form', name: 'Client Details', props: {}, customizable: true, required: true }
+          ],
+          layout: 'default',
+          navigation: {
+            type: 'header',
+            items: [
+              { label: 'Dashboard', href: '/', icon: 'BarChart3' },
+              { label: 'Clients', href: '/clients', icon: 'Users' },
+              { label: 'Projects', href: '/projects', icon: 'Briefcase' },
+              { label: 'Calendar', href: '/calendar', icon: 'Calendar' },
+              { label: 'Invoices', href: '/invoices', icon: 'FileText' }
+            ],
+            position: 'top'
+          }
+        }
+      ],
+      config: {
+        customizableFields: [
+          { id: 'businessName', label: 'Business Name', type: 'text', required: true, page: 'all', component: 'header' },
+          { id: 'serviceType', label: 'Primary Service Type', type: 'text', required: true, page: 'dashboard', component: 'business-metrics' },
+          { id: 'billingCurrency', label: 'Billing Currency', type: 'select', required: true, page: 'invoices', component: 'invoice-form', options: [
+            { value: 'USD', label: 'US Dollar' },
+            { value: 'EUR', label: 'Euro' }
+          ] }
+        ],
+        colorScheme: {
+          primary: '#7C3AED',
+          secondary: '#5B21B6',
+          accent: '#F59E0B',
+          background: '#FAFAFA',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: { heading: 'Inter', body: 'Inter', mono: 'JetBrains Mono' },
+          fontSize: { xs: '0.75rem', sm: '0.875rem', base: '1rem', lg: '1.125rem', xl: '1.25rem', '2xl': '1.5rem', '3xl': '1.875rem', '4xl': '2.25rem' },
+          fontWeight: { normal: '400', medium: '500', semibold: '600', bold: '700' }
+        },
+        routing: {
+          pages: [
+            { path: '/', name: 'Dashboard', component: 'BusinessDashboard', protected: true, exact: true },
+            { path: '/clients', name: 'Clients', component: 'ClientManagement', protected: true, exact: true },
+            { path: '/projects', name: 'Projects', component: 'ProjectManagement', protected: true, exact: true },
+            { path: '/calendar', name: 'Calendar', component: 'CalendarScheduling', protected: true, exact: true },
+            { path: '/invoices', name: 'Invoices', component: 'InvoiceManagement', protected: true, exact: true }
+          ],
+          navigation: [
+            { label: 'Dashboard', href: '/' },
+            { label: 'Clients', href: '/clients' },
+            { label: 'Projects', href: '/projects' },
+            { label: 'Calendar', href: '/calendar' },
+            { label: 'Invoices', href: '/invoices' }
+          ],
+          defaultRoute: '/'
+        },
+        dataStructure: {
+          entities: [
+            { name: 'Client', fields: [
+              { name: 'name', type: 'string', required: true, mockStrategy: 'realistic' },
+              { name: 'email', type: 'string', required: true, mockStrategy: 'realistic' },
+              { name: 'value', type: 'number', required: true, mockStrategy: 'realistic' }
+            ], mockCount: 25 },
+            { name: 'Project', fields: [
+              { name: 'name', type: 'string', required: true, mockStrategy: 'realistic' },
+              { name: 'status', type: 'string', required: true, mockStrategy: 'realistic' },
+              { name: 'budget', type: 'number', required: true, mockStrategy: 'realistic' }
+            ], mockCount: 20 },
+            { name: 'Invoice', fields: [
+              { name: 'amount', type: 'number', required: true, mockStrategy: 'realistic' },
+              { name: 'status', type: 'string', required: true, mockStrategy: 'realistic' }
+            ], mockCount: 12 }
+          ],
+          relationships: [
+            { from: 'Project', to: 'Client', type: 'many-to-one' },
+            { from: 'Invoice', to: 'Client', type: 'many-to-one' }
+          ],
+          apiEndpoints: [
+            { path: '/api/clients', method: 'GET', entity: 'Client', mockResponse: [] },
+            { path: '/api/projects', method: 'GET', entity: 'Project', mockResponse: [] },
+            { path: '/api/invoices', method: 'GET', entity: 'Invoice', mockResponse: [] }
+          ]
+        },
+        mockData: { enabled: true, realistic: true, industrySpecific: true, dataSize: 'large' },
+        features: [
+          { id: 'crm', name: 'Client Relationship Management', description: 'Comprehensive client management system', enabled: true, page: 'clients', component: 'client-list', dependencies: [] },
+          { id: 'invoicing', name: 'Invoice Generation', description: 'Professional invoice creation and tracking', enabled: true, page: 'invoices', component: 'invoice-form', dependencies: [] }
+        ]
+      },
+      version: '2.0.0',
+      popularity: 89,
+      lastUpdated: '2024-01-15',
+      author: 'Advanced Templates',
+      premium: true
+    },
+    {
       id: 'saas-dashboard',
       name: 'SaaS Dashboard',
       description: 'Complete dashboard application with analytics, user management, and settings',
@@ -409,11 +815,51 @@ class AppTemplateManager {
       throw new Error(`Template ${customization.templateId} not found`);
     }
 
+    // For advanced templates, use the actual component
+    if (this.isAdvancedTemplate(customization.templateId)) {
+      return this.generateAdvancedAppCode(template, customization);
+    }
+
     return this.generateAppCode(template, customization);
   }
 
+  private isAdvancedTemplate(templateId: string): boolean {
+    return ['advanced-saas-dashboard', 'modern-ecommerce-platform', 'business-service-platform'].includes(templateId);
+  }
+
+  private generateAdvancedAppCode(template: AppTemplate, customization: AppCustomization): string {
+    const appName = customization.appName || template.name;
+    const componentMap = {
+      'advanced-saas-dashboard': 'AdvancedSaaSDashboardTemplate',
+      'modern-ecommerce-platform': 'ModernEcommerceTemplate',
+      'business-service-platform': 'BusinessPlatformTemplate'
+    };
+
+    const componentName = componentMap[customization.templateId as keyof typeof componentMap];
+
+    return `// ${appName} - Advanced Generated App
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ${componentName} from '@/components/templates/${componentName}';
+
+// Main App Component
+const App = () => {
+  const customization = ${JSON.stringify(customization, null, 2)};
+
+  return (
+    <Router>
+      <div className="min-h-screen">
+        <${componentName} customization={customization} />
+      </div>
+    </Router>
+  );
+};
+
+export default App;`;
+  }
+
   private generateAppCode(template: AppTemplate, customization: AppCustomization): string {
-    // Generate complete React app code with routing and components
+    // ... keep existing code (original generateAppCode implementation)
     const appName = customization.appName || template.name;
     const pages = template.pages.map(page => this.generatePageComponent(page, customization));
     
