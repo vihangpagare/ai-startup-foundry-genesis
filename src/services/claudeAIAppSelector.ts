@@ -8,6 +8,10 @@ interface AIGeneratedAppContent {
   confidence: number;
   appName: string;
   appDescription: string;
+  businessModel: string;
+  coreFeatures: string[];
+  userPersonas: any[];
+  workflows: any[];
   fields: Record<string, string>;
   companyData: {
     name: string;
@@ -17,6 +21,7 @@ interface AIGeneratedAppContent {
   };
   mockData: Record<string, any[]>;
   features: string[];
+  pages: any[];
   colorScheme?: {
     primary: string;
     secondary: string;
