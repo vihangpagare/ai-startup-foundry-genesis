@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -350,8 +349,11 @@ const EnhancedSaaSTemplate = ({ customization }: EnhancedSaaSTemplateProps) => {
           ].map((plan) => (
             <Card 
               key={plan.id} 
-              className={`relative ${plan.popular ? 'ring-2 scale-105' : ''} hover:shadow-lg transition-all cursor-pointer`}
-              style={plan.popular ? { ringColor: colorScheme.primary } : {}}
+              className={`relative cursor-pointer transition-all hover:shadow-lg ${
+                plan.popular 
+                  ? 'ring-2 ring-offset-2' 
+                  : ''
+              } ${plan.popular ? `ring-${colorScheme.primary}` : ''}`}
               onClick={() => setSelectedPlan(plan.id)}
             >
               {plan.popular && (

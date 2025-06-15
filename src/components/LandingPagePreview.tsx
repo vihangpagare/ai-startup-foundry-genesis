@@ -8,6 +8,8 @@ import { templateManager } from '@/services/templateManager';
 import ModernSaaSTemplate from '@/components/templates/ModernSaaSTemplate';
 import MinimalPortfolioTemplate from '@/components/templates/MinimalPortfolioTemplate';
 import BusinessServiceTemplate from '@/components/templates/BusinessServiceTemplate';
+import EnhancedSaaSTemplate from '@/components/templates/EnhancedSaaSTemplate';
+import AnalyticsSaaSTemplate from '@/components/templates/AnalyticsSaaSTemplate';
 
 interface LandingPagePreviewProps {
   customization: TemplateCustomization | null;
@@ -116,6 +118,10 @@ const LandingPagePreview = ({ customization, onEdit }: LandingPagePreviewProps) 
     switch (customization.templateId) {
       case 'modern-saas':
         return <ModernSaaSTemplate customization={customization} />;
+      case 'enhanced-saas':
+        return <EnhancedSaaSTemplate customization={customization} />;
+      case 'analytics-saas':
+        return <AnalyticsSaaSTemplate customization={customization} />;
       case 'minimal-portfolio':
         return <MinimalPortfolioTemplate customization={customization} />;
       case 'business-service':
