@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -67,11 +66,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     setCustomization(templateCustomization);
     
     try {
-      // Generate the customized code
-      const customizedCode = templateManager.generateCustomizedCode(
-        selectedTemplate.id, 
-        templateCustomization
-      );
+      // Generate the customized code - fix: use single parameter
+      const customizedCode = templateManager.generateCustomizedCode(templateCustomization);
       setGeneratedCode(customizedCode);
       setCurrentView('preview');
       
@@ -98,11 +94,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     try {
       setCustomization(templateCustomization);
       
-      // Generate the customized code using template
-      const customizedCode = templateManager.generateCustomizedCode(
-        selectedTemplate.id, 
-        templateCustomization
-      );
+      // Generate the customized code - fix: use single parameter
+      const customizedCode = templateManager.generateCustomizedCode(templateCustomization);
       
       setGeneratedCode(customizedCode);
       
@@ -257,7 +250,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         />
       )}
 
-      {currentView === 'preview' && generatedCode && (
+      {currentView === 'preview' && generatedCode && customization && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold">Live Preview</h3>
@@ -270,7 +263,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
               </Button>
             </div>
           </div>
-          <LandingPagePreview code={generatedCode} />
+          <LandingPagePreview customization={customization} onEdit={() => setCurrentView('customizer')} />
         </div>
       )}
 
@@ -288,7 +281,9 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
           </TabsList>
           
           <TabsContent value="preview" className="mt-6">
-            <LandingPagePreview code={generatedCode} />
+            {customization && (
+              <LandingPagePreview customization={customization} onEdit={() => setCurrentView('customizer')} />
+            )}
           </TabsContent>
           
           <TabsContent value="code" className="mt-6">

@@ -931,8 +931,8 @@ export default ModernSaaS;`
     return this.templates;
   }
 
-  getTemplateById(id: string): LandingPageTemplate | undefined {
-    return this.templates.find(template => template.id === id);
+  getTemplate(id: string): LandingPageTemplate | undefined {
+    return this.getTemplateById(id);
   }
 
   getTemplatesByCategory(category: string): LandingPageTemplate[] {
@@ -966,7 +966,7 @@ export default ModernSaaS;`
   generateCustomizedCode(customization: TemplateCustomization): string {
     try {
       // Generate a complete, self-contained React component
-      const template = this.getTemplate(customization.templateId);
+      const template = this.getTemplateById(customization.templateId);
       if (!template) {
         throw new Error(`Template not found: ${customization.templateId}`);
       }
