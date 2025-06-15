@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -241,19 +242,19 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
   return (
     <div className="space-y-6">
       {/* Enhanced Header */}
-      <Card className="border-0 shadow-lg bg-gradient-to-r from-violet-50 to-purple-50">
-        <CardHeader>
+      <Card className="border border-gray-200 shadow-lg bg-white">
+        <CardHeader className="bg-gradient-to-r from-violet-50 to-purple-50">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center space-x-2 text-gray-900">
               <Brain className="h-6 w-6 text-violet-600" />
               <span>AI-Powered Landing Page Generator</span>
             </CardTitle>
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
+              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Zero Errors
               </Badge>
-              <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-300">
                 <Sparkles className="h-3 w-3 mr-1" />
                 AI Enhanced
               </Badge>
@@ -262,6 +263,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                   onClick={handleBackToAI} 
                   variant="outline" 
                   size="sm"
+                  className="text-gray-700 border-gray-300"
                 >
                   <Brain className="h-4 w-4 mr-2" />
                   AI Generator
@@ -269,7 +271,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
               )}
             </div>
           </div>
-          <CardDescription>
+          <CardDescription className="text-gray-600">
             Let AI analyze your startup data and generate a perfect landing page, or choose manually from our professional templates
           </CardDescription>
         </CardHeader>
@@ -288,8 +290,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       {currentView === 'gallery' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold">Manual Template Selection</h3>
-            <Button variant="outline" onClick={handleBackToAI}>
+            <h3 className="text-xl font-semibold text-gray-900">Manual Template Selection</h3>
+            <Button variant="outline" onClick={handleBackToAI} className="text-gray-700 border-gray-300">
               <Brain className="h-4 w-4 mr-2" />
               Try AI Generator
             </Button>
@@ -315,12 +317,12 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       {currentView === 'preview' && generatedCode && customization && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold">Live Preview</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Live Preview</h3>
             <div className="flex space-x-2">
-              <Button variant="outline" onClick={() => setCurrentView('customizer')}>
+              <Button variant="outline" onClick={() => setCurrentView('customizer')} className="text-gray-700 border-gray-300">
                 Edit Template
               </Button>
-              <Button onClick={() => setCurrentView('code')}>
+              <Button onClick={() => setCurrentView('code')} className="bg-blue-600 hover:bg-blue-700 text-white">
                 View Code
               </Button>
             </div>
@@ -331,12 +333,12 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
 
       {currentView === 'code' && generatedCode && (
         <Tabs defaultValue="preview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="preview">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100">
+            <TabsTrigger value="preview" className="text-gray-700">
               <Eye className="h-4 w-4 mr-2" />
               Live Preview
             </TabsTrigger>
-            <TabsTrigger value="code">
+            <TabsTrigger value="code" className="text-gray-700">
               <Code className="h-4 w-4 mr-2" />
               Source Code
             </TabsTrigger>
@@ -355,10 +357,10 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                   <span className="text-sm text-gray-600">
                     AI-Generated React Component ({generatedCode.split('\n').length} lines)
                   </span>
-                  <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
+                  <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
                     Zero Syntax Errors
                   </Badge>
-                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
+                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
                     Template: {selectedTemplate?.name}
                   </Badge>
                 </div>
@@ -367,11 +369,12 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                     onClick={() => copyToClipboard(generatedCode)}
                     variant="outline"
                     size="sm"
+                    className="text-gray-700 border-gray-300"
                   >
                     <Copy className="h-4 w-4 mr-2" />
                     Copy Code
                   </Button>
-                  <Button onClick={downloadCode} variant="outline" size="sm">
+                  <Button onClick={downloadCode} variant="outline" size="sm" className="text-gray-700 border-gray-300">
                     <Download className="h-4 w-4 mr-2" />
                     Download
                   </Button>
@@ -381,7 +384,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
               <Textarea
                 value={generatedCode}
                 readOnly
-                className="font-mono text-sm min-h-[500px] bg-gray-50"
+                className="font-mono text-sm min-h-[500px] bg-gray-50 text-gray-900 border-gray-300"
                 placeholder="Generated React code will appear here..."
               />
             </div>
@@ -391,28 +394,28 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
 
       {/* Benefits Overview */}
       <div className="grid md:grid-cols-4 gap-4">
-        <Card className="text-center border-0 bg-gradient-to-br from-purple-50 to-violet-50">
+        <Card className="text-center border border-gray-200 bg-white">
           <CardContent className="pt-6">
             <Brain className="h-8 w-8 text-purple-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-purple-700">AI</div>
             <div className="text-sm text-purple-600">Powered</div>
           </CardContent>
         </Card>
-        <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
+        <Card className="text-center border border-gray-200 bg-white">
           <CardContent className="pt-6">
             <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-700">Zero</div>
             <div className="text-sm text-green-600">Syntax Errors</div>
           </CardContent>
         </Card>
-        <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <Card className="text-center border border-gray-200 bg-white">
           <CardContent className="pt-6">
             <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-blue-700">Live</div>
             <div className="text-sm text-blue-600">Preview</div>
           </CardContent>
         </Card>
-        <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
+        <Card className="text-center border border-gray-200 bg-white">
           <CardContent className="pt-6">
             <Code className="h-8 w-8 text-orange-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-orange-700">Template</div>

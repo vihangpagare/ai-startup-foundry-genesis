@@ -10,12 +10,12 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
   const { fields, colorScheme, companyData } = customization;
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6' }}>
+    <div style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6', backgroundColor: '#ffffff' }}>
       {/* Navigation */}
       <div style={{ 
         backgroundColor: 'white', 
         padding: '1rem 2rem',
-        borderBottom: `1px solid ${colorScheme.border}`
+        borderBottom: '1px solid #e5e7eb'
       }}>
         <div style={{ 
           maxWidth: '1200px', 
@@ -40,7 +40,8 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
               fontSize: '0.9rem',
               border: 'none',
               borderRadius: '0.25rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontWeight: '600'
             }}
           >
             {fields.ctaText || 'Contact Us'}
@@ -51,7 +52,7 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
       {/* Hero Section */}
       <div style={{ 
         padding: '5rem 2rem', 
-        backgroundColor: colorScheme.background 
+        backgroundColor: '#f8fafc' 
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ 
@@ -65,15 +66,16 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
                 fontSize: '3rem', 
                 fontWeight: 'bold', 
                 marginBottom: '1rem',
-                color: colorScheme.text,
+                color: '#1f2937',
                 margin: '0 0 1rem 0'
               }}>
                 {fields.heroTitle || 'Professional Services'}
               </h2>
               <p style={{ 
                 fontSize: '1.25rem', 
-                color: colorScheme.muted,
-                marginBottom: '2rem' 
+                color: '#6b7280',
+                marginBottom: '2rem',
+                margin: '0 0 2rem 0'
               }}>
                 {fields.heroSubtitle || companyData.description}
               </p>
@@ -110,14 +112,15 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
             </div>
             <div style={{
               height: '400px',
-              backgroundColor: colorScheme.muted,
+              backgroundColor: '#d1d5db',
               borderRadius: '1rem',
-              opacity: 0.3,
+              opacity: 0.6,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
-              fontSize: '1.2rem'
+              color: '#6b7280',
+              fontSize: '1.2rem',
+              fontWeight: '600'
             }}>
               Hero Image
             </div>
@@ -132,7 +135,8 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
             textAlign: 'center', 
             fontSize: '2.5rem', 
             marginBottom: '3rem',
-            color: colorScheme.text 
+            color: '#1f2937',
+            margin: '0 0 3rem 0'
           }}>
             Our Services
           </h3>
@@ -146,9 +150,10 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
                 key={num}
                 style={{
                   padding: '2rem',
-                  border: `1px solid ${colorScheme.border}`,
+                  border: '1px solid #e5e7eb',
                   borderRadius: '1rem',
-                  textAlign: 'left'
+                  textAlign: 'left',
+                  backgroundColor: 'white'
                 }}
               >
                 <div style={{
@@ -161,12 +166,12 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
                 <h4 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '1rem',
-                  color: colorScheme.text,
+                  color: '#1f2937',
                   margin: '0 0 1rem 0'
                 }}>
                   {fields[`feature${num}Title`] || `Service ${num}`}
                 </h4>
-                <p style={{ color: colorScheme.muted, marginBottom: '1.5rem' }}>
+                <p style={{ color: '#6b7280', marginBottom: '1.5rem', margin: '0 0 1.5rem 0' }}>
                   {fields[`feature${num}Description`] || `Professional service description ${num}`}
                 </p>
                 <button 
@@ -196,10 +201,10 @@ const BusinessServiceTemplate = ({ customization }: BusinessServiceTemplateProps
         textAlign: 'center' 
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h3 style={{ fontSize: '2.5rem', marginBottom: '1rem', margin: '0 0 1rem 0' }}>
+          <h3 style={{ fontSize: '2.5rem', marginBottom: '1rem', margin: '0 0 1rem 0', color: 'white' }}>
             Ready to Get Started?
           </h3>
-          <p style={{ fontSize: '1.25rem', marginBottom: '2rem', opacity: 0.9 }}>
+          <p style={{ fontSize: '1.25rem', marginBottom: '2rem', opacity: 0.9, color: 'white', margin: '0 0 2rem 0' }}>
             Contact us today to discuss how we can help your business grow.
           </p>
           <button 

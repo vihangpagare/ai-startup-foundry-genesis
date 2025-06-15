@@ -10,7 +10,7 @@ const ModernSaaSTemplate = ({ customization }: ModernSaaSTemplateProps) => {
   const { fields, colorScheme, companyData } = customization;
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6' }}>
+    <div style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6', backgroundColor: '#ffffff' }}>
       {/* Hero Section */}
       <div 
         style={{ 
@@ -25,28 +25,31 @@ const ModernSaaSTemplate = ({ customization }: ModernSaaSTemplateProps) => {
             fontSize: '3rem', 
             fontWeight: 'bold', 
             marginBottom: '1rem',
-            margin: '0 0 1rem 0'
+            margin: '0 0 1rem 0',
+            color: 'white'
           }}>
             {fields.heroTitle || companyData.name}
           </h1>
           <p style={{ 
             fontSize: '1.25rem', 
             marginBottom: '2rem',
-            opacity: 0.9 
+            opacity: 0.95,
+            color: 'white'
           }}>
             {fields.heroSubtitle || companyData.tagline}
           </p>
           <button 
             style={{
-              backgroundColor: colorScheme.accent,
-              color: 'white',
+              backgroundColor: 'white',
+              color: colorScheme.primary,
               padding: '1rem 2rem',
               fontSize: '1.1rem',
               fontWeight: '600',
               border: 'none',
               borderRadius: '0.5rem',
               cursor: 'pointer',
-              transition: 'transform 0.2s'
+              transition: 'transform 0.2s',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
             }}
             onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -57,13 +60,14 @@ const ModernSaaSTemplate = ({ customization }: ModernSaaSTemplateProps) => {
       </div>
 
       {/* Features Section */}
-      <div style={{ padding: '4rem 2rem', backgroundColor: colorScheme.background }}>
+      <div style={{ padding: '4rem 2rem', backgroundColor: '#f8fafc' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h2 style={{ 
             textAlign: 'center', 
             fontSize: '2.5rem', 
             marginBottom: '3rem',
-            color: colorScheme.text 
+            color: '#1f2937',
+            margin: '0 0 3rem 0'
           }}>
             Features
           </h2>
@@ -80,17 +84,19 @@ const ModernSaaSTemplate = ({ customization }: ModernSaaSTemplateProps) => {
                   backgroundColor: 'white',
                   borderRadius: '1rem',
                   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  border: '1px solid #e5e7eb'
                 }}
               >
                 <h3 style={{ 
                   fontSize: '1.5rem', 
                   marginBottom: '1rem',
-                  color: colorScheme.primary 
+                  color: colorScheme.primary,
+                  margin: '0 0 1rem 0'
                 }}>
                   {fields[`feature${num}Title`] || `Feature ${num}`}
                 </h3>
-                <p style={{ color: colorScheme.muted }}>
+                <p style={{ color: '#6b7280', margin: 0 }}>
                   {fields[`feature${num}Description`] || `Description for feature ${num}`}
                 </p>
               </div>
@@ -101,12 +107,12 @@ const ModernSaaSTemplate = ({ customization }: ModernSaaSTemplateProps) => {
 
       {/* Footer */}
       <div style={{ 
-        backgroundColor: colorScheme.text, 
+        backgroundColor: '#1f2937', 
         color: 'white', 
         padding: '2rem',
         textAlign: 'center' 
       }}>
-        <p>&copy; 2024 {companyData.name}. All rights reserved.</p>
+        <p style={{ margin: 0 }}>&copy; 2024 {companyData.name}. All rights reserved.</p>
       </div>
     </div>
   );

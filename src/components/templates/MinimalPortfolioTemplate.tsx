@@ -10,23 +10,23 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
   const { fields, colorScheme, companyData } = customization;
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6' }}>
+    <div style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6', backgroundColor: '#ffffff' }}>
       {/* Header */}
       <div style={{ 
         padding: '2rem', 
-        backgroundColor: colorScheme.background,
-        borderBottom: `1px solid ${colorScheme.border}`
+        backgroundColor: '#ffffff',
+        borderBottom: '1px solid #e5e7eb'
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
           <h1 style={{ 
             fontSize: '2rem', 
             fontWeight: 'bold', 
-            color: colorScheme.text,
+            color: '#1f2937',
             margin: '0 0 0.5rem 0'
           }}>
             {companyData.name}
           </h1>
-          <p style={{ color: colorScheme.muted }}>
+          <p style={{ color: '#6b7280', margin: 0 }}>
             {companyData.tagline}
           </p>
         </div>
@@ -35,7 +35,7 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
       {/* Hero Section */}
       <div style={{ 
         padding: '4rem 2rem', 
-        backgroundColor: colorScheme.background,
+        backgroundColor: '#f8fafc',
         textAlign: 'center' 
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -50,8 +50,9 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
           </h2>
           <p style={{ 
             fontSize: '1.25rem', 
-            color: colorScheme.muted,
-            marginBottom: '2rem' 
+            color: '#6b7280',
+            marginBottom: '2rem',
+            margin: '0 0 2rem 0'
           }}>
             {fields.heroSubtitle || 'Bringing ideas to life through design and innovation'}
           </p>
@@ -63,7 +64,8 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
               fontSize: '1rem',
               border: 'none',
               borderRadius: '0.375rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontWeight: '600'
             }}
           >
             {fields.ctaText || 'View Work'}
@@ -78,7 +80,8 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
             textAlign: 'center', 
             fontSize: '2rem', 
             marginBottom: '3rem',
-            color: colorScheme.text 
+            color: '#1f2937',
+            margin: '0 0 3rem 0'
           }}>
             Featured Work
           </h3>
@@ -92,35 +95,35 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
                 key={num}
                 style={{
                   aspectRatio: '1',
-                  backgroundColor: colorScheme.background,
+                  backgroundColor: '#f8fafc',
                   borderRadius: '0.5rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  border: `1px solid ${colorScheme.border}`,
+                  border: '1px solid #e5e7eb',
                   padding: '1rem'
                 }}
               >
                 <div style={{
                   width: '100%',
                   height: '60%',
-                  backgroundColor: colorScheme.muted,
+                  backgroundColor: '#d1d5db',
                   borderRadius: '0.25rem',
                   marginBottom: '1rem',
-                  opacity: 0.3
+                  opacity: 0.6
                 }}></div>
                 <h4 style={{ 
                   fontSize: '1.1rem', 
                   fontWeight: '600',
-                  color: colorScheme.text,
+                  color: '#1f2937',
                   margin: '0 0 0.5rem 0'
                 }}>
                   {fields[`feature${num}Title`] || `Project ${num}`}
                 </h4>
                 <p style={{ 
                   fontSize: '0.9rem',
-                  color: colorScheme.muted,
+                  color: '#6b7280',
                   textAlign: 'center',
                   margin: 0
                 }}>
@@ -140,10 +143,10 @@ const MinimalPortfolioTemplate = ({ customization }: MinimalPortfolioTemplatePro
         textAlign: 'center' 
       }}>
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h3 style={{ fontSize: '2rem', marginBottom: '1rem', margin: '0 0 1rem 0' }}>
+          <h3 style={{ fontSize: '2rem', marginBottom: '1rem', margin: '0 0 1rem 0', color: 'white' }}>
             Let's Work Together
           </h3>
-          <p style={{ marginBottom: '2rem', opacity: 0.9 }}>
+          <p style={{ marginBottom: '2rem', opacity: 0.9, color: 'white', margin: '0 0 2rem 0' }}>
             {companyData.description}
           </p>
           <button 
