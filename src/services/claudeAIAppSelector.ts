@@ -1,3 +1,4 @@
+
 import { AppTemplate, AppCustomization } from '@/types/appTemplate';
 import { supabase } from '@/integrations/supabase/client';
 import { businessAnalysisEngine, BusinessAnalysis } from './businessAnalysisEngine';
@@ -61,14 +62,24 @@ class ClaudeAIAppSelector {
         reports: reports || {}
       });
 
-      // Step 3: Generate customization with business-specific content
+      // Step 3: Validate and register the dynamic template
+      if (!appTemplateManager.validateTemplate(dynamicTemplate)) {
+        console.error('Dynamic template validation failed, falling back to static template');
+        return this.createFallbackBusinessApp(startupData, targetTemplateId, 'Dynamic template validation failed');
+      }
+
+      // Register the dynamic template
+      appTemplateManager.registerDynamicTemplate(dynamicTemplate);
+      console.log(`Successfully registered dynamic template: ${dynamicTemplate.id}`);
+
+      // Step 4: Generate customization with business-specific content
       const customization = dynamicTemplateGenerator.generateCustomization({
         businessAnalysis,
         startupData,
         reports: reports || {}
       });
 
-      // Step 4: Enhance with Claude AI for even more specificity
+      // Step 5: Enhance with Claude AI for even more specificity
       const enhancedCustomization = await this.enhanceWithClaudeAI(
         customization,
         businessAnalysis,
@@ -76,8 +87,15 @@ class ClaudeAIAppSelector {
         reports || {}
       );
 
+      // Step 6: Verify template exists before returning
+      const verifiedTemplate = appTemplateManager.getTemplate(dynamicTemplate.id);
+      if (!verifiedTemplate) {
+        console.error(`Template verification failed for: ${dynamicTemplate.id}`);
+        return this.createFallbackBusinessApp(startupData, targetTemplateId, 'Template verification failed');
+      }
+
       return {
-        template: dynamicTemplate,
+        template: verifiedTemplate,
         customization: enhancedCustomization,
         reasoning: this.generateEnhancedReasoning(businessAnalysis, startupData),
         confidence: 0.95
@@ -266,7 +284,7 @@ This template goes beyond generic SaaS dashboards to create a truly business-spe
   }
 
   private createFallbackBusinessApp(startupData: any, targetTemplateId?: string, errorMessage?: string) {
-    const templates = appTemplateManager.getTemplates();
+    console.log('Creating fallback business app...', { targetTemplateId, errorMessage });
     
     // Smart fallback template selection
     let fallbackTemplate: AppTemplate | null = null;
@@ -280,15 +298,16 @@ This template goes beyond generic SaaS dashboards to create a truly business-spe
       const idea = (startupData?.idea || '').toLowerCase();
       
       if (idea.includes('inventory') || idea.includes('stock') || idea.includes('product')) {
-        fallbackTemplate = appTemplateManager.getTemplate('ecommerce-store');
+        fallbackTemplate = appTemplateManager.getTemplate('modern-ecommerce');
       } else if (idea.includes('service') || idea.includes('consulting') || idea.includes('agency')) {
-        fallbackTemplate = appTemplateManager.getTemplate('service-platform');
+        fallbackTemplate = appTemplateManager.getTemplate('business-platform');
       } else {
-        fallbackTemplate = appTemplateManager.getTemplate('saas-dashboard');
+        fallbackTemplate = appTemplateManager.getTemplate('advanced-saas-dashboard');
       }
     }
     
     if (!fallbackTemplate) {
+      const templates = appTemplateManager.getTemplates();
       fallbackTemplate = templates[0]; // Final fallback to first available template
     }
 
@@ -353,6 +372,70 @@ This template goes beyond generic SaaS dashboards to create a truly business-spe
       throw new Error('Failed to regenerate app content - using fallback');
     }
     return result.customization;
+  }
+
+  // Private helper methods
+  private async enhanceWithClaudeAI(
+    baseCustomization: AppCustomization,
+    businessAnalysis: BusinessAnalysis,
+    startupData: any,
+    reports: Record<string, string>
+  ): Promise<AppCustomization> {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-app-content', {
+        body: {
+          startupData,
+          reports,
+          businessAnalysis,
+          baseCustomization,
+          enhancementRequest: 'business-specific-content'
+        }
+      });
+
+      if (error || !data?.success) {
+        console.warn('Claude enhancement failed, using base customization');
+        return baseCustomization;
+      }
+
+      // Merge Claude enhancements with base customization
+      return this.mergeCustomizations(baseCustomization, data.content);
+
+    } catch (error) {
+      console.error('Claude AI enhancement error:', error);
+      return baseCustomization;
+    }
+  }
+
+  private mergeCustomizations(base: AppCustomization, enhanced: any): AppCustomization {
+    return {
+      ...base,
+      fields: { ...base.fields, ...enhanced.fields },
+      mockData: {
+        ...base.mockData,
+        // Prefer enhanced mock data if available
+        ...(enhanced.mockData || {})
+      },
+      companyData: { ...base.companyData, ...enhanced.companyData },
+      appDescription: enhanced.appDescription || base.appDescription
+    };
+  }
+
+  private generateEnhancedReasoning(businessAnalysis: BusinessAnalysis, startupData: any): string {
+    const features = businessAnalysis.coreFeatures.map(f => f.name).join(', ');
+    const personas = businessAnalysis.userPersonas.map(p => p.role).join(', ');
+    
+    return `Generated a highly customized ${businessAnalysis.businessType} application for ${startupData?.companyName || 'the business'} in the ${businessAnalysis.industry} industry. 
+
+The application features ${features} specifically designed for ${personas}. 
+
+Key customizations include:
+- ${businessAnalysis.coreFeatures.length} business-specific core features
+- ${businessAnalysis.userPersonas.length} user persona interfaces  
+- ${businessAnalysis.businessWorkflows.length} automated business workflows
+- ${businessAnalysis.keyMetrics.length} industry-relevant metrics
+- Custom terminology and branding aligned with ${businessAnalysis.brandIdentity.tone} tone
+
+This template goes beyond generic SaaS dashboards to create a truly business-specific application that demonstrates the actual value proposition and functionality of ${startupData?.companyName || 'the startup'}.`;
   }
 }
 
