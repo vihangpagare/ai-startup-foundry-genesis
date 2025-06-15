@@ -963,75 +963,277 @@ export default ModernSaaS;`
     );
   }
 
-  generateCustomizedCode(templateId: string, customization: TemplateCustomization): string {
-    const template = this.getTemplateById(templateId);
-    if (!template) {
-      throw new Error(`Template not found: ${templateId}`);
+  generateCustomizedCode(customization: TemplateCustomization): string {
+    try {
+      // Generate a complete, self-contained React component
+      const template = this.getTemplate(customization.templateId);
+      if (!template) {
+        throw new Error(`Template not found: ${customization.templateId}`);
+      }
+
+      // Create a complete React component with inline styling and no external dependencies
+      return this.generateSelfContainedComponent(template, customization);
+    } catch (error) {
+      console.error('Error generating customized code:', error);
+      return this.generateFallbackComponent(customization);
     }
-
-    // For advanced templates, load the actual component
-    if (templateId === 'advanced-saas') {
-      return this.loadAdvancedSaaSTemplate(customization);
-    } else if (templateId === 'advanced-ecommerce') {
-      return this.loadAdvancedEcommerceTemplate(customization);
-    }
-
-    // Replace placeholders in the template component with actual values
-    let customizedCode = template.component;
-    
-    // Replace customization values
-    Object.entries(customization.fields).forEach(([key, value]) => {
-      const placeholder = `{fields.${key}`;
-      customizedCode = customizedCode.replace(new RegExp(placeholder, 'g'), `"${this.escapeString(value)}"`);
-    });
-
-    // Replace company data
-    Object.entries(customization.companyData).forEach(([key, value]) => {
-      const placeholder = `{companyData.${key}`;
-      customizedCode = customizedCode.replace(new RegExp(placeholder, 'g'), `"${this.escapeString(value)}"`);
-    });
-
-    return customizedCode;
   }
 
-  private loadAdvancedSaaSTemplate(customization: TemplateCustomization): string {
-    // Return the advanced SaaS template with customization applied
+  private generateSelfContainedComponent(template: LandingPageTemplate, customization: TemplateCustomization): string {
+    const { fields, colorScheme, companyData } = customization;
+    
     return `import React from 'react';
-import AdvancedSaaSTemplate from '@/components/templates/AdvancedSaaSTemplate';
 
 const CustomizedLandingPage = () => {
-  const customization = ${JSON.stringify(customization, null, 2)};
-  
-  return <AdvancedSaaSTemplate customization={customization} />;
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, ${colorScheme.background} 0%, #f8fafc 100%)',
+      fontFamily: '${customization.typography.fontFamily.body}'
+    },
+    header: {
+      padding: '1rem 2rem',
+      backgroundColor: 'white',
+      borderBottom: '1px solid ${colorScheme.border}',
+      position: 'sticky' as const,
+      top: 0,
+      zIndex: 50
+    },
+    nav: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    },
+    logo: {
+      fontSize: '1.5rem',
+      fontWeight: 'bold',
+      color: colorScheme.primary
+    },
+    hero: {
+      padding: '4rem 2rem',
+      textAlign: 'center' as const,
+      maxWidth: '1200px',
+      margin: '0 auto'
+    },
+    heroTitle: {
+      fontSize: '3rem',
+      fontWeight: 'bold',
+      color: colorScheme.text,
+      marginBottom: '1rem',
+      fontFamily: '${customization.typography.fontFamily.heading}'
+    },
+    heroSubtitle: {
+      fontSize: '1.25rem',
+      color: colorScheme.muted,
+      marginBottom: '2rem',
+      maxWidth: '600px',
+      margin: '0 auto 2rem auto'
+    },
+    ctaButton: {
+      backgroundColor: colorScheme.primary,
+      color: 'white',
+      padding: '1rem 2rem',
+      borderRadius: '0.5rem',
+      border: 'none',
+      fontSize: '1.1rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      marginRight: '1rem'
+    },
+    secondaryButton: {
+      backgroundColor: 'transparent',
+      color: colorScheme.primary,
+      padding: '1rem 2rem',
+      borderRadius: '0.5rem',
+      border: \`2px solid \${colorScheme.primary}\`,
+      fontSize: '1.1rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    },
+    features: {
+      padding: '4rem 2rem',
+      backgroundColor: 'white',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    },
+    featuresGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+      gap: '2rem',
+      marginTop: '2rem'
+    },
+    featureCard: {
+      padding: '2rem',
+      borderRadius: '0.75rem',
+      border: \`1px solid \${colorScheme.border}\`,
+      textAlign: 'center' as const,
+      transition: 'all 0.3s ease'
+    },
+    featureIcon: {
+      width: '4rem',
+      height: '4rem',
+      backgroundColor: \`\${colorScheme.primary}20\`,
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: '0 auto 1rem auto',
+      fontSize: '1.5rem'
+    },
+    featureTitle: {
+      fontSize: '1.25rem',
+      fontWeight: '600',
+      color: colorScheme.text,
+      marginBottom: '0.5rem'
+    },
+    featureDescription: {
+      color: colorScheme.muted,
+      lineHeight: '1.6'
+    },
+    footer: {
+      backgroundColor: '#1f2937',
+      color: 'white',
+      padding: '2rem',
+      textAlign: 'center' as const
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <nav style={styles.nav}>
+          <div style={styles.logo}>
+            ${companyData.name || 'Your Company'}
+          </div>
+          <div>
+            <button style={styles.secondaryButton}>
+              Sign In
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <section style={styles.hero}>
+        <h1 style={styles.heroTitle}>
+          ${fields.heroTitle || 'Transform Your Business'}
+        </h1>
+        <p style={styles.heroSubtitle}>
+          ${fields.heroSubtitle || 'Revolutionary solutions for modern business challenges'}
+        </p>
+        <div>
+          <button style={styles.ctaButton}>
+            ${fields.ctaText || 'Get Started Free'}
+          </button>
+          <button style={styles.secondaryButton}>
+            Learn More
+          </button>
+        </div>
+      </section>
+
+      <section style={styles.features}>
+        <h2 style={{ ...styles.heroTitle, fontSize: '2.5rem', textAlign: 'center' }}>
+          Why Choose Us
+        </h2>
+        <div style={styles.featuresGrid}>
+          <div style={styles.featureCard}>
+            <div style={styles.featureIcon}>⚡</div>
+            <h3 style={styles.featureTitle}>
+              ${fields.feature1Title || 'Lightning Fast'}
+            </h3>
+            <p style={styles.featureDescription}>
+              ${fields.feature1Description || 'Experience blazing fast performance with our optimized platform'}
+            </p>
+          </div>
+          <div style={styles.featureCard}>
+            <div style={styles.featureIcon}>🔒</div>
+            <h3 style={styles.featureTitle}>
+              ${fields.feature2Title || 'Secure & Reliable'}
+            </h3>
+            <p style={styles.featureDescription}>
+              ${fields.feature2Description || 'Bank-level security with 99.9% uptime guarantee'}
+            </p>
+          </div>
+          <div style={styles.featureCard}>
+            <div style={styles.featureIcon}>📊</div>
+            <h3 style={styles.featureTitle}>
+              ${fields.feature3Title || 'Advanced Analytics'}
+            </h3>
+            <p style={styles.featureDescription}>
+              ${fields.feature3Description || 'Get insights that matter with our powerful analytics dashboard'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <footer style={styles.footer}>
+        <p>&copy; 2024 ${companyData.name || 'Your Company'}. All rights reserved.</p>
+      </footer>
+    </div>
+  );
 };
 
 export default CustomizedLandingPage;`;
   }
 
-  private loadAdvancedEcommerceTemplate(customization: TemplateCustomization): string {
-    // Return the advanced e-commerce template with customization applied
+  private generateFallbackComponent(customization: TemplateCustomization): string {
+    const { companyData } = customization;
+    
     return `import React from 'react';
-import AdvancedEcommerceTemplate from '@/components/templates/AdvancedEcommerceTemplate';
 
 const CustomizedLandingPage = () => {
-  const customization = ${JSON.stringify(customization, null, 2)};
-  
-  return <AdvancedEcommerceTemplate customization={customization} />;
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      padding: '2rem',
+      fontFamily: 'system-ui, sans-serif'
+    }}>
+      <div style={{ 
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        textAlign: 'center',
+        backgroundColor: 'white',
+        padding: '3rem',
+        borderRadius: '1rem',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h1 style={{ 
+          fontSize: '3rem', 
+          fontWeight: 'bold', 
+          color: '#1f2937',
+          marginBottom: '1rem'
+        }}>
+          ${companyData.name || 'Your Company'}
+        </h1>
+        <p style={{ 
+          fontSize: '1.25rem', 
+          color: '#6b7280',
+          marginBottom: '2rem'
+        }}>
+          ${companyData.tagline || 'Revolutionary solutions for modern business'}
+        </p>
+        <button style={{
+          backgroundColor: '#3b82f6',
+          color: 'white',
+          padding: '1rem 2rem',
+          borderRadius: '0.5rem',
+          border: 'none',
+          fontSize: '1.1rem',
+          fontWeight: '600',
+          cursor: 'pointer'
+        }}>
+          Get Started
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default CustomizedLandingPage;`;
-  }
-
-  private escapeString(str: string): string {
-    if (typeof str !== 'string') return String(str);
-    
-    return str
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/'/g, "\\'")
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t');
   }
 
   recommendTemplates(businessType: string, industry: string): LandingPageTemplate[] {
