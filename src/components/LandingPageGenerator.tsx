@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,8 +73,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
       setGeneratedCode(customizedCode);
       
       toast({
-        title: "AI Template Ready!",
-        description: "Your AI-generated landing page is ready for preview.",
+        title: "Claude AI Template Ready!",
+        description: "Your AI-generated landing page with personalized content is ready for preview.",
       });
     } catch (err: any) {
       console.error('Code generation error:', err);
@@ -212,7 +211,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-indigo-600" />
           <p className="text-gray-600">Generating your customized landing page...</p>
           <p className="text-sm text-gray-500 mt-2">
-            Using template-based generation • Zero syntax errors • Production ready
+            Using Claude AI-powered generation • Zero syntax errors • Production ready
           </p>
         </div>
       </div>
@@ -247,7 +246,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2 text-gray-900">
               <Brain className="h-6 w-6 text-violet-600" />
-              <span>AI-Powered Landing Page Generator</span>
+              <span>Claude AI-Powered Landing Page Generator</span>
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
@@ -255,8 +254,8 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                 Zero Errors
               </Badge>
               <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-300">
-                <Sparkles className="h-3 w-3 mr-1" />
-                AI Enhanced
+                <Brain className="h-3 w-3 mr-1" />
+                Claude AI
               </Badge>
               {currentView !== 'ai-generator' && (
                 <Button 
@@ -266,13 +265,13 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
                   className="text-gray-700 border-gray-300"
                 >
                   <Brain className="h-4 w-4 mr-2" />
-                  AI Generator
+                  Claude AI Generator
                 </Button>
               )}
             </div>
           </div>
           <CardDescription className="text-gray-600">
-            Let AI analyze your startup data and generate a perfect landing page, or choose manually from our professional templates
+            Let Claude AI analyze your startup data and generate a perfect landing page with personalized content, or choose manually from our professional templates
           </CardDescription>
         </CardHeader>
       </Card>
@@ -293,7 +292,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
             <h3 className="text-xl font-semibold text-gray-900">Manual Template Selection</h3>
             <Button variant="outline" onClick={handleBackToAI} className="text-gray-700 border-gray-300">
               <Brain className="h-4 w-4 mr-2" />
-              Try AI Generator
+              Try Claude AI Generator
             </Button>
           </div>
           <TemplateGallery 
@@ -355,7 +354,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-600">
-                    AI-Generated React Component ({generatedCode.split('\n').length} lines)
+                    Claude AI-Generated React Component ({generatedCode.split('\n').length} lines)
                   </span>
                   <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
                     Zero Syntax Errors
@@ -397,7 +396,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         <Card className="text-center border border-gray-200 bg-white">
           <CardContent className="pt-6">
             <Brain className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-purple-700">AI</div>
+            <div className="text-2xl font-bold text-purple-700">Claude AI</div>
             <div className="text-sm text-purple-600">Powered</div>
           </CardContent>
         </Card>
@@ -417,9 +416,9 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         </Card>
         <Card className="text-center border border-gray-200 bg-white">
           <CardContent className="pt-6">
-            <Code className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-orange-700">Template</div>
-            <div className="text-sm text-orange-600">Based</div>
+            <Sparkles className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-orange-700">Personalized</div>
+            <div className="text-sm text-orange-600">Content</div>
           </CardContent>
         </Card>
       </div>
