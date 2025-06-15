@@ -1,7 +1,7 @@
-
 import { AppTemplate, AppCustomization } from '@/types/appTemplate';
-import { appTemplateManager } from './appTemplateManager';
 import { supabase } from '@/integrations/supabase/client';
+import { businessAnalysisEngine, BusinessAnalysis } from './businessAnalysisEngine';
+import { dynamicTemplateGenerator } from './dynamicTemplateGenerator';
 
 interface AIGeneratedAppContent {
   templateId: string;
@@ -42,87 +42,113 @@ class ClaudeAIAppSelector {
     confidence: number;
   }> {
     try {
-      console.log('Generating business-specific SaaS app with Claude...', {
+      console.log('Generating business-specific SaaS app with enhanced AI analysis...', {
         company: startupData?.companyName,
         idea: startupData?.idea?.substring(0, 100),
         targetTemplate: targetTemplateId,
         reportsAvailable: Object.keys(reports || {})
       });
 
-      const templates = appTemplateManager.getTemplates();
-      
-      // Call our enhanced Claude-powered edge function
-      let response;
-      let attempt = 0;
-      const maxAttempts = 2;
-      
-      while (attempt < maxAttempts) {
-        try {
-          const { data, error } = await supabase.functions.invoke('generate-app-content', {
-            body: {
-              startupData,
-              reports: reports || {},
-              templates: templates.map(t => ({
-                id: t.id,
-                name: t.name,
-                category: t.category,
-                description: t.description,
-                features: t.features
-              })),
-              targetTemplateId
-            }
-          });
+      // Step 1: Analyze the business comprehensively
+      const businessAnalysis = businessAnalysisEngine.analyzeStartupData(startupData, reports || {});
+      console.log('Business analysis completed:', businessAnalysis);
 
-          if (error) {
-            console.error(`Edge function error (attempt ${attempt + 1}):`, error);
-            if (attempt === maxAttempts - 1) {
-              throw new Error(`Business-specific app generation failed: ${error.message}`);
-            }
-          } else {
-            response = data;
-            break;
-          }
-        } catch (invokeError) {
-          console.error(`Invoke error (attempt ${attempt + 1}):`, invokeError);
-          if (attempt === maxAttempts - 1) {
-            throw invokeError;
-          }
-        }
-        attempt++;
-        
-        if (attempt < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
+      // Step 2: Generate dynamic template based on analysis
+      const dynamicTemplate = dynamicTemplateGenerator.generateTemplate({
+        businessAnalysis,
+        startupData,
+        reports: reports || {}
+      });
 
-      if (!response) {
-        throw new Error('Failed to get response from AI service after retries');
-      }
+      // Step 3: Generate customization with business-specific content
+      const customization = dynamicTemplateGenerator.generateCustomization({
+        businessAnalysis,
+        startupData,
+        reports: reports || {}
+      });
 
-      if (!response.success) {
-        if (response.content && response.warning) {
-          console.warn('Using fallback business-specific content:', response.warning);
-        } else {
-          throw new Error(response.error || 'Business-specific app generation failed');
-        }
-      }
+      // Step 4: Enhance with Claude AI for even more specificity
+      const enhancedCustomization = await this.enhanceWithClaudeAI(
+        customization,
+        businessAnalysis,
+        startupData,
+        reports || {}
+      );
 
-      const aiContent: AIGeneratedAppContent = response.content;
-      console.log('AI generated business-specific content:', aiContent);
-
-      // Get the existing template that the AI selected
-      const selectedTemplate = appTemplateManager.getTemplate(aiContent.templateId);
-      if (!selectedTemplate) {
-        throw new Error(`Template ${aiContent.templateId} not found in available templates`);
-      }
-      
-      return this.createAppCustomizationFromAIContent(selectedTemplate, aiContent, startupData);
+      return {
+        template: dynamicTemplate,
+        customization: enhancedCustomization,
+        reasoning: this.generateEnhancedReasoning(businessAnalysis, startupData),
+        confidence: 0.95
+      };
 
     } catch (error) {
-      console.error('Claude AI business-specific app error:', error);
-      
+      console.error('Enhanced business analysis error:', error);
       return this.createFallbackBusinessApp(startupData, targetTemplateId, error.message);
     }
+  }
+
+  private async enhanceWithClaudeAI(
+    baseCustomization: AppCustomization,
+    businessAnalysis: BusinessAnalysis,
+    startupData: any,
+    reports: Record<string, string>
+  ): Promise<AppCustomization> {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-app-content', {
+        body: {
+          startupData,
+          reports,
+          businessAnalysis,
+          baseCustomization,
+          enhancementRequest: 'business-specific-content'
+        }
+      });
+
+      if (error || !data?.success) {
+        console.warn('Claude enhancement failed, using base customization');
+        return baseCustomization;
+      }
+
+      // Merge Claude enhancements with base customization
+      return this.mergeCustomizations(baseCustomization, data.content);
+
+    } catch (error) {
+      console.error('Claude AI enhancement error:', error);
+      return baseCustomization;
+    }
+  }
+
+  private mergeCustomizations(base: AppCustomization, enhanced: any): AppCustomization {
+    return {
+      ...base,
+      fields: { ...base.fields, ...enhanced.fields },
+      mockData: {
+        ...base.mockData,
+        // Prefer enhanced mock data if available
+        ...(enhanced.mockData || {})
+      },
+      companyData: { ...base.companyData, ...enhanced.companyData },
+      appDescription: enhanced.appDescription || base.appDescription
+    };
+  }
+
+  private generateEnhancedReasoning(businessAnalysis: BusinessAnalysis, startupData: any): string {
+    const features = businessAnalysis.coreFeatures.map(f => f.name).join(', ');
+    const personas = businessAnalysis.userPersonas.map(p => p.role).join(', ');
+    
+    return `Generated a highly customized ${businessAnalysis.businessType} application for ${startupData?.companyName || 'the business'} in the ${businessAnalysis.industry} industry. 
+
+The application features ${features} specifically designed for ${personas}. 
+
+Key customizations include:
+- ${businessAnalysis.coreFeatures.length} business-specific core features
+- ${businessAnalysis.userPersonas.length} user persona interfaces  
+- ${businessAnalysis.businessWorkflows.length} automated business workflows
+- ${businessAnalysis.keyMetrics.length} industry-relevant metrics
+- Custom terminology and branding aligned with ${businessAnalysis.brandIdentity.tone} tone
+
+This template goes beyond generic SaaS dashboards to create a truly business-specific application that demonstrates the actual value proposition and functionality of ${startupData?.companyName || 'the startup'}.`;
   }
 
   private createAppCustomizationFromAIContent(

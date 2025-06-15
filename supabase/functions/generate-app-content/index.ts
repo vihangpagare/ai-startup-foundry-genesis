@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -11,6 +10,9 @@ interface AppContentGenerationRequest {
   reports: Record<string, string>;
   templates: any[];
   targetTemplateId?: string;
+  businessAnalysis?: any;
+  baseCustomization?: any;
+  enhancementRequest?: string;
 }
 
 interface GeneratedAppContent {
@@ -80,7 +82,71 @@ const detectAdvancedBusinessModelTemplate = (startupData: any, reports: Record<s
   return 'advanced-saas-dashboard';
 };
 
-const generateAdvancedBusinessAnalysisPrompt = (startupData: any, reports: Record<string, string>, templateId: string) => {
+const generateAdvancedBusinessAnalysisPrompt = (startupData: any, reports: Record<string, string>, businessAnalysis?: any) => {
+  // If we have business analysis, use it for more targeted generation
+  if (businessAnalysis) {
+    return `You are an expert application architect specializing in ${businessAnalysis.industry} business software. 
+
+BUSINESS ANALYSIS PROVIDED:
+- Business Type: ${businessAnalysis.businessType}
+- Industry: ${businessAnalysis.industry}
+- Core Features: ${businessAnalysis.coreFeatures.map(f => f.name).join(', ')}
+- User Personas: ${businessAnalysis.userPersonas.map(p => `${p.name} (${p.role})`).join(', ')}
+- Brand Tone: ${businessAnalysis.brandIdentity.tone}
+- Key Differentiators: ${businessAnalysis.competitiveDifferentiators.join(', ')}
+
+STARTUP INFORMATION:
+- Company: ${startupData?.companyName || 'Not specified'}
+- Business Idea: ${startupData?.idea || 'Not specified'}
+- Target Market: ${startupData?.targetAudience || 'Not specified'}
+- Problem: ${startupData?.problemStatement || 'Not specified'}
+- Solution: ${startupData?.solution || 'Not specified'}
+
+TASK: Enhance the provided business analysis with even more specific, realistic business content and mock data that perfectly represents ${startupData?.companyName || 'this business'}.
+
+Focus on creating:
+1. Ultra-realistic mock data that reflects actual business operations
+2. Industry-specific terminology and workflows
+3. Detailed user interfaces for each persona type
+4. Business processes that demonstrate real value proposition
+
+CRITICAL: Respond with ONLY a valid JSON object with enhancements.
+
+Required JSON structure:
+{
+  "fields": {
+    "appName": "Enhanced business-specific name that reflects actual functionality",
+    "primaryFeature": "Most important business capability with industry terminology",
+    "userTypes": "Specific user roles relevant to this business model",
+    "businessTerminology": "Industry-specific terms that should replace generic ones"
+  },
+  "mockData": {
+    "businessEntities": [
+      {"name": "Highly specific business entity relevant to ${businessAnalysis.businessType}", "status": "Industry-appropriate status", "metrics": "Business-relevant numbers", "details": "Realistic business context"},
+      {"name": "Another specific entity", "status": "Different status", "metrics": "Different metrics", "details": "More context"}
+    ],
+    "userInteractions": [
+      {"user": "Realistic ${businessAnalysis.industry} professional name", "action": "Specific business action for ${businessAnalysis.businessType}", "result": "Meaningful business outcome", "timestamp": "recent", "context": "Why this action matters"},
+      {"user": "Another industry professional", "action": "Different business-critical action", "result": "Important result", "timestamp": "recent", "context": "Business impact"}
+    ],
+    "businessMetrics": [
+      {"name": "Critical KPI for ${businessAnalysis.industry}", "value": "Realistic industry number", "trend": "up", "significance": "Why this metric matters for this business"},
+      {"name": "Operational metric specific to ${businessAnalysis.businessType}", "value": "Another realistic value", "trend": "up", "significance": "Business impact"}
+    ]
+  },
+  "appDescription": "Compelling description that specifically explains how this application serves ${startupData?.companyName || 'the business'}'s unique value proposition in ${businessAnalysis.industry}",
+  "companyData": {
+    "tagline": "Powerful tagline that captures ${startupData?.companyName || 'the business'}'s mission in ${businessAnalysis.industry}",
+    "description": "Detailed description of what this application actually does for ${businessAnalysis.industry} professionals"
+  }
+}`;
+  }
+
+  // Fallback to original prompt if no business analysis
+  return generateOriginalPrompt(startupData, reports);
+};
+
+const generateOriginalPrompt = (startupData: any, reports: Record<string, string>) => {
   const templateContext = {
     'advanced-saas-dashboard': 'an advanced SaaS dashboard with real-time analytics, team management, project tracking, and comprehensive business intelligence',
     'modern-ecommerce-platform': 'a modern e-commerce platform with advanced product management, customer analytics, inventory tracking, and sales optimization',
@@ -370,21 +436,59 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
-    const { startupData, reports, targetTemplateId }: AppContentGenerationRequest = await req.json();
+    const { startupData, reports, businessAnalysis, baseCustomization, enhancementRequest } = await req.json();
     
-    console.log('Generating advanced business-specific app content for:', {
+    console.log('Enhanced app content generation:', {
       company: startupData?.companyName,
-      idea: startupData?.idea?.substring(0, 100),
+      hasBusinessAnalysis: !!businessAnalysis,
+      enhancementRequest,
       reportsCount: Object.keys(reports || {}).length
     });
 
+    // If this is an enhancement request with business analysis, use enhanced prompt
+    if (enhancementRequest === 'business-specific-content' && businessAnalysis) {
+      const prompt = generateAdvancedBusinessAnalysisPrompt(startupData, reports || {}, businessAnalysis);
+      
+      console.log('Using enhanced business analysis prompt...');
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 3000,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Claude API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const enhancedContent = extractJsonFromResponse(data.content[0].text);
+      
+      return new Response(JSON.stringify({
+        success: true,
+        content: enhancedContent
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // Advanced template selection - always use new advanced templates
-    const selectedTemplateId = targetTemplateId || detectAdvancedBusinessModelTemplate(startupData, reports || {});
+    const selectedTemplateId = baseCustomization?.templateId || detectAdvancedBusinessModelTemplate(startupData, reports || {});
     console.log('Selected advanced template:', selectedTemplateId);
 
     let generatedContent: GeneratedAppContent;
 
-    const prompt = generateAdvancedBusinessAnalysisPrompt(startupData, reports || {}, selectedTemplateId);
+    const prompt = generateAdvancedBusinessAnalysisPrompt(startupData, reports || {}, businessAnalysis);
     
     console.log('Calling Claude API for advanced business-specific customization...');
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -464,30 +568,14 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Advanced app content generation error:', error);
+    console.error('Enhanced app content generation error:', error);
     
-    try {
-      const { startupData, targetTemplateId } = await req.json().catch(() => ({}));
-      const fallbackTemplateId = targetTemplateId || 'advanced-saas-dashboard';
-      const fallbackContent = createAdvancedBusinessSpecificFallback(startupData || {}, fallbackTemplateId);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        content: fallbackContent,
-        warning: 'Used advanced business-specific fallback content due to AI generation failure'
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    } catch (fallbackError) {
-      console.error('Advanced fallback content generation failed:', fallbackError);
-      
-      return new Response(JSON.stringify({
-        success: false,
-        error: error.message || 'Advanced app content generation failed'
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message || 'Enhanced app content generation failed'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 });
