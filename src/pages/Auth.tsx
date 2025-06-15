@@ -217,7 +217,7 @@ const Auth = () => {
                   <TabsContent value="login">
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="login-email" className="text-gray-700">Email</Label>
+                        <Label htmlFor="login-email" className="text-gray-700 font-medium">Email</Label>
                         <Input
                           id="login-email"
                           type="email"
@@ -225,11 +225,11 @@ const Auth = () => {
                           value={loginForm.email}
                           onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
                           required
-                          className="border-gray-300 focus:border-blue-500"
+                          className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 placeholder:text-gray-400"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="login-password" className="text-gray-700">Password</Label>
+                        <Label htmlFor="login-password" className="text-gray-700 font-medium">Password</Label>
                         <div className="relative">
                           <Input
                             id="login-password"
@@ -238,7 +238,7 @@ const Auth = () => {
                             value={loginForm.password}
                             onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
                             required
-                            className="border-gray-300 focus:border-blue-500 pr-10"
+                            className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 placeholder:text-gray-400 pr-10"
                           />
                           <Button
                             type="button"
@@ -268,7 +268,7 @@ const Auth = () => {
                   <TabsContent value="signup">
                     <form onSubmit={handleSignup} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="signup-name" className="text-gray-700">Full Name</Label>
+                        <Label htmlFor="signup-name" className="text-gray-700 font-medium">Full Name</Label>
                         <Input
                           id="signup-name"
                           type="text"
@@ -276,11 +276,11 @@ const Auth = () => {
                           value={signupForm.name}
                           onChange={(e) => setSignupForm(prev => ({ ...prev, name: e.target.value }))}
                           required
-                          className="border-gray-300 focus:border-blue-500"
+                          className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 placeholder:text-gray-400"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signup-email" className="text-gray-700">Email</Label>
+                        <Label htmlFor="signup-email" className="text-gray-700 font-medium">Email</Label>
                         <Input
                           id="signup-email"
                           type="email"
@@ -288,11 +288,11 @@ const Auth = () => {
                           value={signupForm.email}
                           onChange={(e) => setSignupForm(prev => ({ ...prev, email: e.target.value }))}
                           required
-                          className="border-gray-300 focus:border-blue-500"
+                          className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 placeholder:text-gray-400"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signup-password" className="text-gray-700">Password</Label>
+                        <Label htmlFor="signup-password" className="text-gray-700 font-medium">Password</Label>
                         <Input
                           id="signup-password"
                           type="password"
@@ -301,11 +301,11 @@ const Auth = () => {
                           onChange={(e) => setSignupForm(prev => ({ ...prev, password: e.target.value }))}
                           required
                           minLength={6}
-                          className="border-gray-300 focus:border-blue-500"
+                          className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 placeholder:text-gray-400"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signup-confirm" className="text-gray-700">Confirm Password</Label>
+                        <Label htmlFor="signup-confirm" className="text-gray-700 font-medium">Confirm Password</Label>
                         <Input
                           id="signup-confirm"
                           type="password"
@@ -313,7 +313,7 @@ const Auth = () => {
                           value={signupForm.confirmPassword}
                           onChange={(e) => setSignupForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                           required
-                          className="border-gray-300 focus:border-blue-500"
+                          className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 placeholder:text-gray-400"
                         />
                       </div>
                       <Button 
