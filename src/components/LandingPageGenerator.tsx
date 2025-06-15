@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play, CheckCircle, AlertTriangle, Sparkles } from 'lucide-react';
+import { Loader2, RefreshCw, Code, Download, Eye, Copy, Play, CheckCircle, AlertTriangle, Sparkles, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LandingPagePreview from './LandingPagePreview';
 import TemplateGallery from './TemplateGallery';
 import TemplateCustomizer from './TemplateCustomizer';
+import AILandingPageGenerator from './AILandingPageGenerator';
 import { LandingPageTemplate, TemplateCustomization } from '@/types/template';
 import { templateManager } from '@/services/templateManager';
 
@@ -17,18 +18,30 @@ interface LandingPageGeneratorProps {
   ideaData?: any;
 }
 
-type ViewMode = 'gallery' | 'customizer' | 'preview' | 'code';
+type ViewMode = 'ai-generator' | 'gallery' | 'customizer' | 'preview' | 'code';
 
 const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => {
-  const [currentView, setCurrentView] = useState<ViewMode>('gallery');
+  const [currentView, setCurrentView] = useState<ViewMode>('ai-generator');
   const [selectedTemplate, setSelectedTemplate] = useState<LandingPageTemplate | null>(null);
   const [customization, setCustomization] = useState<TemplateCustomization | null>(null);
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reports, setReports] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => {
+    // Load generated reports
+    const storedReports = localStorage.getItem('generatedReports');
+    if (storedReports) {
+      try {
+        const parsedReports = JSON.parse(storedReports);
+        setReports(parsedReports);
+      } catch (error) {
+        console.error('Error parsing stored reports:', error);
+      }
+    }
+
     // Check for pre-generated content
     loadPreGeneratedContent();
   }, []);
@@ -49,6 +62,34 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     }
   };
 
+  const handleAITemplateSelected = (template: LandingPageTemplate, templateCustomization: TemplateCustomization) => {
+    setSelectedTemplate(template);
+    setCustomization(templateCustomization);
+    setCurrentView('preview');
+    
+    // Generate code immediately
+    try {
+      const customizedCode = templateManager.generateCustomizedCode(templateCustomization);
+      setGeneratedCode(customizedCode);
+      
+      toast({
+        title: "AI Template Ready!",
+        description: "Your AI-generated landing page is ready for preview.",
+      });
+    } catch (err: any) {
+      console.error('Code generation error:', err);
+      toast({
+        title: "Generation Failed",
+        description: err.message || "Could not generate code. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleManualSelection = () => {
+    setCurrentView('gallery');
+  };
+
   const handleTemplateSelect = (template: LandingPageTemplate) => {
     setSelectedTemplate(template);
     setCurrentView('customizer');
@@ -60,13 +101,18 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     setCurrentView('gallery');
   };
 
+  const handleBackToAI = () => {
+    setSelectedTemplate(null);
+    setCustomization(null);
+    setCurrentView('ai-generator');
+  };
+
   const handlePreview = (templateCustomization: TemplateCustomization) => {
     if (!selectedTemplate) return;
     
     setCustomization(templateCustomization);
     
     try {
-      // Generate the customized code - fix: use single parameter
       const customizedCode = templateManager.generateCustomizedCode(templateCustomization);
       setGeneratedCode(customizedCode);
       setCurrentView('preview');
@@ -94,12 +140,10 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
     try {
       setCustomization(templateCustomization);
       
-      // Generate the customized code - fix: use single parameter
       const customizedCode = templateManager.generateCustomizedCode(templateCustomization);
       
       setGeneratedCode(customizedCode);
       
-      // Store in localStorage
       const storedReports = localStorage.getItem('generatedReports');
       const reports = storedReports ? JSON.parse(storedReports) : {};
       reports['landing-page'] = customizedCode;
@@ -185,7 +229,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         </CardHeader>
         <CardContent>
           <p className="text-red-700 mb-4">{error}</p>
-          <Button onClick={resetToGallery} variant="outline" className="border-red-300">
+          <Button onClick={handleBackToAI} variant="outline" className="border-red-300">
             <RefreshCw className="h-4 w-4 mr-2" />
             Start Over
           </Button>
@@ -201,43 +245,61 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
-              <Sparkles className="h-6 w-6 text-violet-600" />
-              <span>AI-Enhanced Template System</span>
+              <Brain className="h-6 w-6 text-violet-600" />
+              <span>AI-Powered Landing Page Generator</span>
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Badge variant="secondary" className="bg-green-100 text-green-800">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Zero Errors
               </Badge>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                <Play className="h-3 w-3 mr-1" />
-                Template Based
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                <Sparkles className="h-3 w-3 mr-1" />
+                AI Enhanced
               </Badge>
-              {currentView !== 'gallery' && (
+              {currentView !== 'ai-generator' && (
                 <Button 
-                  onClick={resetToGallery} 
+                  onClick={handleBackToAI} 
                   variant="outline" 
                   size="sm"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  New Template
+                  <Brain className="h-4 w-4 mr-2" />
+                  AI Generator
                 </Button>
               )}
             </div>
           </div>
           <CardDescription>
-            Choose from professionally designed templates, customize with AI assistance, and generate error-free React code for {ideaData?.companyName || 'your startup'}
+            Let AI analyze your startup data and generate a perfect landing page, or choose manually from our professional templates
           </CardDescription>
         </CardHeader>
       </Card>
 
       {/* Main Content */}
-      {currentView === 'gallery' && (
-        <TemplateGallery 
-          onSelectTemplate={handleTemplateSelect}
-          businessType={ideaData?.problemStatement}
-          industry={ideaData?.targetAudience}
+      {currentView === 'ai-generator' && (
+        <AILandingPageGenerator
+          ideaData={ideaData}
+          reports={reports}
+          onTemplateSelected={handleAITemplateSelected}
+          onManualSelection={handleManualSelection}
         />
+      )}
+
+      {currentView === 'gallery' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold">Manual Template Selection</h3>
+            <Button variant="outline" onClick={handleBackToAI}>
+              <Brain className="h-4 w-4 mr-2" />
+              Try AI Generator
+            </Button>
+          </div>
+          <TemplateGallery 
+            onSelectTemplate={handleTemplateSelect}
+            businessType={ideaData?.problemStatement}
+            industry={ideaData?.targetAudience}
+          />
+        </div>
       )}
 
       {currentView === 'customizer' && selectedTemplate && (
@@ -291,7 +353,7 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-600">
-                    Template-Generated React Component ({generatedCode.split('\n').length} lines)
+                    AI-Generated React Component ({generatedCode.split('\n').length} lines)
                   </span>
                   <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
                     Zero Syntax Errors
@@ -329,6 +391,13 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
 
       {/* Benefits Overview */}
       <div className="grid md:grid-cols-4 gap-4">
+        <Card className="text-center border-0 bg-gradient-to-br from-purple-50 to-violet-50">
+          <CardContent className="pt-6">
+            <Brain className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-700">AI</div>
+            <div className="text-sm text-purple-600">Powered</div>
+          </CardContent>
+        </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-green-50 to-emerald-50">
           <CardContent className="pt-6">
             <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -338,16 +407,9 @@ const LandingPageGenerator = ({ idea, ideaData }: LandingPageGeneratorProps) => 
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardContent className="pt-6">
-            <Sparkles className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-blue-700">AI</div>
-            <div className="text-sm text-blue-600">Customization</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center border-0 bg-gradient-to-br from-purple-50 to-violet-50">
-          <CardContent className="pt-6">
-            <Eye className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-purple-700">Live</div>
-            <div className="text-sm text-purple-600">Preview</div>
+            <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-700">Live</div>
+            <div className="text-sm text-blue-600">Preview</div>
           </CardContent>
         </Card>
         <Card className="text-center border-0 bg-gradient-to-br from-orange-50 to-amber-50">
