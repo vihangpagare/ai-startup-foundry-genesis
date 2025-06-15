@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,13 +25,17 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
     templateId: template.id,
     fields: {},
     colorScheme: template.config.colorScheme,
+    typography: template.config.typography,
     enabledSections: template.config.sections.filter(s => s.required).map(s => s.id),
+    sectionVariants: {},
+    animations: template.config.animations,
     companyData: {
       name: ideaData?.companyName || 'Your Company',
       tagline: ideaData?.uniqueValue || 'Revolutionary solutions for modern business',
       description: ideaData?.solution || 'We provide innovative solutions to help your business grow',
       industry: ideaData?.targetAudience || 'Technology'
-    }
+    },
+    integrations: {}
   });
 
   // Initialize fields with AI-generated content
