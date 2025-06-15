@@ -9,33 +9,6 @@ export const generateEnhancedMarketData = (ideaData: any) => {
   ];
 };
 
-export const generateDetailedRevenueData = () => {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return months.map((month, index) => ({
-    month,
-    revenue: Math.floor(Math.random() * 50000) + 10000 + (index * 2000),
-    users: Math.floor(Math.random() * 1000) + 200 + (index * 50),
-    churn: Math.random() * 5 + 2,
-    mrr: Math.floor(Math.random() * 15000) + 5000 + (index * 800)
-  }));
-};
-
-export const generateFunnelData = (colors: any) => [
-  { name: 'Website Visitors', value: 10000, fill: colors.primary },
-  { name: 'Sign-ups', value: 3000, fill: colors.secondary },
-  { name: 'Trial Users', value: 1500, fill: colors.success },
-  { name: 'Paid Users', value: 500, fill: colors.warning },
-  { name: 'Long-term Customers', value: 200, fill: colors.danger }
-];
-
-export const generateCompetitiveData = (colors: any) => [
-  { name: 'Your Company', share: 25, funding: 5000000, employees: 50, color: colors.primary },
-  { name: 'Competitor A', share: 35, funding: 15000000, employees: 150, color: colors.secondary },
-  { name: 'Competitor B', share: 20, funding: 8000000, employees: 80, color: colors.success },
-  { name: 'Competitor C', share: 15, funding: 12000000, employees: 120, color: colors.warning },
-  { name: 'Others', share: 5, funding: 2000000, employees: 30, color: colors.muted }
-];
-
 // New startup-focused metrics generator
 export const generateStartupMetrics = (ideaData: any, colors: any) => {
   // Generate metrics based on idea context
@@ -106,3 +79,30 @@ export const generateStartupMetrics = (ideaData: any, colors: any) => {
 
 // Keep existing function for backward compatibility but rename the export
 export const generateMetricsData = generateStartupMetrics;
+
+export const generateDetailedRevenueData = () => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months.map((month, index) => ({
+    month,
+    revenue: Math.floor(Math.random() * 50000) + 10000 + (index * 2000),
+    users: Math.floor(Math.random() * 1000) + 200 + (index * 50),
+    churn: Math.random() * 5 + 2,
+    mrr: Math.floor(Math.random() * 15000) + 5000 + (index * 800)
+  }));
+};
+
+export const generateFunnelData = (colors: any) => [
+  { name: 'Website Visitors', value: 10000, fill: colors.primary },
+  { name: 'Sign-ups', value: 3000, fill: colors.secondary },
+  { name: 'Trial Users', value: 1500, fill: colors.success },
+  { name: 'Paid Users', value: 500, fill: colors.warning },
+  { name: 'Long-term Customers', value: 200, fill: colors.danger }
+];
+
+export const generateCompetitiveData = (colors: any) => [
+  { name: 'Your Company', share: 25, funding: 5000000, employees: 50, color: colors.primary },
+  { name: 'Competitor A', share: 35, funding: 15000000, employees: 150, color: colors.secondary },
+  { name: 'Competitor B', share: 20, funding: 8000000, employees: 80, color: colors.success },
+  { name: 'Competitor C', share: 15, funding: 12000000, employees: 120, color: colors.warning },
+  { name: 'Others', share: 5, funding: 2000000, employees: 30, color: colors.muted }
+];
