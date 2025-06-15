@@ -1,4 +1,3 @@
-
 import { AppTemplate, AppCustomization, AppPage, AppComponent } from '@/types/appTemplate';
 
 class AppTemplateManager {
@@ -373,7 +372,7 @@ class AppTemplateManager {
             { name: 'Service', fields: [{ name: 'name', type: 'string', required: true, mockStrategy: 'realistic' }, { name: 'price', type: 'number', required: true, mockStrategy: 'realistic' }], mockCount: 15 },
             { name: 'Booking', fields: [{ name: 'date', type: 'date', required: true, mockStrategy: 'realistic' }], mockCount: 8 }
           ],
-          relationships: [{ from: 'Booking', to: 'Service', type: 'many-to-one' }],
+          relationships: [{ from: 'Booking', to: 'Service', type: 'one-to-many' }],
           apiEndpoints: [
             { path: '/api/services', method: 'GET', entity: 'Service', mockResponse: [] },
             { path: '/api/bookings', method: 'GET', entity: 'Booking', mockResponse: [] }
@@ -511,7 +510,7 @@ const ${componentName} = () => {
     <div className="space-y-6">
       <div className="md:flex md:items-center md:justify-between">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          <h2 className="text-2xl font-bold leading-7 text-gray-900">
             ${page.name}
           </h2>
           <p className="mt-1 text-sm text-gray-500">
