@@ -144,6 +144,29 @@ class AppTemplateManager {
             bold: '700'
           }
         },
+        dataStructure: {
+          entities: [
+            {
+              name: 'users',
+              fields: [
+                { name: 'id', type: 'string', required: true, mockStrategy: 'realistic' },
+                { name: 'name', type: 'string', required: true, mockStrategy: 'realistic' },
+                { name: 'email', type: 'string', required: true, mockStrategy: 'realistic' }
+              ],
+              mockCount: 10
+            }
+          ],
+          relationships: [],
+          apiEndpoints: [
+            { path: '/api/users', method: 'GET', entity: 'users', mockResponse: [] }
+          ]
+        },
+        mockData: {
+          enabled: true,
+          realistic: true,
+          industrySpecific: false,
+          dataSize: 'medium'
+        },
         routing: {
           pages: [
             { path: '/', name: 'Dashboard', component: 'Dashboard', protected: true, exact: true },
@@ -186,12 +209,12 @@ class AppTemplateManager {
           description: 'Main store page with featured products',
           components: [
             { id: 'header', type: 'header', name: 'Store Header', props: {}, customizable: true, required: true },
-            { id: 'hero', type: 'hero', name: 'Hero Banner', props: {}, customizable: true, required: true },
-            { id: 'products', type: 'grid', name: 'Product Grid', props: {}, customizable: false, required: true }
+            { id: 'content', type: 'content', name: 'Hero Banner', props: {}, customizable: true, required: true },
+            { id: 'products', type: 'content', name: 'Product Grid', props: {}, customizable: false, required: true }
           ],
           layout: 'full-width',
           navigation: {
-            type: 'horizontal',
+            type: 'header',
             items: [
               { label: 'Home', href: '/', icon: 'Home' },
               { label: 'Products', href: '/products', icon: 'Package' },
@@ -208,11 +231,11 @@ class AppTemplateManager {
           components: [
             { id: 'header', type: 'header', name: 'Store Header', props: {}, customizable: true, required: true },
             { id: 'filters', type: 'sidebar', name: 'Product Filters', props: {}, customizable: false, required: true },
-            { id: 'product-grid', type: 'grid', name: 'Products Grid', props: {}, customizable: false, required: true }
+            { id: 'product-grid', type: 'content', name: 'Products Grid', props: {}, customizable: false, required: true }
           ],
           layout: 'sidebar',
           navigation: {
-            type: 'horizontal',
+            type: 'header',
             items: [
               { label: 'Home', href: '/', icon: 'Home' },
               { label: 'Products', href: '/products', icon: 'Package' },
@@ -228,12 +251,12 @@ class AppTemplateManager {
           description: 'Review items and proceed to checkout',
           components: [
             { id: 'header', type: 'header', name: 'Store Header', props: {}, customizable: true, required: true },
-            { id: 'cart-items', type: 'list', name: 'Cart Items', props: {}, customizable: false, required: true },
+            { id: 'cart-items', type: 'content', name: 'Cart Items', props: {}, customizable: false, required: true },
             { id: 'checkout', type: 'form', name: 'Checkout Form', props: {}, customizable: true, required: true }
           ],
           layout: 'centered',
           navigation: {
-            type: 'horizontal',
+            type: 'header',
             items: [
               { label: 'Home', href: '/', icon: 'Home' },
               { label: 'Products', href: '/products', icon: 'Package' },
@@ -262,7 +285,7 @@ class AppTemplateManager {
             placeholder: 'Welcome to Our Store',
             required: true,
             page: 'storefront',
-            component: 'hero'
+            component: 'content'
           },
           {
             id: 'productCategory',
@@ -309,6 +332,29 @@ class AppTemplateManager {
             bold: '700'
           }
         },
+        dataStructure: {
+          entities: [
+            {
+              name: 'products',
+              fields: [
+                { name: 'id', type: 'string', required: true, mockStrategy: 'realistic' },
+                { name: 'name', type: 'string', required: true, mockStrategy: 'realistic' },
+                { name: 'price', type: 'number', required: true, mockStrategy: 'realistic' }
+              ],
+              mockCount: 20
+            }
+          ],
+          relationships: [],
+          apiEndpoints: [
+            { path: '/api/products', method: 'GET', entity: 'products', mockResponse: [] }
+          ]
+        },
+        mockData: {
+          enabled: true,
+          realistic: true,
+          industrySpecific: false,
+          dataSize: 'medium'
+        },
         routing: {
           pages: [
             { path: '/', name: 'Store', component: 'Storefront', protected: false, exact: true },
@@ -351,12 +397,12 @@ class AppTemplateManager {
           description: 'Professional homepage showcasing services',
           components: [
             { id: 'header', type: 'header', name: 'Platform Header', props: {}, customizable: true, required: true },
-            { id: 'hero', type: 'hero', name: 'Service Hero', props: {}, customizable: true, required: true },
-            { id: 'services', type: 'grid', name: 'Services Grid', props: {}, customizable: false, required: true }
+            { id: 'content', type: 'content', name: 'Service Hero', props: {}, customizable: true, required: true },
+            { id: 'services', type: 'content', name: 'Services Grid', props: {}, customizable: false, required: true }
           ],
           layout: 'full-width',
           navigation: {
-            type: 'horizontal',
+            type: 'header',
             items: [
               { label: 'Home', href: '/', icon: 'Home' },
               { label: 'Services', href: '/services', icon: 'Briefcase' },
@@ -372,12 +418,12 @@ class AppTemplateManager {
           description: 'Detailed service offerings and pricing',
           components: [
             { id: 'header', type: 'header', name: 'Platform Header', props: {}, customizable: true, required: true },
-            { id: 'service-list', type: 'list', name: 'Service Details', props: {}, customizable: false, required: true },
+            { id: 'service-list', type: 'content', name: 'Service Details', props: {}, customizable: false, required: true },
             { id: 'booking-form', type: 'form', name: 'Booking Form', props: {}, customizable: true, required: true }
           ],
           layout: 'centered',
           navigation: {
-            type: 'horizontal',
+            type: 'header',
             items: [
               { label: 'Home', href: '/', icon: 'Home' },
               { label: 'Services', href: '/services', icon: 'Briefcase' },
@@ -393,12 +439,12 @@ class AppTemplateManager {
           description: 'Client dashboard and project management',
           components: [
             { id: 'header', type: 'header', name: 'Platform Header', props: {}, customizable: true, required: true },
-            { id: 'client-dashboard', type: 'dashboard', name: 'Client Dashboard', props: {}, customizable: false, required: true },
+            { id: 'client-dashboard', type: 'content', name: 'Client Dashboard', props: {}, customizable: false, required: true },
             { id: 'project-tracker', type: 'table', name: 'Project Tracker', props: {}, customizable: false, required: true }
           ],
           layout: 'sidebar',
           navigation: {
-            type: 'horizontal',
+            type: 'header',
             items: [
               { label: 'Home', href: '/', icon: 'Home' },
               { label: 'Services', href: '/services', icon: 'Briefcase' },
@@ -427,7 +473,7 @@ class AppTemplateManager {
             placeholder: 'Professional Services Platform',
             required: true,
             page: 'homepage',
-            component: 'hero'
+            component: 'content'
           },
           {
             id: 'serviceType',
@@ -473,6 +519,29 @@ class AppTemplateManager {
             semibold: '600',
             bold: '700'
           }
+        },
+        dataStructure: {
+          entities: [
+            {
+              name: 'services',
+              fields: [
+                { name: 'id', type: 'string', required: true, mockStrategy: 'realistic' },
+                { name: 'name', type: 'string', required: true, mockStrategy: 'realistic' },
+                { name: 'description', type: 'string', required: true, mockStrategy: 'realistic' }
+              ],
+              mockCount: 15
+            }
+          ],
+          relationships: [],
+          apiEndpoints: [
+            { path: '/api/services', method: 'GET', entity: 'services', mockResponse: [] }
+          ]
+        },
+        mockData: {
+          enabled: true,
+          realistic: true,
+          industrySpecific: false,
+          dataSize: 'medium'
         },
         routing: {
           pages: [
@@ -599,6 +668,121 @@ class AppTemplateManager {
       console.error('Template validation error:', error);
       return false;
     }
+  }
+
+  generateCustomizedApp(customization: AppCustomization): string {
+    const template = this.getTemplate(customization.templateId);
+    if (!template) {
+      throw new Error(`Template not found: ${customization.templateId}`);
+    }
+
+    // Generate React component code
+    const componentCode = `import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { BarChart3, Users, TrendingUp, Settings, Home, Package, ShoppingCart, Briefcase } from 'lucide-react';
+
+const ${customization.appName?.replace(/[^a-zA-Z0-9]/g, '') || 'Generated'}App = () => {
+  const [currentPage, setCurrentPage] = useState('${template.config.routing.defaultRoute}');
+  
+  const renderPage = () => {
+    switch (currentPage) {
+      ${template.pages.map(page => `
+      case '${page.route}':
+        return (
+          <div className="space-y-6">
+            <h1 className="text-3xl font-bold">${page.name}</h1>
+            <p className="text-gray-600">${page.description}</p>
+            ${this.generatePageContent(page, customization)}
+          </div>
+        );`).join('')}
+      default:
+        return <div>Page not found</div>;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold">${customization.companyData?.name || 'Generated App'}</h1>
+            </div>
+            <div className="flex space-x-4 items-center">
+              ${template.config.routing.navigation.map(nav => `
+              <Button
+                variant={currentPage === '${nav.href}' ? 'default' : 'ghost'}
+                onClick={() => setCurrentPage('${nav.href}')}
+              >
+                ${nav.label}
+              </Button>`).join('')}
+            </div>
+          </div>
+        </div>
+      </nav>
+      
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          {renderPage()}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default ${customization.appName?.replace(/[^a-zA-Z0-9]/g, '') || 'Generated'}App;`;
+
+    return componentCode;
+  }
+
+  private generatePageContent(page: any, customization: AppCustomization): string {
+    return `
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>${customization.fields?.primaryMetric || 'Key Metrics'}</CardTitle>
+                  <CardDescription>Overview of important data</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    ${(customization.mockData?.metrics || [
+                      { name: 'Total Users', value: '1,234', change: '+12%' },
+                      { name: 'Revenue', value: '$45,678', change: '+8%' },
+                      { name: 'Growth', value: '23%', change: '+3%' }
+                    ]).map(metric => `
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold">${metric.value}</div>
+                      <div className="text-sm text-gray-600">${metric.name}</div>
+                      ${metric.change ? `<div className="text-xs text-green-600">${metric.change}</div>` : ''}
+                    </div>`).slice(0, 3).join('')}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>${customization.fields?.featureTitle || 'Recent Activity'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    ${(customization.mockData?.activities || [
+                      { action: 'New user registered', user: 'John Doe', timestamp: '2 hours ago' },
+                      { action: 'Order completed', user: 'Jane Smith', timestamp: '4 hours ago' },
+                      { action: 'Report generated', user: 'Admin', timestamp: '1 day ago' }
+                    ]).map(activity => `
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                      <div>
+                        <div className="font-medium">${activity.action}</div>
+                        <div className="text-sm text-gray-500">by ${activity.user}</div>
+                      </div>
+                      <div className="text-sm text-gray-400">${activity.timestamp}</div>
+                    </div>`).slice(0, 5).join('')}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>`;
   }
 }
 
