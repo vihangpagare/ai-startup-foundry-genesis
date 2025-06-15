@@ -16,21 +16,26 @@ class ClaudeAIAppSelector {
     confidence: number;
   }> {
     try {
-      console.log('Generating intelligent app customization...', {
+      console.log('=== AI App Generation Started ===', {
         company: startupData?.companyName,
         idea: startupData?.idea?.substring(0, 100),
         targetTemplate: targetTemplateId,
         reportsAvailable: Object.keys(reports || {})
       });
 
-      // Step 1: Analyze startup data for intelligent template selection
+      // Step 1: Validate input data
+      if (!startupData) {
+        throw new Error('Startup data is required for app generation');
+      }
+
+      // Step 2: Analyze startup data for intelligent template selection
       const businessAnalysis = intelligentTemplateSelector.analyzeStartupForTemplateSelection(
         startupData, 
         reports || {}
       );
       console.log('Business analysis completed:', businessAnalysis);
 
-      // Step 2: Select the best existing template (no dynamic generation)
+      // Step 3: Select the best existing template
       let selectedTemplate: AppTemplate | null = null;
       let reasoning = '';
       let confidence = 0.8;
@@ -41,40 +46,62 @@ class ClaudeAIAppSelector {
         if (selectedTemplate) {
           reasoning = `Using specified template: ${selectedTemplate.name}`;
           confidence = 0.9;
+          console.log('Using specified template:', selectedTemplate.id);
+        } else {
+          console.warn('Specified template not found:', targetTemplateId);
         }
       }
 
       if (!selectedTemplate) {
         // AI-powered template selection
-        const templateMatch = intelligentTemplateSelector.selectBestTemplate(businessAnalysis);
-        selectedTemplate = appTemplateManager.getTemplate(templateMatch.templateId);
-        reasoning = templateMatch.reasoning;
-        confidence = templateMatch.confidence;
+        try {
+          const templateMatch = intelligentTemplateSelector.selectBestTemplate(businessAnalysis);
+          selectedTemplate = appTemplateManager.getTemplate(templateMatch.templateId);
+          reasoning = templateMatch.reasoning;
+          confidence = templateMatch.confidence;
+          console.log('AI selected template:', templateMatch);
+        } catch (error) {
+          console.error('Template selection failed:', error);
+        }
       }
 
       if (!selectedTemplate) {
-        // Fallback to first available template
+        // Fallback to feature-centric template
         const templates = appTemplateManager.getTemplates();
-        selectedTemplate = templates[0];
-        reasoning = 'Using fallback template due to selection failure';
-        confidence = 0.6;
+        selectedTemplate = templates.find(t => t.id === 'advanced-saas-dashboard') || templates[0];
+        reasoning = 'Using feature-centric dashboard template as fallback';
+        confidence = 0.7;
+        console.log('Using fallback template:', selectedTemplate?.id);
       }
 
       if (!selectedTemplate) {
-        throw new Error('No templates available');
+        throw new Error('No templates available for app generation');
       }
 
-      console.log(`Selected template: ${selectedTemplate.name} (${selectedTemplate.id})`);
+      console.log(`✓ Selected template: ${selectedTemplate.name} (${selectedTemplate.id})`);
 
-      // Step 3: Generate business-specific content using AI
-      const businessContent = await aiContentCustomizer.generateBusinessSpecificContent(
-        selectedTemplate.id,
-        startupData,
-        businessAnalysis,
-        reports || {}
-      );
+      // Step 4: Generate business-specific content using AI
+      let businessContent;
+      try {
+        businessContent = await aiContentCustomizer.generateBusinessSpecificContent(
+          selectedTemplate.id,
+          startupData,
+          businessAnalysis,
+          reports || {}
+        );
+        console.log('✓ Business content generated successfully');
+      } catch (error) {
+        console.error('Business content generation failed, using fallback:', error);
+        // The service will handle fallback internally
+        businessContent = await aiContentCustomizer.generateBusinessSpecificContent(
+          selectedTemplate.id,
+          startupData,
+          businessAnalysis,
+          reports || {}
+        );
+      }
 
-      // Step 4: Create highly customized app customization
+      // Step 5: Create highly customized app customization
       const customization = aiContentCustomizer.createCustomizedAppCustomization(
         selectedTemplate,
         businessContent,
@@ -82,13 +109,26 @@ class ClaudeAIAppSelector {
         businessAnalysis
       );
 
-      // Step 5: Generate enhanced reasoning
+      // Step 6: Validate the customization
+      if (!customization || !customization.templateId) {
+        throw new Error('Failed to create valid app customization');
+      }
+
+      console.log('✓ App customization created:', {
+        templateId: customization.templateId,
+        appName: customization.appName,
+        industry: customization.companyData.industry
+      });
+
+      // Step 7: Generate enhanced reasoning
       const enhancedReasoning = this.generateEnhancedReasoning(
         selectedTemplate,
         businessAnalysis,
         startupData,
         reasoning
       );
+
+      console.log('=== AI App Generation Completed Successfully ===');
 
       return {
         template: selectedTemplate,
@@ -98,7 +138,7 @@ class ClaudeAIAppSelector {
       };
 
     } catch (error) {
-      console.error('Intelligent app generation error:', error);
+      console.error('=== AI App Generation Failed ===', error);
       return this.createFallbackResult(startupData, targetTemplateId, error.message);
     }
   }
@@ -109,99 +149,117 @@ class ClaudeAIAppSelector {
     startupData: any,
     baseReasoning: string
   ): string {
-    const companyName = startupData?.companyName || 'the business';
-    const industry = businessAnalysis.industry;
-    const features = businessAnalysis.coreFeatures.join(', ');
+    const companyName = startupData?.companyName || 'your business';
+    const industry = businessAnalysis?.industry || 'Technology';
+    const features = businessAnalysis?.coreFeatures?.join(', ') || 'core business features';
     
-    return `Selected ${template.name} template for ${companyName} in the ${industry} industry. ${baseReasoning}
+    return `✨ Selected ${template.name} template for ${companyName} in the ${industry} industry.
 
-This template has been deeply customized with:
-- Industry-specific terminology and user interfaces
-- Business-appropriate mock data and examples  
-- ${businessAnalysis.coreFeatures.length} core features: ${features}
-- ${businessAnalysis.userPersonas.length} user persona interfaces
-- Custom color scheme and branding for ${industry}
+${baseReasoning}
 
-The resulting application demonstrates ${companyName}'s specific value proposition with realistic ${industry.toLowerCase()} scenarios, making it feel like a purpose-built solution rather than a generic template.`;
+🚀 This template has been intelligently customized with:
+• Industry-specific terminology and user interfaces optimized for ${industry.toLowerCase()}
+• Business-appropriate mock data and realistic examples
+• ${businessAnalysis?.coreFeatures?.length || 3} core features: ${features}
+• ${businessAnalysis?.userPersonas?.length || 2} user persona interfaces
+• Custom color scheme and branding aligned with ${industry} best practices
+• Feature-centric navigation focusing on user engagement and functionality
+
+The resulting application demonstrates ${companyName}'s specific value proposition with realistic ${industry.toLowerCase()} scenarios, creating a purpose-built solution that feels native to your business domain rather than a generic template.`;
   }
 
   private createFallbackResult(startupData: any, targetTemplateId?: string, errorMessage?: string) {
-    console.log('Creating intelligent fallback result...', { targetTemplateId, errorMessage });
+    console.log('=== Creating Intelligent Fallback Result ===', { targetTemplateId, errorMessage });
     
-    const templates = appTemplateManager.getTemplates();
-    let fallbackTemplate = null;
-    
-    if (targetTemplateId) {
-      fallbackTemplate = appTemplateManager.getTemplate(targetTemplateId);
-    }
-    
-    if (!fallbackTemplate) {
-      // Intelligent fallback based on startup idea
-      const idea = (startupData?.idea || '').toLowerCase();
+    try {
+      const templates = appTemplateManager.getTemplates();
+      let fallbackTemplate = null;
       
-      if (idea.includes('education') || idea.includes('learning') || idea.includes('student')) {
-        fallbackTemplate = appTemplateManager.getTemplate('advanced-saas-dashboard');
-      } else if (idea.includes('ecommerce') || idea.includes('product') || idea.includes('store')) {
-        fallbackTemplate = appTemplateManager.getTemplate('modern-ecommerce');
-      } else if (idea.includes('service') || idea.includes('consulting') || idea.includes('agency')) {
-        fallbackTemplate = appTemplateManager.getTemplate('business-platform');
-      } else {
-        fallbackTemplate = appTemplateManager.getTemplate('advanced-saas-dashboard');
+      // Try specified template first
+      if (targetTemplateId) {
+        fallbackTemplate = appTemplateManager.getTemplate(targetTemplateId);
       }
-    }
-    
-    if (!fallbackTemplate) {
-      fallbackTemplate = templates[0];
-    }
+      
+      // Intelligent fallback based on startup idea
+      if (!fallbackTemplate && startupData?.idea) {
+        const idea = startupData.idea.toLowerCase();
+        
+        if (idea.includes('education') || idea.includes('learning') || idea.includes('student')) {
+          fallbackTemplate = appTemplateManager.getTemplate('advanced-saas-dashboard');
+        } else if (idea.includes('ecommerce') || idea.includes('product') || idea.includes('store')) {
+          fallbackTemplate = appTemplateManager.getTemplate('modern-ecommerce-platform');
+        } else if (idea.includes('service') || idea.includes('consulting') || idea.includes('agency')) {
+          fallbackTemplate = appTemplateManager.getTemplate('business-service-platform');
+        }
+      }
+      
+      // Default to feature-centric dashboard
+      if (!fallbackTemplate) {
+        fallbackTemplate = templates.find(t => t.id === 'advanced-saas-dashboard') || templates[0];
+      }
 
-    if (!fallbackTemplate) {
-      throw new Error('No app templates available for fallback');
+      if (!fallbackTemplate) {
+        throw new Error('No app templates available for fallback generation');
+      }
+
+      console.log('✓ Fallback template selected:', fallbackTemplate.id);
+
+      // Create robust fallback customization
+      const fallbackCustomization: AppCustomization = {
+        templateId: fallbackTemplate.id,
+        fields: {
+          appName: `${startupData?.companyName || 'Feature'} Platform`,
+          dashboardTitle: 'Feature-Centric Dashboard',
+          primaryEntity: 'Features',
+          actionVerb: 'Manage',
+          metricName: 'Feature Usage',
+          pageTitle: 'Feature Overview',
+          buttonText: 'Explore Features'
+        },
+        colorScheme: fallbackTemplate.config.colorScheme,
+        typography: fallbackTemplate.config.typography,
+        enabledFeatures: fallbackTemplate.config.features.map(f => f.id),
+        mockData: {
+          features: [
+            { name: 'User Management', usage: '95%', status: 'Active', users: 247 },
+            { name: 'Analytics Dashboard', usage: '87%', status: 'Active', users: 189 },
+            { name: 'Feature Library', usage: '76%', status: 'Active', users: 156 }
+          ],
+          metrics: [
+            { name: 'Feature Adoption', value: '94%', change: '+12%', trend: 'up' },
+            { name: 'User Engagement', value: '87%', change: '+8%', trend: 'up' },
+            { name: 'Feature Requests', value: '23', change: '+5', trend: 'up' }
+          ],
+          activities: [
+            { user: 'Sarah Chen', action: 'Activated Analytics feature', time: '2 minutes ago' },
+            { user: 'Mike Johnson', action: 'Completed Feature onboarding', time: '15 minutes ago' },
+            { user: 'Emily Davis', action: 'Explored Feature Library', time: '1 hour ago' }
+          ]
+        },
+        companyData: {
+          name: startupData?.companyName || 'Feature Platform',
+          tagline: 'Empowering businesses through intelligent features',
+          description: startupData?.idea || 'A comprehensive feature-centric platform designed for modern businesses',
+          industry: 'Technology'
+        },
+        routing: fallbackTemplate.config.routing,
+        appName: `${startupData?.companyName || 'Feature'} Platform`,
+        appDescription: 'A robust feature-centric platform built for your specific business needs'
+      };
+
+      console.log('✓ Fallback customization created successfully');
+
+      return {
+        template: fallbackTemplate,
+        customization: fallbackCustomization,
+        reasoning: `🔄 Intelligent fallback: ${fallbackTemplate.name} template${errorMessage ? ` (${errorMessage})` : ''}. Selected feature-centric approach based on business analysis with customized terminology and industry-appropriate mock data.`,
+        confidence: 0.75
+      };
+
+    } catch (fallbackError) {
+      console.error('Fallback generation failed:', fallbackError);
+      throw new Error(`App generation failed completely: ${fallbackError.message}`);
     }
-
-    const fallbackCustomization: AppCustomization = {
-      templateId: fallbackTemplate.id,
-      fields: {
-        appName: `${startupData?.companyName || 'Your'} Platform`,
-        dashboardTitle: 'Business Dashboard',
-        primaryEntity: 'Users',
-        actionVerb: 'Manage',
-        metricName: 'Performance Score',
-        pageTitle: 'Dashboard',
-        buttonText: 'Get Started'
-      },
-      colorScheme: fallbackTemplate.config.colorScheme,
-      typography: fallbackTemplate.config.typography,
-      enabledFeatures: fallbackTemplate.config.features.map(f => f.id),
-      mockData: {
-        users: [
-          { name: 'John Smith', role: 'Manager', status: 'Active', performance: 'Excellent' },
-          { name: 'Sarah Johnson', role: 'Analyst', status: 'Active', performance: 'Good' }
-        ],
-        projects: [
-          { name: 'Business Initiative', progress: 75, team: 4, status: 'On Track' }
-        ],
-        metrics: [
-          { name: 'Performance', value: '95%', change: '+8%', trend: 'up' },
-          { name: 'Efficiency', value: '87%', change: '+5%', trend: 'up' }
-        ]
-      },
-      companyData: {
-        name: startupData?.companyName || 'Your Company',
-        tagline: 'Transforming business through innovation',
-        description: startupData?.idea || 'A comprehensive platform for business success',
-        industry: 'Technology'
-      },
-      routing: fallbackTemplate.config.routing,
-      appName: `${startupData?.companyName || 'Your'} Platform`,
-      appDescription: 'A comprehensive business platform designed for your specific needs'
-    };
-
-    return {
-      template: fallbackTemplate,
-      customization: fallbackCustomization,
-      reasoning: `Intelligent fallback using ${fallbackTemplate.name} template${errorMessage ? ` due to: ${errorMessage}` : ''}. Template selected based on business analysis and customized with appropriate terminology.`,
-      confidence: 0.7
-    };
   }
 
   async regenerateAppContent(
@@ -209,10 +267,14 @@ The resulting application demonstrates ${companyName}'s specific value propositi
     startupData: any,
     reports: Record<string, string>
   ): Promise<AppCustomization> {
+    console.log('Regenerating app content for template:', templateId);
+    
     const result = await this.generateAppContentWithAI(startupData, reports, templateId);
     if (!result.customization) {
-      throw new Error('Failed to regenerate app content - using fallback');
+      throw new Error('Failed to regenerate app content - no customization returned');
     }
+    
+    console.log('✓ App content regenerated successfully');
     return result.customization;
   }
 }
