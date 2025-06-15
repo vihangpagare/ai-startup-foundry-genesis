@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -45,7 +44,7 @@ const extractJsonFromResponse = (text: string): any => {
 };
 
 const generateTemplateAnalysisPrompt = (startupData: any, reports: Record<string, string>, templates: any[]) => {
-  return `You are an expert marketing consultant and web designer. Analyze this startup and select the best landing page template with AI-generated content.
+  return `You are an expert SaaS marketing consultant and web designer. Analyze this startup and select the best SaaS-focused landing page template with AI-generated content.
 
 STARTUP DATA:
 - Company: ${startupData?.companyName || 'Not specified'}
@@ -60,32 +59,42 @@ ${Object.entries(reports).slice(0, 3).map(([type, content]) =>
   `${type.toUpperCase()}: ${content.substring(0, 800)}...`
 ).join('\n\n')}
 
-AVAILABLE TEMPLATES:
-${templates.map(t => `- ${t.id}: ${t.name} (${t.category}) - ${t.description}`).join('\n')}
+AVAILABLE SaaS TEMPLATES:
+${templates.map(t => `- ${t.id}: ${t.name} (${t.category}) - ${t.description} [Complexity: ${t.complexity}]`).join('\n')}
 
 CRITICAL: You must respond with ONLY a valid JSON object, no additional text or explanation. 
+
+Focus on SaaS-specific content that emphasizes:
+- Technical capabilities and features
+- Business benefits and ROI
+- Scalability and performance
+- Security and compliance
+- Integration capabilities
+- Data analytics and insights
+- Team collaboration features
+- Enterprise-grade solutions
 
 Return this exact structure:
 {
   "templateId": "selected_template_id",
-  "reasoning": "Why this template is perfect for this startup",
+  "reasoning": "Why this template is perfect for this SaaS startup, focusing on technical and business alignment",
   "confidence": 0.95,
   "fields": {
-    "heroTitle": "Compelling headline specific to this startup",
-    "heroSubtitle": "Clear value proposition that resonates with target audience",
-    "ctaText": "Action-oriented CTA button text",
-    "feature1Title": "First key feature/benefit",
-    "feature1Description": "Detailed description of first feature",
-    "feature2Title": "Second key feature/benefit", 
-    "feature2Description": "Detailed description of second feature",
-    "feature3Title": "Third key feature/benefit",
-    "feature3Description": "Detailed description of third feature"
+    "heroTitle": "Compelling SaaS headline that emphasizes transformation and business value",
+    "heroSubtitle": "Clear value proposition highlighting technical capabilities, business benefits, and competitive advantages",
+    "ctaText": "Action-oriented CTA specific to SaaS (e.g., 'Start Free Trial', 'Get Demo', 'Scale Your Business')",
+    "feature1Title": "Primary technical capability or core feature",
+    "feature1Description": "Detailed description emphasizing business impact and technical superiority",
+    "feature2Title": "Secondary key feature or integration capability", 
+    "feature2Description": "Technical feature with clear business benefits and competitive advantages",
+    "feature3Title": "Enterprise or scalability feature",
+    "feature3Description": "Security, compliance, or enterprise-grade capability description"
   },
   "companyData": {
     "name": "${startupData?.companyName || 'Your Company'}",
-    "tagline": "Brief, memorable tagline",
-    "description": "One-sentence company description",
-    "industry": "Primary industry"
+    "tagline": "Brief, memorable SaaS tagline emphasizing transformation or efficiency",
+    "description": "One-sentence company description highlighting SaaS value proposition",
+    "industry": "Primary SaaS vertical or industry focus"
   },
   "colorScheme": {
     "primary": "#3B82F6",
@@ -96,7 +105,7 @@ Return this exact structure:
 };
 
 const generateSpecificContentPrompt = (startupData: any, reports: Record<string, string>, template: any) => {
-  return `You are an expert copywriter specializing in ${template.category} landing pages. Generate highly personalized content for this specific template and startup.
+  return `You are an expert SaaS copywriter specializing in ${template.category} landing pages. Generate highly personalized, conversion-optimized content for this specific SaaS template and startup.
 
 STARTUP DETAILS:
 - Company: ${startupData?.companyName || 'Not specified'}
@@ -110,28 +119,38 @@ ${Object.entries(reports).slice(0, 2).map(([type, content]) =>
   `${type.toUpperCase()}: ${content.substring(0, 600)}...`
 ).join('\n\n')}
 
-TEMPLATE: ${template.name} (${template.category})
+TEMPLATE: ${template.name} (${template.category}) - ${template.description}
+Template Complexity: ${template.complexity}
+Template Features: ${template.features?.join(', ') || 'Standard SaaS features'}
 
 CRITICAL: You must respond with ONLY a valid JSON object, no additional text or explanation.
+
+Create SaaS-focused content that includes:
+- Technical differentiation and competitive advantages
+- Specific business metrics and ROI implications
+- Industry-specific use cases and benefits
+- Integration and scalability messaging
+- Security and compliance assurances
+- Team productivity and collaboration benefits
 
 Return this exact structure:
 {
   "fields": {
-    "heroTitle": "Unique, compelling headline for this specific startup",
-    "heroSubtitle": "Value proposition that speaks directly to target audience pain points",
-    "ctaText": "Conversion-optimized CTA for their business model",
-    "feature1Title": "Primary capability/benefit",
-    "feature1Description": "How this feature solves customer problems specifically",
-    "feature2Title": "Secondary capability/benefit",
-    "feature2Description": "Technical or business benefit explained clearly", 
-    "feature3Title": "Competitive advantage/differentiator",
-    "feature3Description": "What makes this startup unique in their market"
+    "heroTitle": "Powerful SaaS headline specific to this startup's value proposition and industry",
+    "heroSubtitle": "Compelling value proposition that addresses target audience pain points with specific business benefits and technical capabilities",
+    "ctaText": "Conversion-optimized CTA tailored to their SaaS business model and user journey",
+    "feature1Title": "Primary SaaS capability that drives core business value",
+    "feature1Description": "How this feature solves specific customer problems with measurable business impact",
+    "feature2Title": "Secondary technical or business capability",
+    "feature2Description": "Technical or business benefit with specific industry applications", 
+    "feature3Title": "Enterprise, security, or scalability differentiator",
+    "feature3Description": "What makes this SaaS solution unique in their market with competitive advantages"
   },
   "companyData": {
     "name": "${startupData?.companyName || 'Your Company'}",
-    "tagline": "Memorable tagline that captures the essence",
-    "description": "One compelling sentence about what the company does",
-    "industry": "Primary industry/vertical"
+    "tagline": "Memorable SaaS tagline that captures the transformation or efficiency promise",
+    "description": "One compelling sentence about what the SaaS company does and its primary value",
+    "industry": "Primary SaaS industry vertical or market segment"
   }
 }`;
 };

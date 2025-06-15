@@ -1,4 +1,3 @@
-
 import { LandingPageTemplate, TemplateCustomization } from '@/types/template';
 
 class TemplateManager {
@@ -482,6 +481,340 @@ class TemplateManager {
         },
         integrations: []
       }
+    },
+    {
+      id: 'enhanced-saas',
+      name: 'Enhanced SaaS Platform',
+      description: 'Comprehensive SaaS template with advanced features, pricing, testimonials, and security sections',
+      category: 'saas',
+      complexity: 'advanced',
+      features: [
+        'Interactive Navigation', 'Hero with Live Dashboard', 'Social Proof Section', 
+        'Advanced Features Grid', 'Interactive Demo', 'Pricing Tables', 
+        'Customer Testimonials', 'Security & Compliance', 'Comprehensive Footer'
+      ],
+      previewImage: '/preview-enhanced-saas.jpg',
+      tags: ['saas', 'advanced', 'comprehensive', 'professional'],
+      version: '2.0.0',
+      popularity: 98,
+      lastUpdated: '2024-01-15',
+      author: 'Template Studio',
+      premium: false,
+      component: 'EnhancedSaaSTemplate',
+      config: {
+        customizableFields: [
+          {
+            id: 'heroTitle',
+            label: 'Main Headline',
+            type: 'text',
+            placeholder: 'Transform Your Business with AI',
+            required: true,
+            section: 'hero'
+          },
+          {
+            id: 'heroSubtitle',
+            label: 'Hero Description',
+            type: 'textarea',
+            placeholder: 'Comprehensive platform description with key benefits',
+            required: true,
+            section: 'hero'
+          },
+          {
+            id: 'ctaText',
+            label: 'Primary CTA Button',
+            type: 'text',
+            placeholder: 'Start Free Trial',
+            required: true,
+            section: 'hero'
+          },
+          {
+            id: 'feature1Title',
+            label: 'Feature 1 Title',
+            type: 'text',
+            placeholder: 'Advanced Analytics',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature1Description',
+            label: 'Feature 1 Description',
+            type: 'textarea',
+            placeholder: 'Detailed description of analytics capabilities',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature2Title',
+            label: 'Feature 2 Title',
+            type: 'text',
+            placeholder: 'Lightning Performance',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature2Description',
+            label: 'Feature 2 Description',
+            type: 'textarea',
+            placeholder: 'Performance and scalability benefits',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature3Title',
+            label: 'Feature 3 Title',
+            type: 'text',
+            placeholder: 'Enterprise Security',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature3Description',
+            label: 'Feature 3 Description',
+            type: 'textarea',
+            placeholder: 'Security and compliance features',
+            required: true,
+            section: 'features'
+          }
+        ],
+        colorScheme: {
+          primary: '#3B82F6',
+          secondary: '#8B5CF6',
+          accent: '#F59E0B',
+          background: '#F8FAFC',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Inter, sans-serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
+        },
+        sections: [
+          { id: 'hero', name: 'Hero Section', description: 'Main banner with interactive dashboard', required: true, customizable: true, fields: ['heroTitle', 'heroSubtitle', 'ctaText'], variants: [], position: 1 },
+          { id: 'features', name: 'Features', description: 'Advanced features showcase', required: true, customizable: true, fields: ['feature1Title', 'feature1Description', 'feature2Title', 'feature2Description', 'feature3Title', 'feature3Description'], variants: [], position: 2 },
+          { id: 'demo', name: 'Interactive Demo', description: 'Product demonstration section', required: true, customizable: false, fields: [], variants: [], position: 3 },
+          { id: 'pricing', name: 'Pricing Plans', description: 'Pricing table with plans', required: true, customizable: false, fields: [], variants: [], position: 4 },
+          { id: 'testimonials', name: 'Customer Testimonials', description: 'Social proof and reviews', required: true, customizable: false, fields: [], variants: [], position: 5 },
+          { id: 'security', name: 'Security & Compliance', description: 'Trust indicators', required: true, customizable: false, fields: [], variants: [], position: 6 }
+        ],
+        layout: {
+          header: { enabled: true, variant: 'standard', sticky: true, transparent: false },
+          navigation: { enabled: true, type: 'horizontal', items: [] },
+          hero: { enabled: true, variant: 'split', backgroundType: 'gradient', height: 'large' },
+          features: true,
+          testimonials: true,
+          pricing: true,
+          footer: { enabled: true, variant: 'extended', columns: 4 }
+        },
+        animations: {
+          enabled: true,
+          type: 'moderate',
+          transitions: [],
+          parallax: false,
+          scrollAnimations: true
+        },
+        responsiveness: {
+          breakpoints: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px'
+          },
+          mobileFirst: true,
+          adaptiveImages: true,
+          touchOptimized: true
+        },
+        integrations: []
+      }
+    },
+    {
+      id: 'analytics-saas',
+      name: 'Analytics SaaS Platform',
+      description: 'Data analytics focused template with interactive dashboards, AI insights, and data visualization showcase',
+      category: 'saas',
+      complexity: 'advanced',
+      features: [
+        'Real-time Analytics Dashboard', 'AI-Powered Insights', 'Data Visualization Showcase', 
+        'Interactive Metrics', 'Data Source Integrations', 'Predictive Analytics',
+        'Custom Chart Builder', 'Advanced Reporting'
+      ],
+      previewImage: '/preview-analytics-saas.jpg',
+      tags: ['analytics', 'saas', 'data', 'ai', 'dashboard'],
+      version: '1.0.0',
+      popularity: 94,
+      lastUpdated: '2024-01-15',
+      author: 'Template Studio',
+      premium: false,
+      component: 'AnalyticsSaaSTemplate',
+      config: {
+        customizableFields: [
+          {
+            id: 'heroTitle',
+            label: 'Main Headline',
+            type: 'text',
+            placeholder: 'Turn Data Into Actionable Insights',
+            required: true,
+            section: 'hero'
+          },
+          {
+            id: 'heroSubtitle',
+            label: 'Analytics Description',
+            type: 'textarea',
+            placeholder: 'Transform complex data into clear, actionable insights with AI-powered analytics',
+            required: true,
+            section: 'hero'
+          },
+          {
+            id: 'ctaText',
+            label: 'Primary CTA Button',
+            type: 'text',
+            placeholder: 'Start Analyzing Data',
+            required: true,
+            section: 'hero'
+          },
+          {
+            id: 'feature1Title',
+            label: 'Analytics Feature 1',
+            type: 'text',
+            placeholder: 'Real-Time Dashboards',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature1Description',
+            label: 'Analytics Feature 1 Description',
+            type: 'textarea',
+            placeholder: 'Create beautiful, interactive dashboards that update in real-time',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature2Title',
+            label: 'AI Feature Title',
+            type: 'text',
+            placeholder: 'AI-Powered Insights',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature2Description',
+            label: 'AI Feature Description',
+            type: 'textarea',
+            placeholder: 'Discover hidden patterns with machine learning algorithms',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature3Title',
+            label: 'Integration Feature Title',
+            type: 'text',
+            placeholder: 'Universal Connectors',
+            required: true,
+            section: 'features'
+          },
+          {
+            id: 'feature3Description',
+            label: 'Integration Feature Description',
+            type: 'textarea',
+            placeholder: 'Connect to any data source with extensive integrations',
+            required: true,
+            section: 'features'
+          }
+        ],
+        colorScheme: {
+          primary: '#2563EB',
+          secondary: '#8B5CF6',
+          accent: '#06B6D4',
+          background: '#F8FAFC',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Inter, sans-serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
+        },
+        sections: [
+          { id: 'hero', name: 'Analytics Hero', description: 'Hero with interactive analytics dashboard', required: true, customizable: true, fields: ['heroTitle', 'heroSubtitle', 'ctaText'], variants: [], position: 1 },
+          { id: 'analytics', name: 'Analytics Features', description: 'Data analytics capabilities', required: true, customizable: true, fields: ['feature1Title', 'feature1Description', 'feature2Title', 'feature2Description', 'feature3Title', 'feature3Description'], variants: [], position: 2 },
+          { id: 'visualizations', name: 'Data Visualizations', description: 'Chart and graph showcase', required: true, customizable: false, fields: [], variants: [], position: 3 },
+          { id: 'integrations', name: 'Data Integrations', description: 'Data source connections', required: true, customizable: false, fields: [], variants: [], position: 4 }
+        ],
+        layout: {
+          header: { enabled: true, variant: 'standard', sticky: true, transparent: false },
+          navigation: { enabled: true, type: 'horizontal', items: [] },
+          hero: { enabled: true, variant: 'split', backgroundType: 'gradient', height: 'large' },
+          features: true,
+          testimonials: false,
+          pricing: false,
+          footer: { enabled: true, variant: 'standard', columns: 4 }
+        },
+        animations: {
+          enabled: true,
+          type: 'moderate',
+          transitions: [],
+          parallax: false,
+          scrollAnimations: true
+        },
+        responsiveness: {
+          breakpoints: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px'
+          },
+          mobileFirst: true,
+          adaptiveImages: true,
+          touchOptimized: true
+        },
+        integrations: []
+      }
     }
   ];
 
@@ -540,6 +873,14 @@ class TemplateManager {
         case 'ModernSaaSTemplate':
           componentName = 'ModernSaaSTemplate';
           importPath = '@/components/templates/ModernSaaSTemplate';
+          break;
+        case 'EnhancedSaaSTemplate':
+          componentName = 'EnhancedSaaSTemplate';
+          importPath = '@/components/templates/EnhancedSaaSTemplate';
+          break;
+        case 'AnalyticsSaaSTemplate':
+          componentName = 'AnalyticsSaaSTemplate';
+          importPath = '@/components/templates/AnalyticsSaaSTemplate';
           break;
         case 'MinimalPortfolioTemplate':
           componentName = 'MinimalPortfolioTemplate';
