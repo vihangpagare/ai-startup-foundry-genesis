@@ -8,9 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Palette, Layout, Type, Eye } from 'lucide-react';
+import { ArrowLeft, Palette, Layout, Type, Eye, Sparkles } from 'lucide-react';
 import { LandingPageTemplate, TemplateCustomization, CustomizableField } from '@/types/template';
 import { templateManager } from '@/services/templateManager';
+import { aiTemplateIntelligence } from '@/services/aiTemplateIntelligence';
+import AdvancedThemeBuilder from './AdvancedThemeBuilder';
+import AIContentGenerator from './AIContentGenerator';
 
 interface TemplateCustomizerProps {
   template: LandingPageTemplate;
@@ -80,6 +83,38 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
     setCustomization(prev => ({
       ...prev,
       fields: initialFields
+    }));
+  }, [template, ideaData]);
+
+  // Add AI-enhanced initialization
+  useEffect(() => {
+    const analysis = aiTemplateIntelligence.analyzeBusinessModel(
+      ideaData?.idea || '', 
+      ideaData?.targetAudience || ''
+    );
+    
+    const aiContent = aiTemplateIntelligence.generateContent(
+      analysis, 
+      ideaData?.companyName || 'Your Company'
+    );
+    
+    const aiModifications = aiTemplateIntelligence.suggestTemplateModifications(template, analysis);
+
+    // Apply AI suggestions
+    setCustomization(prev => ({
+      ...prev,
+      ...aiModifications,
+      fields: {
+        ...prev.fields,
+        heroTitle: aiContent.heroTitle,
+        heroSubtitle: aiContent.heroSubtitle,
+        ctaText: aiContent.ctaTexts[0] || 'Get Started',
+        ...aiContent.features.reduce((acc, feature, index) => {
+          acc[`feature${index + 1}Title`] = feature.title;
+          acc[`feature${index + 1}Description`] = feature.description;
+          return acc;
+        }, {} as Record<string, string>)
+      }
     }));
   }, [template, ideaData]);
 
@@ -186,6 +221,17 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{template.name}</h2>
             <p className="text-gray-600">{template.description}</p>
+            <div className="flex items-center space-x-2 mt-2">
+              <Badge variant="secondary" className="flex items-center space-x-1">
+                <Sparkles className="h-3 w-3" />
+                <span>AI Enhanced</span>
+              </Badge>
+              {template.premium && (
+                <Badge variant="outline" className="text-purple-600 border-purple-600">
+                  Premium
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex space-x-2">
@@ -203,7 +249,7 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
         {/* Customization Panel */}
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="content" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="content">
                 <Type className="h-4 w-4 mr-2" />
                 Content
@@ -215,6 +261,10 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
               <TabsTrigger value="layout">
                 <Layout className="h-4 w-4 mr-2" />
                 Layout
+              </TabsTrigger>
+              <TabsTrigger value="ai-content">
+                <Sparkles className="h-4 w-4 mr-2" />
+                AI Content
               </TabsTrigger>
               <TabsTrigger value="company">
                 Company
@@ -248,35 +298,22 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
             </TabsContent>
 
             <TabsContent value="design" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Color Scheme</CardTitle>
-                  <CardDescription>
-                    Customize your brand colors
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(customization.colorScheme).map(([key, value]) => (
-                    <div key={key} className="flex items-center space-x-4">
-                      <Label className="w-20 capitalize">{key}:</Label>
-                      <div className="flex items-center space-x-2 flex-1">
-                        <Input
-                          type="color"
-                          value={value}
-                          onChange={(e) => handleColorChange(key, e.target.value)}
-                          className="w-12 h-10 p-1 border rounded"
-                        />
-                        <Input
-                          type="text"
-                          value={value}
-                          onChange={(e) => handleColorChange(key, e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+              <AdvancedThemeBuilder
+                colorScheme={customization.colorScheme}
+                typography={customization.typography}
+                onColorChange={(colors) => setCustomization(prev => ({
+                  ...prev,
+                  colorScheme: { ...prev.colorScheme, ...colors }
+                }))}
+                onTypographyChange={(typography) => setCustomization(prev => ({
+                  ...prev,
+                  typography: { ...prev.typography, ...typography }
+                }))}
+                onSpacingChange={(spacing) => {
+                  // Handle spacing changes
+                  console.log('Spacing updated:', spacing);
+                }}
+              />
             </TabsContent>
 
             <TabsContent value="layout" className="space-y-6">
@@ -305,6 +342,31 @@ const TemplateCustomizer = ({ template, ideaData, onBack, onPreview, onGenerate 
                   ))}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="ai-content" className="space-y-6">
+              <AIContentGenerator
+                startupIdea={ideaData?.idea || ''}
+                companyName={ideaData?.companyName || 'Your Company'}
+                targetAudience={ideaData?.targetAudience || 'Technology professionals'}
+                onContentGenerated={(content) => {
+                  // Update customization with AI-generated content
+                  setCustomization(prev => ({
+                    ...prev,
+                    fields: {
+                      ...prev.fields,
+                      heroTitle: content.heroTitle,
+                      heroSubtitle: content.heroSubtitle,
+                      ctaText: content.ctaTexts[0] || prev.fields.ctaText,
+                      ...content.features.reduce((acc: Record<string, string>, feature: any, index: number) => {
+                        acc[`feature${index + 1}Title`] = feature.title;
+                        acc[`feature${index + 1}Description`] = feature.description;
+                        return acc;
+                      }, {})
+                    }
+                  }));
+                }}
+              />
             </TabsContent>
 
             <TabsContent value="company" className="space-y-6">
