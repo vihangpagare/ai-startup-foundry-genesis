@@ -1,4 +1,3 @@
-
 import { AppTemplate, AppCustomization } from '@/types/appTemplate';
 import { appTemplateManager } from './appTemplateManager';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,15 +36,16 @@ class ClaudeAIAppSelector {
     confidence: number;
   }> {
     try {
-      console.log('Generating AI app content with Claude...', {
+      console.log('Generating business-specific SaaS app with Claude...', {
         company: startupData?.companyName,
+        idea: startupData?.idea?.substring(0, 100),
         targetTemplate: targetTemplateId,
         reportsAvailable: Object.keys(reports || {})
       });
 
       const templates = appTemplateManager.getTemplates();
       
-      // Call our Claude-powered edge function with retry logic
+      // Call our enhanced Claude-powered edge function
       let response;
       let attempt = 0;
       const maxAttempts = 2;
@@ -70,7 +70,7 @@ class ClaudeAIAppSelector {
           if (error) {
             console.error(`Edge function error (attempt ${attempt + 1}):`, error);
             if (attempt === maxAttempts - 1) {
-              throw new Error(`AI app generation failed: ${error.message}`);
+              throw new Error(`Business-specific app generation failed: ${error.message}`);
             }
           } else {
             response = data;
@@ -84,7 +84,6 @@ class ClaudeAIAppSelector {
         }
         attempt++;
         
-        // Wait before retry
         if (attempt < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
@@ -95,35 +94,108 @@ class ClaudeAIAppSelector {
       }
 
       if (!response.success) {
-        // If AI failed but we have fallback content, use it
         if (response.content && response.warning) {
-          console.warn('Using fallback app content:', response.warning);
+          console.warn('Using fallback business-specific content:', response.warning);
         } else {
-          throw new Error(response.error || 'AI app content generation failed');
+          throw new Error(response.error || 'Business-specific app generation failed');
         }
       }
 
       const aiContent: AIGeneratedAppContent = response.content;
-      console.log('AI generated app content:', aiContent);
+      console.log('AI generated business-specific content:', aiContent);
 
-      // Get the selected template
-      const selectedTemplate = appTemplateManager.getTemplate(aiContent.templateId);
-      if (!selectedTemplate) {
-        // Fallback to first available template if AI selected invalid template
-        const fallbackTemplate = templates[0];
-        console.warn(`App template ${aiContent.templateId} not found, using fallback: ${fallbackTemplate.id}`);
-        aiContent.templateId = fallbackTemplate.id;
-        return this.createAppCustomizationFromAIContent(fallbackTemplate, aiContent, startupData);
-      }
-
-      return this.createAppCustomizationFromAIContent(selectedTemplate, aiContent, startupData);
+      // For business-specific apps, we use a custom template approach
+      const customTemplate = this.createBusinessSpecificTemplate(aiContent);
+      
+      return this.createAppCustomizationFromAIContent(customTemplate, aiContent, startupData);
 
     } catch (error) {
-      console.error('Claude AI app selection error:', error);
+      console.error('Claude AI business-specific app error:', error);
       
-      // Create fallback content if AI completely fails
-      return this.createFallbackAppResult(startupData, targetTemplateId, error.message);
+      return this.createFallbackBusinessApp(startupData, targetTemplateId, error.message);
     }
+  }
+
+  private createBusinessSpecificTemplate(aiContent: AIGeneratedAppContent): AppTemplate {
+    return {
+      id: 'business-specific-saas',
+      name: `${aiContent.appName} Prototype`,
+      description: aiContent.appDescription,
+      category: 'saas-dashboard' as any,
+      complexity: 'moderate' as any,
+      features: aiContent.features || [],
+      previewImage: '/placeholder.svg',
+      tags: ['business-specific', 'ai-generated', 'prototype'],
+      pages: [],
+      config: {
+        customizableFields: [],
+        colorScheme: {
+          primary: aiContent.colorScheme?.primary || '#2563EB',
+          secondary: aiContent.colorScheme?.secondary || '#1E40AF',
+          accent: aiContent.colorScheme?.accent || '#10B981',
+          background: '#FFFFFF',
+          text: '#1F2937',
+          muted: '#6B7280',
+          border: '#E5E7EB',
+          success: '#10B981',
+          warning: '#F59E0B',
+          error: '#EF4444'
+        },
+        typography: {
+          fontFamily: {
+            heading: 'Inter, sans-serif',
+            body: 'Inter, sans-serif',
+            mono: 'JetBrains Mono, monospace'
+          },
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem',
+            base: '1rem',
+            lg: '1.125rem',
+            xl: '1.25rem',
+            '2xl': '1.5rem',
+            '3xl': '1.875rem',
+            '4xl': '2.25rem'
+          },
+          fontWeight: {
+            normal: '400',
+            medium: '500',
+            semibold: '600',
+            bold: '700'
+          }
+        },
+        routing: {
+          pages: [
+            { path: '/', name: 'Main Interface', component: 'MainInterfacePage', protected: false, exact: true },
+            { path: '/analytics', name: 'Analytics', component: 'AnalyticsDashboardPage', protected: false, exact: true },
+            { path: '/account', name: 'Account', component: 'UserManagementPage', protected: false, exact: true }
+          ],
+          navigation: [
+            { label: aiContent.fields?.primaryFeature || 'Dashboard', href: '/', icon: 'Zap' },
+            { label: 'Analytics', href: '/analytics', icon: 'BarChart3' },
+            { label: 'Account', href: '/account', icon: 'User' }
+          ],
+          defaultRoute: '/'
+        },
+        dataStructure: {
+          entities: [],
+          relationships: [],
+          apiEndpoints: []
+        },
+        mockData: {
+          enabled: true,
+          realistic: true,
+          industrySpecific: true,
+          dataSize: 'medium' as any
+        },
+        features: []
+      },
+      version: '1.0.0',
+      popularity: 100,
+      lastUpdated: new Date().toISOString(),
+      author: 'Claude AI',
+      premium: false
+    };
   }
 
   private createAppCustomizationFromAIContent(
@@ -131,37 +203,115 @@ class ClaudeAIAppSelector {
     aiContent: AIGeneratedAppContent,
     startupData: any
   ) {
-    // Create customization object
     const customization: AppCustomization = {
-      templateId: aiContent.templateId,
-      fields: aiContent.fields || {},
+      templateId: template.id,
+      fields: {
+        ...aiContent.fields,
+        businessModel: aiContent.businessModel || 'Custom SaaS Platform',
+        primaryFeature: aiContent.fields?.primaryFeature || aiContent.coreFeatures?.[0] || 'Dashboard',
+        userType: aiContent.userPersonas?.[0]?.name || startupData?.targetAudience || 'Business User',
+        dataType: this.extractDataType(aiContent.businessModel, startupData?.idea),
+        actionVerb: this.extractActionVerb(aiContent.businessModel, startupData?.idea),
+        metricName: this.extractMetricName(aiContent.businessModel, startupData?.idea)
+      },
       colorScheme: {
         ...template.config.colorScheme,
         ...(aiContent.colorScheme || {})
       },
       typography: template.config.typography,
       enabledFeatures: aiContent.features || [],
-      mockData: aiContent.mockData || {},
+      mockData: {
+        ...aiContent.mockData,
+        // Ensure we have fallback data
+        primaryEntities: aiContent.mockData?.primaryEntities || this.generateFallbackEntities(aiContent.businessModel),
+        users: aiContent.mockData?.users || [
+          { name: 'Alex Chen', role: 'Manager', status: 'Active', joined: '2024-01-15' },
+          { name: 'Sarah Wilson', role: 'Analyst', status: 'Active', joined: '2024-02-20' }
+        ],
+        activities: aiContent.mockData?.activities || [
+          { action: 'Updated system', user: 'Alex Chen', timestamp: '2 hours ago', result: 'Success' },
+          { action: 'Generated report', user: 'Sarah Wilson', timestamp: '1 day ago', result: 'Completed' }
+        ],
+        metrics: aiContent.mockData?.metrics || [
+          { name: 'Success Rate', value: '94%', change: '+8%', trend: 'up' },
+          { name: 'User Satisfaction', value: '4.7/5', change: '+0.3', trend: 'up' }
+        ]
+      },
       companyData: aiContent.companyData || {
-        name: startupData?.companyName || 'Your Company',
-        tagline: 'Innovation that drives results',
-        description: startupData?.idea || 'A powerful application for business success',
+        name: startupData?.companyName || 'Your SaaS',
+        tagline: 'Transforming business operations',
+        description: startupData?.idea || 'A powerful SaaS solution',
         industry: startupData?.targetAudience || 'Technology'
       },
       routing: template.config.routing,
-      appName: aiContent.appName || `${startupData?.companyName || 'Your'} App`,
-      appDescription: aiContent.appDescription || 'A comprehensive business application'
+      appName: aiContent.appName || `${startupData?.companyName || 'Your'} SaaS`,
+      appDescription: aiContent.appDescription || 'A comprehensive business application designed for your specific needs'
     };
 
     return {
       template,
       customization,
-      reasoning: aiContent.reasoning || 'AI-generated app with personalized content and functionality',
-      confidence: aiContent.confidence || 0.8
+      reasoning: aiContent.reasoning || 'Business-specific SaaS application generated using AI analysis of startup data and reports',
+      confidence: aiContent.confidence || 0.85
     };
   }
 
-  private createFallbackAppResult(startupData: any, targetTemplateId?: string, errorMessage?: string) {
+  private extractDataType(businessModel: string = '', idea: string = ''): string {
+    const combined = `${businessModel} ${idea}`.toLowerCase();
+    
+    if (combined.includes('inventory') || combined.includes('stock')) return 'Products';
+    if (combined.includes('user') || combined.includes('customer')) return 'Users';
+    if (combined.includes('marketplace') || combined.includes('seller')) return 'Sellers';
+    if (combined.includes('analytics') || combined.includes('data')) return 'Datasets';
+    if (combined.includes('project') || combined.includes('task')) return 'Projects';
+    
+    return 'Items';
+  }
+
+  private extractActionVerb(businessModel: string = '', idea: string = ''): string {
+    const combined = `${businessModel} ${idea}`.toLowerCase();
+    
+    if (combined.includes('track') || combined.includes('monitor')) return 'Track';
+    if (combined.includes('manage') || combined.includes('organize')) return 'Manage';
+    if (combined.includes('analyze') || combined.includes('analyze')) return 'Analyze';
+    if (combined.includes('connect') || combined.includes('match')) return 'Connect';
+    
+    return 'Manage';
+  }
+
+  private extractMetricName(businessModel: string = '', idea: string = ''): string {
+    const combined = `${businessModel} ${idea}`.toLowerCase();
+    
+    if (combined.includes('inventory') || combined.includes('stock')) return 'Stock Levels';
+    if (combined.includes('marketplace')) return 'Transaction Volume';
+    if (combined.includes('analytics')) return 'Data Processing';
+    if (combined.includes('user') || combined.includes('customer')) return 'User Engagement';
+    
+    return 'Performance Score';
+  }
+
+  private generateFallbackEntities(businessModel: string = ''): any[] {
+    if (businessModel.includes('inventory')) {
+      return [
+        { name: 'Eco-Friendly Widget A', status: 'In Stock', metric: '250', category: 'Sustainable' },
+        { name: 'Recycled Component B', status: 'Low Stock', metric: '45', category: 'Green' }
+      ];
+    }
+    
+    if (businessModel.includes('marketplace')) {
+      return [
+        { name: 'Premium Seller', status: 'Verified', metric: '4.8', category: 'Top Rated' },
+        { name: 'Growing Business', status: 'Active', metric: '4.2', category: 'Standard' }
+      ];
+    }
+    
+    return [
+      { name: 'Sample Entity A', status: 'Active', metric: '100', category: 'Primary' },
+      { name: 'Sample Entity B', status: 'Pending', metric: '85', category: 'Secondary' }
+    ];
+  }
+
+  private createFallbackBusinessApp(startupData: any, targetTemplateId?: string, errorMessage?: string) {
     const templates = appTemplateManager.getTemplates();
     const fallbackTemplate = targetTemplateId 
       ? appTemplateManager.getTemplate(targetTemplateId) || templates[0]
@@ -213,8 +363,8 @@ class ClaudeAIAppSelector {
     return {
       template: fallbackTemplate,
       customization: fallbackCustomization,
-      reasoning: `Using fallback app content${errorMessage ? ` due to: ${errorMessage}` : ''}. Template selected based on business type and industry.`,
-      confidence: 0.6
+      reasoning: `Generated business-specific fallback SaaS application${errorMessage ? ` due to: ${errorMessage}` : ''}. Application designed based on startup idea and target audience.`,
+      confidence: 0.7
     };
   }
 
