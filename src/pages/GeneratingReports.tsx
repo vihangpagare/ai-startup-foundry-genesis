@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRetryLogic } from '@/hooks/useRetryLogic';
 
 interface GenerationStatus {
   'business-plan': 'pending' | 'loading' | 'complete' | 'error';
@@ -36,6 +37,7 @@ const GeneratingReports = () => {
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const generationLockRef = useRef(false);
   const currentGenerationSessionRef = useRef<string | null>(null);
+  const { executeWithRetry } = useRetryLogic({ maxAttempts: 3, baseDelay: 2000 });
   
   const [generationState, setGenerationState] = useState<GenerationState>(() => {
     // Try to restore from localStorage
@@ -103,68 +105,79 @@ const GeneratingReports = () => {
     }
   }, [navigate]);
 
-  // Memoized report generation function
-  const generateReport = useCallback(async (analysisType: string, data: any): Promise<boolean> => {
-    if (generationLockRef.current || generationState.isPaused) {
-      console.log('Generation locked or paused, skipping:', analysisType);
-      return false;
-    }
-
-    if (currentGenerationSessionRef.current !== generationState.sessionId) {
-      console.log('Session changed, aborting generation:', analysisType);
-      return false;
-    }
-
-    console.log(`Starting generation for ${analysisType}`);
+  // Stable report generation function with timeout handling
+  const generateSingleReport = useCallback(async (analysisType: string, data: any, sessionId: string): Promise<boolean> => {
+    console.log(`Starting generation for ${analysisType} with session ${sessionId}`);
     
+    // Check if generation should proceed
+    if (generationLockRef.current === false || currentGenerationSessionRef.current !== sessionId) {
+      console.log(`Generation aborted for ${analysisType} - session mismatch or not locked`);
+      return false;
+    }
+
+    // Update status to loading using functional update
     setGenerationState(prev => ({
       ...prev,
       status: { ...prev.status, [analysisType]: 'loading' }
     }));
 
     try {
-      const { data: result, error } = await supabase.functions.invoke('ai-startup-analysis', {
-        body: {
-          idea: data.idea,
-          companyName: data.companyName,
-          targetAudience: data.targetAudience,
-          problemStatement: data.problemStatement,
-          solution: data.solution,
-          uniqueValue: data.uniqueValue,
-          analysisType: analysisType
+      const result = await executeWithRetry(async () => {
+        // Add timeout wrapper for edge function call
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
+        try {
+          const { data: result, error } = await supabase.functions.invoke('ai-startup-analysis', {
+            body: {
+              idea: data.idea,
+              companyName: data.companyName,
+              targetAudience: data.targetAudience,
+              problemStatement: data.problemStatement,
+              solution: data.solution,
+              uniqueValue: data.uniqueValue,
+              analysisType: analysisType
+            }
+          });
+
+          clearTimeout(timeoutId);
+
+          if (error) throw error;
+          if (!result?.success) throw new Error(result?.error || 'Generation failed');
+          
+          return result;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          throw error;
         }
       });
 
-      // Check if session is still valid
-      if (currentGenerationSessionRef.current !== generationState.sessionId) {
-        console.log('Session changed during generation, discarding result:', analysisType);
+      // Verify session is still valid before updating state
+      if (currentGenerationSessionRef.current !== sessionId) {
+        console.log(`Session changed during ${analysisType} generation, discarding result`);
         return false;
       }
 
-      if (error) throw error;
+      console.log(`${analysisType} completed successfully`);
       
-      if (result?.success) {
-        console.log(`${analysisType} completed successfully`);
-        
-        setGenerationState(prev => ({
-          ...prev,
-          status: { ...prev.status, [analysisType]: 'complete' },
-          generatedContent: { ...prev.generatedContent, [analysisType]: result.analysis }
-        }));
-        
-        toast({
-          title: "Report Generated",
-          description: `${analysisTypes.find(t => t.key === analysisType)?.name} completed successfully`,
-        });
-        
-        return true;
-      } else {
-        throw new Error(result?.error || 'Generation failed');
-      }
+      // Update state with functional updates to avoid stale closures
+      setGenerationState(prev => ({
+        ...prev,
+        status: { ...prev.status, [analysisType]: 'complete' },
+        generatedContent: { ...prev.generatedContent, [analysisType]: result.analysis }
+      }));
+      
+      toast({
+        title: "Report Generated",
+        description: `${analysisTypes.find(t => t.key === analysisType)?.name} completed successfully`,
+      });
+      
+      return true;
     } catch (err: any) {
       console.error(`${analysisType} generation error:`, err);
       
-      if (currentGenerationSessionRef.current === generationState.sessionId) {
+      // Only update state if session is still valid
+      if (currentGenerationSessionRef.current === sessionId) {
         setGenerationState(prev => ({
           ...prev,
           status: { ...prev.status, [analysisType]: 'error' }
@@ -179,34 +192,48 @@ const GeneratingReports = () => {
       
       return false;
     }
-  }, [generationState.sessionId, generationState.isPaused, toast, analysisTypes]);
+  }, [toast, analysisTypes, executeWithRetry]);
 
-  // Memoized sequential generation function
-  const generateReportsSequentially = useCallback(async (data: any) => {
+  // Stable sequential generation function with proper session management
+  const startSequentialGeneration = useCallback(async (data: any) => {
+    console.log('Starting sequential generation with session:', sessionId);
+    
+    // Prevent multiple generations
     if (generationLockRef.current) {
       console.log('Generation already in progress, skipping');
       return;
     }
 
+    // Initialize session and lock
     generationLockRef.current = true;
-    currentGenerationSessionRef.current = generationState.sessionId;
+    currentGenerationSessionRef.current = sessionId;
     
-    console.log('Starting sequential generation of reports...', generationState.sessionId);
-    
+    // Update state to indicate generation started
     setGenerationState(prev => ({ ...prev, isGenerating: true }));
 
     try {
-      for (let i = generationState.currentIndex; i < analysisTypes.length; i++) {
+      // Get current state for iteration
+      const currentState = JSON.parse(localStorage.getItem('generation_state') || '{}');
+      const startIndex = currentState.currentIndex || 0;
+
+      for (let i = startIndex; i < analysisTypes.length; i++) {
         // Check if generation should stop
-        if (generationState.isPaused || currentGenerationSessionRef.current !== generationState.sessionId) {
+        if (!generationLockRef.current || currentGenerationSessionRef.current !== sessionId) {
           console.log('Generation stopped at index:', i);
+          break;
+        }
+
+        // Check if paused
+        const latestState = JSON.parse(localStorage.getItem('generation_state') || '{}');
+        if (latestState.isPaused) {
+          console.log('Generation paused at index:', i);
           break;
         }
 
         const type = analysisTypes[i];
         
         // Skip if already completed
-        if (generationState.status[type.key as keyof GenerationStatus] === 'complete') {
+        if (latestState.status?.[type.key] === 'complete') {
           console.log('Skipping already completed report:', type.key);
           continue;
         }
@@ -215,25 +242,33 @@ const GeneratingReports = () => {
         setGenerationState(prev => ({ ...prev, currentIndex: i }));
         
         // Add delay between reports (except first)
-        if (i > generationState.currentIndex) {
-          await new Promise(resolve => setTimeout(resolve, 4000));
+        if (i > startIndex) {
+          await new Promise(resolve => setTimeout(resolve, 3000));
         }
         
         // Generate the report
-        const success = await generateReport(type.key, data);
+        const success = await generateSingleReport(type.key, data, sessionId);
         
         // Check if we should continue
-        if (!success || generationState.isPaused || currentGenerationSessionRef.current !== generationState.sessionId) {
+        if (!success || !generationLockRef.current || currentGenerationSessionRef.current !== sessionId) {
+          console.log('Breaking generation loop due to failure or session change');
           break;
         }
       }
+    } catch (error) {
+      console.error('Sequential generation error:', error);
+      toast({
+        title: "Generation Error",
+        description: "An error occurred during report generation. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       generationLockRef.current = false;
       setGenerationState(prev => ({ ...prev, isGenerating: false }));
     }
     
     console.log('Sequential generation completed');
-  }, [generationState.sessionId, generationState.currentIndex, generationState.isPaused, generationState.status, generateReport, analysisTypes]);
+  }, [sessionId, generateSingleReport, analysisTypes, toast]);
 
   // Start generation when idea data is available
   useEffect(() => {
@@ -244,10 +279,10 @@ const GeneratingReports = () => {
       // Only start if not all reports are complete
       if (completedReports < totalReports) {
         console.log('Starting generation process...');
-        generateReportsSequentially(ideaData);
+        startSequentialGeneration(ideaData);
       }
     }
-  }, [ideaData, generationState.isGenerating, generationState.isPaused, generateReportsSequentially, generationState.status, analysisTypes.length]);
+  }, [ideaData]); // Removed circular dependencies
 
   // Check completion and redirect
   useEffect(() => {
@@ -298,6 +333,7 @@ const GeneratingReports = () => {
   const pauseGeneration = useCallback(() => {
     console.log('Pausing generation');
     setGenerationState(prev => ({ ...prev, isPaused: true }));
+    generationLockRef.current = false;
     currentGenerationSessionRef.current = null;
   }, []);
 
@@ -305,9 +341,9 @@ const GeneratingReports = () => {
     console.log('Resuming generation');
     setGenerationState(prev => ({ ...prev, isPaused: false }));
     if (ideaData) {
-      generateReportsSequentially(ideaData);
+      startSequentialGeneration(ideaData);
     }
-  }, [ideaData, generateReportsSequentially]);
+  }, [ideaData, startSequentialGeneration]);
 
   const retryGeneration = useCallback(() => {
     console.log('Retrying generation...');
