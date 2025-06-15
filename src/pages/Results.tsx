@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +20,7 @@ import LandingPageGenerator from '@/components/LandingPageGenerator';
 // Import enhanced components
 import EnhancedDataVisualization from '@/components/EnhancedDataVisualization';
 import EnhancedReportRenderer from '@/components/EnhancedReportRenderer';
+import SimplifiedReportRenderer from '@/components/SimplifiedReportRenderer';
 
 // Import export utilities
 import { exportToPDF, downloadCompletePackage } from '@/utils/exportUtils';
@@ -196,7 +196,7 @@ const Results = () => {
             <TabsContent value="business-plan">
               <ErrorBoundary>
                 {reports['business-plan'] ? (
-                  <EnhancedReportRenderer 
+                  <SimplifiedReportRenderer 
                     content={reports['business-plan']} 
                     title="Business Plan Analysis" 
                     type="business-plan" 
@@ -210,7 +210,7 @@ const Results = () => {
             <TabsContent value="marketing">
               <ErrorBoundary>
                 {reports['marketing'] ? (
-                  <EnhancedReportRenderer 
+                  <SimplifiedReportRenderer 
                     content={reports['marketing']} 
                     title="Marketing Strategy" 
                     type="marketing" 
@@ -224,7 +224,7 @@ const Results = () => {
             <TabsContent value="competitive">
               <ErrorBoundary>
                 {reports['competitive'] ? (
-                  <EnhancedReportRenderer 
+                  <SimplifiedReportRenderer 
                     content={reports['competitive']} 
                     title="Competitive Analysis" 
                     type="competitive" 
@@ -238,7 +238,7 @@ const Results = () => {
             <TabsContent value="technical">
               <ErrorBoundary>
                 {reports['technical'] ? (
-                  <EnhancedReportRenderer 
+                  <SimplifiedReportRenderer 
                     content={reports['technical']} 
                     title="Technical Specifications" 
                     type="technical" 
@@ -252,7 +252,7 @@ const Results = () => {
             <TabsContent value="financial">
               <ErrorBoundary>
                 {reports['financial'] ? (
-                  <EnhancedReportRenderer 
+                  <SimplifiedReportRenderer 
                     content={reports['financial']} 
                     title="Financial Projections" 
                     type="financial" 
@@ -266,7 +266,7 @@ const Results = () => {
             <TabsContent value="ux-design">
               <ErrorBoundary>
                 {reports['ux-design'] ? (
-                  <EnhancedReportRenderer 
+                  <SimplifiedReportRenderer 
                     content={reports['ux-design']} 
                     title="UX Design Specifications" 
                     type="ux-design" 
