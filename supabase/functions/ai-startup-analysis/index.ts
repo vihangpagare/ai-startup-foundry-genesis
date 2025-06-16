@@ -34,7 +34,7 @@ serve(async (req) => {
       throw new Error('Missing required fields: idea and analysisType')
     }
 
-    // Get market research data with error handling
+    // Get market research data with error handling and size limits
     let marketResearch = ''
     try {
       const exaApiKey = Deno.env.get('EXA_API_KEY')
@@ -42,6 +42,12 @@ serve(async (req) => {
         console.log('Fetching market research...')
         marketResearch = await fetchMarketResearch(request.idea, exaApiKey)
         console.log('Market research completed, length:', marketResearch.length)
+        
+        // If market research is extremely large, truncate early
+        if (marketResearch.length > 500000) {
+          console.log('Market research too large, truncating early...')
+          marketResearch = marketResearch.substring(0, 50000) + '\n[Market research truncated due to size constraints]'
+        }
       } else {
         console.log('EXA_API_KEY not available, proceeding without market research')
       }
@@ -50,7 +56,7 @@ serve(async (req) => {
       marketResearch = 'Market research data temporarily unavailable. Analysis based on provided startup data.'
     }
 
-    // Generate analysis using OpenAI
+    // Generate analysis using OpenAI with improved error handling
     console.log('Starting analysis generation with OpenAI...')
     const analysis = await generateAnalysis(request, marketResearch, openaiApiKey)
     
