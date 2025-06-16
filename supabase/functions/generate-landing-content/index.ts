@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -31,7 +32,7 @@ interface GeneratedContent {
 }
 
 const extractJsonFromResponse = (text: string): any => {
-  // Try to find JSON in the response, handling cases where Claude adds extra text
+  // Try to find JSON in the response, handling cases where OpenAI adds extra text
   const jsonStart = text.indexOf('{');
   const jsonEnd = text.lastIndexOf('}');
   
@@ -191,10 +192,10 @@ serve(async (req) => {
   }
 
   try {
-    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
-    if (!anthropicApiKey) {
-      console.error('ANTHROPIC_API_KEY not configured');
-      throw new Error('ANTHROPIC_API_KEY not configured');
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      console.error('OPENAI_API_KEY not configured');
+      throw new Error('OPENAI_API_KEY not configured');
     }
 
     const { startupData, reports, templates, targetTemplateId }: ContentGenerationRequest = await req.json();
@@ -218,16 +219,15 @@ serve(async (req) => {
 
       const prompt = generateSpecificContentPrompt(startupData, reports || {}, template);
       
-      console.log('Calling Claude API for specific template content...');
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      console.log('Calling OpenAI API for specific template content...');
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': anthropicApiKey,
-          'anthropic-version': '2023-06-01'
+          'Authorization': `Bearer ${openaiApiKey}`,
         },
         body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
+          model: 'gpt-4o',
           max_tokens: 2000,
           messages: [{
             role: 'user',
@@ -236,29 +236,29 @@ serve(async (req) => {
         })
       });
 
-      console.log('Claude API response status:', response.status);
+      console.log('OpenAI API response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Claude API error response:', errorText);
-        throw new Error(`Claude API error: ${response.status} - ${errorText}`);
+        console.error('OpenAI API error response:', errorText);
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Claude API response received, parsing content...');
+      console.log('OpenAI API response received, parsing content...');
       
-      if (!data.content || !data.content[0] || !data.content[0].text) {
-        console.error('Invalid Claude API response structure:', data);
-        throw new Error('Invalid response structure from Claude API');
+      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        console.error('Invalid OpenAI API response structure:', data);
+        throw new Error('Invalid response structure from OpenAI API');
       }
 
       let content;
       try {
-        content = extractJsonFromResponse(data.content[0].text);
-        console.log('Successfully parsed JSON from Claude response');
+        content = extractJsonFromResponse(data.choices[0].message.content);
+        console.log('Successfully parsed JSON from OpenAI response');
       } catch (parseError) {
         console.error('JSON parsing failed:', parseError.message);
-        console.error('Raw response:', data.content[0].text);
+        console.error('Raw response:', data.choices[0].message.content);
         
         // Use fallback content
         console.log('Using fallback content due to JSON parsing failure');
@@ -283,16 +283,15 @@ serve(async (req) => {
       // AI template selection + content generation
       const prompt = generateTemplateAnalysisPrompt(startupData, reports || {}, templates || []);
       
-      console.log('Calling Claude API for template selection and content generation...');
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      console.log('Calling OpenAI API for template selection and content generation...');
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': anthropicApiKey,
-          'anthropic-version': '2023-06-01'
+          'Authorization': `Bearer ${openaiApiKey}`,
         },
         body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
+          model: 'gpt-4o',
           max_tokens: 3000,
           messages: [{
             role: 'user',
@@ -301,28 +300,28 @@ serve(async (req) => {
         })
       });
 
-      console.log('Claude API response status:', response.status);
+      console.log('OpenAI API response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Claude API error response:', errorText);
-        throw new Error(`Claude API error: ${response.status} - ${errorText}`);
+        console.error('OpenAI API error response:', errorText);
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Claude API response received, parsing content...');
+      console.log('OpenAI API response received, parsing content...');
       
-      if (!data.content || !data.content[0] || !data.content[0].text) {
-        console.error('Invalid Claude API response structure:', data);
-        throw new Error('Invalid response structure from Claude API');
+      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        console.error('Invalid OpenAI API response structure:', data);
+        throw new Error('Invalid response structure from OpenAI API');
       }
 
       try {
-        generatedContent = extractJsonFromResponse(data.content[0].text);
-        console.log('Successfully parsed JSON from Claude response');
+        generatedContent = extractJsonFromResponse(data.choices[0].message.content);
+        console.log('Successfully parsed JSON from OpenAI response');
       } catch (parseError) {
         console.error('JSON parsing failed:', parseError.message);
-        console.error('Raw response:', data.content[0].text);
+        console.error('Raw response:', data.choices[0].message.content);
         
         // Use fallback content with first available template
         const fallbackTemplateId = templates?.[0]?.id || 'modern-saas';

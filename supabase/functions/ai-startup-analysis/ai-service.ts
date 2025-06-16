@@ -5,32 +5,35 @@ import { getSystemPrompt, buildUserPrompt } from './prompts.ts';
 export async function generateAnalysis(
   request: AnalysisRequest,
   marketResearch: string,
-  anthropicApiKey: string
+  openaiApiKey: string
 ): Promise<string> {
   const { idea, companyName, targetAudience, problemStatement, solution, uniqueValue, analysisType } = request;
   
   const systemPrompt = getSystemPrompt(analysisType);
   const userPrompt = buildUserPrompt(idea, companyName, targetAudience, problemStatement, solution, uniqueValue, marketResearch, analysisType);
 
-  console.log('Calling Anthropic API with enhanced research data...');
-  console.log('Using API key starting with:', anthropicApiKey.substring(0, 15));
+  console.log('Calling OpenAI API with enhanced research data...');
+  console.log('Using API key starting with:', openaiApiKey.substring(0, 15));
   console.log('Market research data length:', marketResearch.length);
   
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'x-api-key': anthropicApiKey,
+      'Authorization': `Bearer ${openaiApiKey}`,
       'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'gpt-4o',
       max_tokens: 8000,
       temperature: 0.7,
       messages: [
         {
+          role: 'system',
+          content: systemPrompt
+        },
+        {
           role: 'user',
-          content: `${systemPrompt}\n\n${userPrompt}
+          content: `${userPrompt}
 
 IMPORTANT FORMATTING REQUIREMENTS:
 1. Use proper markdown formatting with headers (##, ###), lists, and emphasis
@@ -50,16 +53,16 @@ The output should be visually appealing, well-structured, and easy to read with 
     }),
   });
 
-  console.log('Anthropic API response status:', response.status);
+  console.log('OpenAI API response status:', response.status);
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('Anthropic API error details:', errorText);
-    throw new Error(`Anthropic API error: ${response.status} - ${errorText}`);
+    console.error('OpenAI API error details:', errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
-  const analysis = data.content[0].text;
+  const analysis = data.choices[0].message.content;
 
   console.log('Enhanced analysis generated successfully, length:', analysis?.length);
   
