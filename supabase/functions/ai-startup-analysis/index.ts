@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0'
 import { generateAnalysis } from './ai-service.ts'
 import { AnalysisRequest } from './types.ts'
-import { getMarketResearch } from './market-research.ts'
+import { fetchMarketResearch } from './research.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,7 +40,7 @@ serve(async (req) => {
       const exaApiKey = Deno.env.get('EXA_API_KEY')
       if (exaApiKey) {
         console.log('Fetching market research...')
-        marketResearch = await getMarketResearch(request, exaApiKey)
+        marketResearch = await fetchMarketResearch(request.idea, exaApiKey)
         console.log('Market research completed, length:', marketResearch.length)
       } else {
         console.log('EXA_API_KEY not available, proceeding without market research')
